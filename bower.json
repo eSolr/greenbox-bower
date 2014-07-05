@@ -12,5 +12,8 @@
     "greenbox",
     "esolr"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "ignore": [
+	  ".gitignore"
+  ]
 }
