@@ -2,11 +2,10 @@
   "name": "greenbox",
   "version": "0.9.0",
   "homepage": "https://github.com/eSolr/greenbox-bower.git",
-  "main": "dist/js/esolr.min.js",
   "authors": [
     "Armin"
   ],
-  "description": "SASS Framework with a bit of jquery",
+  "description": "SASS Framework with a bit of jQuery",
   "keywords": [
     "css",
     "scss",
