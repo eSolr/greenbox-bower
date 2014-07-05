@@ -1,0 +1,35 @@
+//	@desc		CSS3 Transitions
+//	@name
+//	@author		Armin
+//	@tested
+//	@requires	_prefix.scss
+
+//	Resource
+//	http://css-tricks.com/almanac/properties/t/transition/
+//	http://css-tricks.com/almanac/properties/t/transition-timing-function/
+//	http://www.roblaplaca.com/examples/bezierBuilder/
+
+//	Parameters
+//	transition: [transition-property] [transition-duration] [transition-timing-function] [transition-delay];
+
+@mixin transition($args...) {
+	@include prefix("transition", $args, webkit moz o);
+}
+
+@mixin transition-property($args...) {
+	@include prefix("transition-property", $args, webkit moz o);
+}
+
+@mixin transition-timing-function($args...) {
+	@include prefix("transition-timing-function", $args, webkit moz o);
+}
+
+@mixin transition-duration($args...) {
+	@include prefix("transition-duration", $args, webkit moz o);
+}
+
+//	ease|linear|ease-in|ease-out|ease-in-out|step-start|step-end
+
+@mixin transition-delay($args...) {
+	@include prefix("transition-delay", $args, webkit moz o);
+}

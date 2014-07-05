@@ -1,0 +1,132 @@
+/*
+	todo	lekezelni a bal és jobb belső margó kérdését
+
+	Research	Media Query
+				http://css-tricks.com/css-media-queries/
+				http://5by5.tv/bigwebshow/9
+				http://stuffandnonsense.co.uk/blog/about/proportional_leading_with_css3_media_queries/
+				http://andycroll.com
+				http://cssmediaqueries.com/overview.html
+				http://css-tricks.com/snippets/css/retina-display-media-query/
+				http://blog.14islands.com/post/37259603246/sass-resolution-mixin
+
+				Kerekítési probléma
+				http://www.palantir.net/blog/responsive-design-s-dirty-little-secret
+				http://ejohn.org/blog/sub-pixel-problems-in-css/
+				http://css-tricks.com/percentage-bugs-in-webkit/
+				http://meyerweb.com/eric/thoughts/2010/02/10/rounding-off/
+				http://webweaversworld.blogspot.hu/2009/10/quick-fix-for-1px-rounding-error.html
+				http://nimbupani.com/using-decimal-percentage-values-in-responsive-design.html
+
+				Browser detection
+				http://www.pontikis.net/tip/?id=27
+				http://modernizr.com/download/
+*/
+
+
+$g2-grid-columns:		12;
+$g2-grid-gutter:		20px;
+$g2-grid-max-width:		1200px;
+$g2-grid-unit-depth:	4;		// max 5 level (.unit-2 .unit-1 etc.)
+$g2-grid-block:			float;	// float|inline-block
+$g2-grid-align:			center;	// left|center|right
+$g2-grid-direction:		left;	// reading direction 	if grid is floating
+$g2-grid-valign:		top;	// if $g2-grid-block is inline-block
+$g2-grid-wrap-class:	grid;
+
+
+//	makes all gri
+.#{$g2-grid-wrap-class},
+.#{$g2-grid-wrap-class} * {
+	@include border-box;
+}
+
+//	column wrapper class
+.#{$g2-grid-wrap-class} {
+	float: none;
+	@if $g2-grid-align == center {
+		margin-left: auto;
+		margin-right: auto;
+	}
+//	width: $g2-grid-max-width;
+	max-width: $g2-grid-max-width;
+	@include clearfix;
+
+	.#{$g2-grid-wrap-class} {
+		margin-left: $g2-grid-gutter / -2;
+		margin-right: $g2-grid-gutter / -2;
+	}
+}
+
+//	alap unit jellemzők
+.unit-base {
+	//	eldöthető, hogy float-tal vagy inline-block-kal szeretnénk-e használni a gridünket
+	@if $g2-grid-block == inline-block {
+		@include inline-block;
+		margin-right: -4px;
+		vertical-align: top;
+	} @else {
+		float: $g2-grid-direction;
+	}
+	position: relative;
+	padding-left: $g2-grid-gutter / 2;
+	padding-right: $g2-grid-gutter / 2;
+	min-height: 1px;	// prevent column collapse if empty
+}
+
+//	visszaadja a unit szélességét az teljes oszlopszám és szülő oszlopszélesség alányában
+@function get-unit-width($units, $parent-unit: false) {
+	@if $parent-unit != false {
+		@return ((100 / $g2-grid-columns) * $units * ($g2-grid-columns / $parent-unit))#{"%"};
+	}
+	@else {
+//		@return (100 / $g2-grid-columns) * $units * 1%;
+		@return ((100 / 12) * $units)#{"%"};
+	}
+}
+
+//	legenerálja 5 szint mélységig a unit szélességeket; ha a második paraméter igaz, akkor ellátja unit jellemzőkkel
+@mixin -generate-grid-width($prefix, $is-column: true) {
+
+	// level 1
+	@for $i from 1 through $g2-grid-columns {
+		.#{$prefix}#{$i} {
+			@if $is-column { @extend .unit-base; }
+			width: get-unit-width($i);
+
+			// level 2
+			@for $j from 1 through $i {
+				.#{$prefix}#{$j} {
+					@if $is-column { @extend .unit-base; }
+					width: get-unit-width($j, $i);
+
+					// level 3
+					@for $k from 1 through $j {
+						.#{$prefix}#{$k} {
+							@if $is-column { @extend .unit-base; }
+							width: get-unit-width($k, $j);
+
+							// level 4
+							/*@for $l from 1 through $k {
+								.#{$prefix}#{$l} {
+									@if $is-column { @extend .unit-base; }
+									width: get-unit-width($l, $k);
+
+									// level 5
+									@for $m from 1 through $l {
+										.#{$prefix}#{$m} {
+											@if $is-column { @extend .unit-base; }
+											width: get-unit-width($m, $l);
+										}
+									}
+								}
+							}*/
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+@include -generate-grid-width("unit-", true);

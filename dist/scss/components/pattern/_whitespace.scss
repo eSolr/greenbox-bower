@@ -1,0 +1,119 @@
+//
+//	@desc		Create spacing classes and default spacing
+//	@name		Whitespace
+//	@author
+//	@tested		Safari, Chrome, Firefox, IE7+
+//	@requires	_esolr-settings.scss
+//
+//	todo		negatív értékekre is megcsinálni
+
+
+//	––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+//	NEW spacing states
+//
+
+//	––––––––––––––
+//	outer spacing
+
+
+//	margin top
+.no-margin-top		{ margin-top: 0 !important; }
+.margin-top			{ margin-top: $baseline; }
+.margin-top-half	{ margin-top: $baseline / 2; }
+.margin-top-third	{ margin-top: $baseline / 3; }
+.margin-top-dbl		{ margin-top: $baseline * 2; }
+
+//	margin bottom
+.no-margin-bottom	{ margin-bottom: 0 !important; }
+.margin-bottom		{ margin-bottom: $baseline; }
+.margin-bottom-half	{ margin-bottom: $baseline / 2; }
+.margin-bottom-third{ margin-bottom: $baseline / 3; }
+.margin-bottom-dbl	{ margin-bottom: $baseline * 2; }
+
+//	vertical margin
+.no-vmargin			{ @extend .no-margin-top;		@extend .no-margin-bottom; }
+.vmargin			{ @extend .margin-top;			@extend .margin-bottom; }
+.vmargin-half		{ @extend .margin-top-half;		@extend .margin-bottom-half; }
+.vmargin-third		{ @extend .margin-top-third;	@extend .margin-bottom-third; }
+.vmargin-dbl		{ @extend .margin-top-dbl;		@extend .margin-bottom-dbl; }
+
+//	margin left
+.no-margin-left		{ margin-left: 0 !important; }
+.margin-left		{ margin-left: $es-grid-gutter; }
+.margin-left-half	{ margin-left: $es-grid-gutter / 2; }
+.margin-left-third	{ margin-left: $es-grid-gutter / 3; }
+.margin-left-dbl	{ margin-left: $es-grid-gutter * 2; }
+
+//	margin right
+.no-margin-right	{ margin-right: 0 !important; }
+.margin-right		{ margin-right: $es-grid-gutter; }
+.margin-right-half	{ margin-right: $es-grid-gutter / 2; }
+.margin-right-third	{ margin-right: $es-grid-gutter / 3; }
+.margin-right-dbl	{ margin-right: $es-grid-gutter * 2; }
+
+//	horizontal margin
+.no-hmargin			{ @extend .no-margin-left;		@extend .no-margin-right; }
+.hmargin			{ @extend .margin-left;			@extend .margin-right; }
+.hmargin-half		{ @extend .margin-left-half;	@extend .margin-right-half; }
+.hmargin-third		{ @extend .margin-left-third;	@extend .margin-right-third; }
+.hmargin-dbl		{ @extend .margin-left-dbl;		@extend .margin-right-dbl; }
+
+//	margin
+.no-margin			{ @extend .no-hmargin;		@extend .no-vmargin; }
+.margin				{ @extend .hmargin;			@extend .vmargin; }
+.margin-half		{ @extend .hmargin-half;	@extend .vmargin-half; }
+.margin-third		{ @extend .hmargin-third;	@extend .vmargin-third; }
+.margin-dbl			{ @extend .hmargin-dbl;		@extend .vmargin-dbl; }
+
+
+//	––––––––––––––
+//	inner spacing
+
+//	padding top
+.no-padding-top			{ padding-top: 0 !important; }
+.padding-top			{ padding-top: $baseline; }
+.padding-top-half		{ padding-top: $baseline / 2; }
+.padding-top-third		{ padding-top: $baseline / 3; }
+.padding-top-dbl		{ padding-top: $baseline * 2; }
+
+//	padding bottom
+.no-padding-bottom		{ padding-bottom: 0 !important; }
+.padding-bottom			{ padding-bottom: $baseline; }
+.padding-bottom-half	{ padding-bottom: $baseline / 2; }
+.padding-bottom-third	{ padding-bottom: $baseline / 3; }
+.padding-bottom-dbl		{ padding-bottom: $baseline * 2; }
+
+//	vertical padding
+.no-vpadding			{ @extend .no-padding-top;		@extend .no-padding-bottom; }
+.vpadding				{ @extend .padding-top;			@extend .padding-bottom; }
+.vpadding-half			{ @extend .padding-top-half;	@extend .padding-bottom-half; }
+.vpadding-third			{ @extend .padding-top-third;	@extend .padding-bottom-third; }
+.vpadding-dbl			{ @extend .padding-top-dbl;		@extend .padding-bottom-dbl; }
+
+//	padding left
+.no-padding-left		{ padding-left: 0 !important; }
+.padding-left			{ padding-left: $es-grid-gutter; }
+.padding-left-half		{ padding-left: $es-grid-gutter / 2; }
+.padding-left-third		{ padding-left: $es-grid-gutter / 3; }
+.padding-left-dbl		{ padding-left: $es-grid-gutter * 2; }
+
+//	padding right
+.no-padding-right		{ padding-right: 0 !important; }
+.padding-right			{ padding-right: $es-grid-gutter; }
+.padding-right-half		{ padding-right: $es-grid-gutter / 2; }
+.padding-right-third	{ padding-right: $es-grid-gutter / 3; }
+.padding-right-dbl		{ padding-right: $es-grid-gutter * 2; }
+
+//	horizontal padding
+.no-hpadding			{ @extend .no-padding-left;		@extend .no-padding-right; }
+.hpadding				{ @extend .padding-left;		@extend .padding-right; }
+.hpadding-half			{ @extend .padding-left-half;	@extend .padding-right-half; }
+.hpadding-third			{ @extend .padding-left-third;	@extend .padding-right-third; }
+.hpadding-dbl			{ @extend .padding-left-dbl;	@extend .padding-right-dbl; }
+
+//	padding
+.no-padding				{ @extend .no-hpadding;		@extend .no-vpadding; }
+.padding				{ @extend .hpadding;		@extend .vpadding; }
+.padding-half			{ @extend .hpadding-half;	@extend .vpadding-half; }
+.padding-third			{ @extend .hpadding-third;	@extend .vpadding-third; }
+.padding-dbl			{ @extend .hpadding-dbl;	@extend .vpadding-dbl; }

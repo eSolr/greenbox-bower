@@ -1,0 +1,37 @@
+//	@desc         Keep inline and inline-block elements at the same line
+//	@name         No wrap
+//	@author
+//	@tested
+//	@requires
+
+//	Research	http://css-tricks.com/almanac/properties/w/whitespace/
+
+//				New			Spaces 		Text
+//				lines		and tabs	wrapping
+//				--------	--------	--------
+//	normal		Collapse	Collapse	Wrap
+//	pre			Preserve	Preserve	No wrap
+//	nowrap		Collapse	Collapse	No wrap
+//	pre-wrap	Preserve	Preserve	Wrap
+//	pre-line	Preserve	Collapse	Wrap
+
+
+.has-normal-wrap {
+	white-space: normal;
+}
+
+.has-no-wrap {
+	white-space: nowrap;
+}
+
+.has-pre {
+	white-space: pre;
+}
+
+.has-pre-wrap {
+	white-space: pre-wrap;
+}
+
+.has-pre-line {
+	white-space: pre-line;
+}

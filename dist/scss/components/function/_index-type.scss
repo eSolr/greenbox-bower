@@ -1,0 +1,19 @@
+//	@desc		Returns the first occurence of a type in a list, else it is false
+//	@name
+//	@author		Armin
+//	@requires
+
+
+//	Usage:		index-type(apple 23 nine 1 6, number)		// 2
+//				index-type(2 3 apple 8 99, string)			// 3
+//				index-type(apple banana (1 2 3), list)		// 3
+
+
+@function index-type($index-type-list, $arg-type) {
+  @for $i from 1 through length($index-type-list) {
+    @if type-of(nth($index-type-list, $i)) == list {
+      @return $i;
+    }
+  }
+  @return false;
+}

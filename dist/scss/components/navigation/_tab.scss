@@ -1,0 +1,49 @@
+//	@desc		Content tab
+//	@name		Tabs
+//	@author
+//	@tested
+//	@requires
+//
+//	todo		kibogarászni
+
+
+
+.tab-group {
+	margin-bottom: 20px;
+	border-bottom: 1px solid lighten($text-color, 55%);
+
+	& > * {
+		margin-bottom: 0 !important;
+
+		&:first-child {
+			margin-left: 10px;
+		}
+	}
+}
+
+.tab {
+	display: block;
+	margin-right: 5px;
+	margin-bottom: -1px;
+	padding: 10px 15px;
+	font-family: $font-family-1;
+	color: $text-color;
+	@include border-radius(5px 5px 0 0);
+	background-color: lighten($text-color, 65%);
+	border: 1px solid lighten($text-color, 55%);
+	border-bottom: none;
+
+	&:hover {
+		text-decoration: none;
+		background-color: lighten($text-color, 60%);
+	}
+
+	.selected & {
+		background-color: $bg-color;
+		border-bottom: 1px solid $bg-color;
+
+		&:hover {
+			background-color: $bg-color;
+		}
+	}
+}

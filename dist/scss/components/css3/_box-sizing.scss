@@ -1,0 +1,21 @@
+//	@desc		Sets the box model: content-box or border-box
+//	@name
+//	@author		Armin
+//	@tested
+//	@requires	_prefix.scss
+
+
+//	Parameters:
+//	content-box, border-box, inherit
+
+@mixin box-sizing($args...) {
+	@include prefix("box-sizing", $args, webkit moz ms);
+}
+
+@mixin content-box {
+	@include box-sizing(content-box);
+}
+
+@mixin border-box {
+	@include box-sizing(border-box);
+}

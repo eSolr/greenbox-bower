@@ -1,0 +1,58 @@
+//  ------------------------------------------------------------
+// Definig grid specific debug function.
+// ------------------------------------------------------------
+// This sass is not for direct import.
+
+
+
+//@import "esolr/utility/msg";
+
+
+//
+//  Debug mode
+//
+
+//  use $DEBUG: true to make visible the grid
+@mixin debug-grid {
+
+	@if global-variable-exists(DEBUG) {
+
+		@if $DEBUG {
+
+			//  makes .container visible – obsolete
+			//.#{$es-container-class} {
+			//	background-color: beige; // for IE
+			//	background-color: transparentize(red, 0.92);
+			//	@include msg("container");
+			//}
+
+			.container {
+				background-color: greenyellow; // for IE
+				background-color: transparentize(greenyellow, 0.7);
+				@include msg("wrap");
+				border-top: 1px dashed transparentize(black, 0.2);
+			}
+
+			//  makes .wrap/.row visible
+			#{$es-wrap-class} {
+				background-color: bisque; // for IE
+				background-color: transparentize(bisque, 0.7);
+				@include msg("wrap");
+			}
+
+			//  makes .column visible
+			#{$es-column-class} {
+				background-color: violet; // for IE
+				background-color: transparentize(violet, 0.7);
+				//border: 1px solid transparentize(black, 0.9)
+				@include msg("column");
+
+				.portlet {
+					background-color: blue; // for IE
+					background-color: transparentize(blue, 0.9);
+					@include msg("portlet");
+				}
+			}
+		}
+	}
+}

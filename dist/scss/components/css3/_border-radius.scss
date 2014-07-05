@@ -1,0 +1,50 @@
+//	@desc		Set cross-browser border radius
+//	@name		Border radius
+//	@author		Armin
+//	@tested		Safari 3+, Chrome (Any), Firefox (Any), Opera 10.5+, IE9+, Android (Any), iOS (Any)
+//	@requires	_esolr-settings.scss ($es-global-radius), _prefix.scss
+
+
+//	Research	http://css-tricks.com/almanac/properties/b/border-radius/
+
+
+//	prevent background color leak outs
+@mixin border-radius-prevent {
+	-webkit-background-clip: padding-box;
+	-moz-background-clip:    padding;
+	background-clip:         padding-box;
+}
+
+
+@mixin border-radius($radius:$es-global-radius) {
+	@include prefix("border-radius", $radius, webkit moz);
+	@include border-radius-prevent;
+}
+
+@mixin border-top-left-radius($radius:$es-global-radius) {
+	-webkit-border-top-left-radius: $radius;
+	-moz-border-radius-topleft: $radius;
+	border-top-left-radius: $radius;
+	@include border-radius-prevent;
+}
+
+@mixin border-top-right-radius($radius:$es-global-radius) {
+	-webkit-border-top-right-radius: $radius;
+	-moz-border-radius-topright: $radius;
+	border-top-right-radius: $radius;
+	@include border-radius-prevent;
+}
+
+@mixin border-bottom-left-radius($radius:$es-global-radius) {
+	-webkit-border-bottom-left-radius: $radius;
+	-moz-border-radius-bottomleft: $radius;
+	border-bottom-left-radius: $radius;
+	@include border-radius-prevent;
+}
+
+@mixin border-bottom-right-radius($radius:$es-global-radius) {
+	-webkit-border-bottom-right-radius: $radius;
+	-moz-border-radius-bottomright: $radius;
+	border-bottom-right-radius: $radius;
+	@include border-radius-prevent;
+}

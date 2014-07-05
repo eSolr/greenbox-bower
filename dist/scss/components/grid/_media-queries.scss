@@ -1,0 +1,38 @@
+//  ------------------------------------------------------------
+//  Media query defaults
+//  ------------------------------------------------------------
+
+
+//@import "esolr/variables";
+//@import "esolr/utility/rem-calc";
+
+
+//  responsivity breakpoints
+//$small-screen:  rem-calc(640px);
+//$medium-screen: 640px;
+//$medium-screen: px-calc(64rem);
+//$large-screen:  px-calc(102.4rem);
+//$xlarge-screen: px-calc(144rem);
+
+//	kivezetve az esolr-settingbe
+//$medium-screen: 640px;
+//$large-screen:  1024px;
+//$xlarge-screen: 1440px;
+
+//  screen size specific media queries
+$screen:        "only screen"; // - 640px
+//$small:         "only screen and (max-width:"#{$medium-screen}")";
+$small:         $screen;
+$medium:        "only screen and (min-width:"#{$medium-screen}")";  // 640px–1024px
+$large:         "only screen and (min-width:"#{$large-screen}")";   // 1024–1440px
+$xlarge:        "only screen and (min-width:"#{$xlarge-screen}")";  // 1440px–
+
+//  orientation specific media queries
+$landscape:     "only screen and (orientation: landscape)";
+$portrait:      "only screen and (orientation: portrait)";
+
+
+//
+//  touch device specific settings
+//  TODO megcsinálni az érintésvezérelt leválogatást is
+//

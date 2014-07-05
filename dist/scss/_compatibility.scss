@@ -1,0 +1,213 @@
+
+//	draw/circle
+.is-circle {
+	@extend .circle;
+}
+
+
+
+//
+//	pattern/states
+//
+
+//	Block specific type
+.is-block			{ @extend .block; }
+.is-inline			{ @extend .inline; }
+.is-inline-block	{ @extend .inline-block; }
+
+//	Table specific type
+.is-table	{ @extend .table; }
+.is-row		{ @extend .table-row; }
+.is-column	{ @extend .table-column; }
+.is-cell	{ @extend .table-cell; }
+
+//	Fluid dimension
+.has-fluid-width	{ @extend .fluid-width; }
+.has-fluid-height	{ @extend .fluid-height; }
+
+
+//
+//	Box sizing
+//
+.is-borderbox	{ @extend .borderbox; }
+.is-contentbox	{ @extend .contentbox; }
+
+
+//
+//	Typographic states
+//
+
+//	Font style
+.is-regular { @extend .regular; }
+.is-italic	{ @extend .italic; }
+
+//	Font weight
+.is-bold	{ @extend .bold; }
+.is-bolder	{ @extend .bolder; }
+.is-lighter	{ @extend .lighter; }
+
+//	Extended fontweight
+.is-fw-thin 		{ @extend .fw-thin }
+.is-fw-extralight	{ @extend .fw-extralight; }
+.is-fw-light		{ @extend .fw-light; }
+.is-fw-book			{ @extend .fw-book; }
+.is-fw-regular		{ @extend .fw-regular; }
+.is-fw-medium		{ @extend .fw-medium; }
+.is-fw-semibold		{ @extend .fw-semibold; }
+.is-fw-bold			{ @extend .fw-bold; }
+.is-fw-extrabold	{ @extend .fw-extrabold; }
+.is-fw-black		{ @extend .fw-black; }
+
+//	Font size
+.is-small	{ @extend .small; }
+.is-smaller	{ @extend .smaller; }
+.is-large	{ @extend .large; }
+.is-larger	{ @extend .larger; }
+
+//	Capitalization
+.is-uppercase	{ @extend .uppercase; }
+.is-lowercase	{ @extend .lowercase; }
+.is-capitalize	{ @extend .capitalize; }
+
+//	Underline, linethrought
+.has-no-textdecoration	{ @extend .no-textdecoration; }
+.has-linethrough		{ @extend .linethrough; }
+.has-underline			{ @extend .underline; }
+
+//	Font family
+.is-sans	{ @extend .sans; }
+.is-serif	{ @extend .serif; }
+
+
+//
+//	Color states
+//
+
+//	generates shades of a bgcolor in 5% steps from 5%–95%
+//	output is .classname--op10 ... .classname--op90
+@mixin generate-bg-shades($classprefix, $shadedcolor) {
+
+	@for $i from 5 through 95 {
+		#{$classprefix}--op#{$i}	{ background-color: transparentize($shadedcolor, $i / 100); }
+		$i: $i + 5;
+	}
+}
+
+//	background colors
+.has-no-bg	{ @extend .no-bg }
+.has-bg		{ @extend .bg }
+.has-bg-text{ @extend .bg-text }
+.has-bg-1	{ @extend .bg-1 }
+.has-bg-2	{ @extend .bg-2; }
+.has-bg-3	{ @extend .bg-3; }
+.has-bg-4	{ @extend .bg-4; }
+.has-bg-5	{ @extend .bg-5; }
+.has-bg-6	{ @extend .bg-6; }
+
+//	generated shades of bgcolors in 5% steps
+@include generate-bg-shades(".has-bg", $bg-color);			//	.has-bg-a ... .has-bg-i
+@include generate-bg-shades(".has-bg-text", $text-color);	//	.has-bg-text-a ... .has-bg-text-i
+@include generate-bg-shades(".has-bg-1", $color-1);			//	.has-bg-1a ... .has-bg-1i
+@include generate-bg-shades(".has-bg-2", $color-2);
+@include generate-bg-shades(".has-bg-3", $color-3);
+
+//	font color
+.has-no-color	{ @extend .no-color; }
+.has-color-bg	{ @extend .color-bg; }
+.has-color-text	{ @extend .color-text; }
+.has-color-1	{ @extend .color-1; }
+.has-color-2	{ @extend .color-2; }
+.has-color-3	{ @extend .color-3; }
+.has-color-4	{ @extend .color-4; }
+.has-color-5	{ @extend .color-5; }
+.has-color-6	{ @extend .color-6; }
+
+
+//
+//	pattern/alignment
+//
+
+//	Vertical alignment
+@mixin valign($arg) {
+	vertical-align: $arg;
+}
+
+.valign-top		{ @include valign(top); }
+.valign-middle	{ @include valign(middle); }
+.valign-bottom	{ @include valign(bottom); }
+
+.valign-text-top	{ @include valign(text-top); }
+.valign-text-bottom	{ @include valign(text-bottom); }
+
+.valign-baseline	{ @include valign(baseline); }
+.valign-sub		{ @include valign(sub); }
+.valign-super	{ @include valign(super); }
+
+.valign-inherit	{ @include valign(inherit); }
+
+//	Vertical alignment grouped items
+@mixin g-valign($arg) {
+
+	& > *:not(.valign-except) {
+		vertical-align: $arg;
+	}
+}
+
+.g-valign-top		{ @include g-valign(top); }
+.g-valign-middle	{ @include g-valign(middle); }
+.g-valign-bottom	{ @include g-valign(bottom); }
+
+.g-valign-text-top	{ @include g-valign(text-top); }
+.g-valign-text-bottom	{ @include g-valign(text-bottom); }
+
+.g-valign-baseline	{ @include g-valign(baseline); }
+.g-valign-sub		{ @include g-valign(sub); }
+.g-valign-supere	{ @include g-valign(super); }
+
+.g-valign-inherit	{ @include g-valign(inherit); }
+
+//	Horizontal alignment
+@mixin halign($arg) {
+	text-align: $arg;
+}
+
+.align-inherit		{ @include halign(inherit); }
+
+//	Horizontal alignment grouped items
+@mixin g-halign($arg) {
+
+	&:not(.halign-except) {
+		text-align: $arg;
+	}
+}
+
+.g-align-inherit		{ @include g-halign(inherit); }
+
+
+
+//
+//	template/article
+//
+
+.is-richtext, .temp-article {
+	@extend .richtext;
+}
+
+
+//
+//	media
+//
+
+.media {
+	margin-top: $baseline;
+	margin-bottom: $baseline;
+	@extend .clearfix-micro;
+
+	.media-left {
+		margin-right: 0;
+	}
+
+	.media-right {
+		margin-left: 0;
+	}
+}

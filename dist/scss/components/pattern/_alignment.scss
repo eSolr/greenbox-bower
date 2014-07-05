@@ -1,0 +1,96 @@
+//
+//	@desc		Align all encapsuled elements
+//	@name		Alignment
+//	@author		Armin
+//	@tested
+//	@requires
+//
+//	todo		AI szerű igazítási sort betenni fel/középre/le, bal/közép/jobb, egyenletes köz
+
+//	Parameters	inherit|top|middle|bottom|text-top|text-bottom|baseline|sub|super|[n]%|[n]px
+//
+//	Usage
+//
+//		<div class="align-middle">
+//			<span>…</span>
+//			<span>…</span>
+//			<span class="align-except">…</span>	<!--This will be ignored-->
+//		</div>
+
+
+//	Vertical alignment
+@mixin valign($arg) {
+	vertical-align: $arg;
+}
+
+.align-top		{ @include valign(top); }
+.align-middle	{ @include valign(middle); }
+.align-bottom	{ @include valign(bottom); }
+
+.align-text-top	{ @include valign(text-top); }
+.align-text-bottom	{ @include valign(text-bottom); }
+
+.align-baseline	{ @include valign(baseline); }
+.align-sub		{ @include valign(sub); }
+.align-super	{ @include valign(super); }
+
+
+//	Vertical alignment grouped items
+@mixin g-valign($arg) {
+
+	& > *:not(.align-except) {
+		vertical-align: $arg;
+	}
+}
+
+.g-align-top	{ @include g-valign(top); }
+.g-align-middle	{ @include g-valign(middle); }
+.g-align-bottom	{ @include g-valign(bottom); }
+
+.g-align-text-top		{ @include g-valign(text-top); }
+.g-align-text-bottom	{ @include g-valign(text-bottom); }
+
+.g-align-baseline	{ @include g-valign(baseline); }
+.g-align-sub		{ @include g-valign(sub); }
+.g-align-supere		{ @include g-valign(super); }
+
+
+//	Parameters	initial|inherit|left|center|right|justify|start|end|match-parent
+//				start|end – left or right depending on reading direction ltr, rtl – not supported by Opera and IE
+//
+//	Research	http://css-tricks.com/almanac/properties/t/text-align/
+
+
+//	Horizontal alignment
+@mixin halign($arg) {
+	text-align: $arg;
+}
+
+.align-left		{ @include halign(left); }
+.align-center	{ @include halign(center); }
+.align-right	{ @include halign(right); }
+.align-justify	{ @include halign(justify); }
+
+.align-start	{ @include halign(start); }
+.align-end		{ @include halign(end); }
+
+.align-match-parent	{ @include halign(match-parent); }
+
+
+//	Horizontal alignment grouped items
+@mixin g-halign($arg) {
+
+	&:not(.align-except) {
+		text-align: $arg;
+	}
+}
+
+.g-align-left		{ @include g-halign(left); }
+.g-align-center	{ @include g-halign(center); }
+.g-align-right	{ @include g-halign(right); }
+.g-align-justify	{ @include g-halign(justify); }
+
+.g-align-start	{ @include g-halign(start); }
+.g-align-end		{ @include g-halign(end); }
+
+.g-align-match-parent	{ @include g-halign(match-parent); }

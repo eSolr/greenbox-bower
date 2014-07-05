@@ -1,0 +1,9 @@
+
+
+
+//  basic visibility options
+.visible {visibility: visible}
+.hidden {visibility: hidden}
+.show {display: block}
+.show-inline {@include inline-block}
+.hide {display: none !important;}

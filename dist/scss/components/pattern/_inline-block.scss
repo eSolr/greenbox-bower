@@ -1,0 +1,38 @@
+//	@desc		inline-block Fix for IE7
+//	@name
+//	@author		Armin
+//	@tested		Safari, Chrome, Firefox
+//	@required	_esolr-settings.scss ($ie7)
+
+//	This line of code needs to be placed into the header of the page
+//	to force IE8 render intranet pages as IE8 instead of IE7:
+//	<meta http-equiv="X-UA-Compatible" content="IE=edge">  or
+//	<meta http-equiv="X-UA-Compatible" content="IE=8" />
+//
+//	This hack is required when IE7 is used.
+//
+//	Research:	http://stackoverflow.com/questions/9110646/ie8-display-inline-block-not-working
+//				http://stackoverflow.com/questions/4457851/ie8-rendering-as-ie7-by-default
+
+//	Usage:		@include inline-block;
+//				@extend .inline-block;
+
+
+@if not global-variable-exists(ie7) { $ie7: false !global; }
+
+
+@mixin inline-block {
+	display: inline-block;
+	@if $ie7 {
+		*display: inline;
+		*zoom: 1;
+	}
+}
+
+.inline-block {
+	@include inline-block;
+}
+
+.block {
+	display: block;
+}

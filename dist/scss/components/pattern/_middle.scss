@@ -1,0 +1,7 @@
+
+
+
+@mixin middle($shift: 0) {
+	top: 50%;
+	margin-top: $shift;
+}

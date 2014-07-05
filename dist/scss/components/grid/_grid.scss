@@ -1,0 +1,477 @@
+//
+//  Grid v1.0
+//
+//  @description:
+//  Originally designed for eSolr CMS system. To keep some compatibility
+//  with produtcs on market the syntax follows zurb foundation's grid 5 with
+//  additional size specific widths.
+//
+
+//  TODO border classokat elkészíteni
+//  TODO csekkolni, miért nem fut le a fluid-wrap generálásnál a celarfix
+
+//  Helpers
+
+//  Grid specific imports
+@import "media-queries";
+@import "grid-variables";
+@import "grid-visibility";
+@import "debug";
+
+
+//	Research	http://css-tricks.com/make-sure-columns-dont-collapse-horizontally/
+
+
+//
+//  Fontos, hogy a nagyobb media query felül tudja definiálni a kisebb felbontás gutter értékét.
+//  A probléma csak az, hogy ezzel a .columns újradefiniálva felülírja a float stb. értékeket,
+//	ami bekavar a push, pull classoknak. Emiatt ha már egyszer lefutott legalább egy grid definiálás
+//	– amit a $SET-GRID: true-val lehet jelezni az init mixin végén, akkor nem a teljes .columns
+//  definiálás „fut le”, hanem csak egy set-gutter($gutter), ami csak a gutter értékeket frissíti.
+//
+
+$SET-GRID: false;
+
+@if not global-variable-exists(ie8) { $ie8: false !global; }
+@if not global-variable-exists(ie7) { $ie7: false !global; }
+
+//
+//  use width: fluid-span(6); to get the width of 6 columns in percent
+//
+
+@function fluid-span($n, $columns: $es-grid-columns) {
+	@if $n == "full" {
+		$n: $columns;
+	}
+	@return unquote($n * 100 / $columns + "%");
+}
+
+
+//
+//  use to define .wrap/.row like container class properties
+//
+
+@mixin fluid-grid-wrap($behavior: false, $gutter: $es-grid-gutter, $direction: $es-grid-direction) {
+
+	// use +fluid-grid-wrap(collapsed) to collapse row margins
+	@if unquote($behavior) == collapsed {
+		width: 100%;
+		margin: 0;
+	}
+
+	// use +fluid-grid-wrap(nested) to include a nested wrap
+	@else if unquote($behavior) == nested {
+		// collapse outer margins
+		width: auto;
+		margin-#{$direction}: rem($gutter) / -2;
+		margin-#{opposite($direction)}: rem($gutter) / -2;
+	}
+
+	// use +fluid-grid-wrap(nested-collapsed) to collapse outer margins on a nested wrap
+	@else if unquote($behavior) == nested-collapsed {
+		width: auto;
+		margin: 0;
+	}
+
+	// use +fluid-grid-wrap to use a container wrap
+	@else {
+		width: 100%;
+		@if $es-grid-align == center {
+			margin-#{$direction}: auto;
+			margin-#{opposite($direction)}: auto;
+		}
+	}
+
+//	@include clearfix(micro);
+	@include clearfix-micro;
+	//@include clearfix;
+}
+
+
+//
+//  use @include set-gutter($gutter); to set gutter :)
+//
+
+@mixin set-gutter($gutter: $es-grid-gutter, $direction: $es-grid-direction) {
+//	 Columns overdefinition
+	padding-#{$direction}: rem($gutter) / 2;
+	padding-#{opposite($direction)}: rem($gutter) / 2;
+}
+
+//
+//  use
+//  @include column
+//  to define .column like class properties
+//
+
+@mixin column($gutter: $es-grid-gutter, $direction: $es-grid-direction) {
+
+	//  details at the top above $SET-GRID
+	@if $SET-GRID == false {
+		position: relative;
+		float: #{$direction};
+	}
+	@include set-gutter($gutter, $direction);
+	min-height: 1px; // prevent column collapse if empty
+}
+
+
+//
+//  use @include fluid-last(true); to generate last column properties
+//
+
+@mixin fluid-last($display: true) {
+	@if $display {
+		display: table-cell;
+		@if ($ie7 or $ie8) {
+			*display: block;
+			*zoom: 1;
+		}
+		float: none;
+		_position: relative;
+		_left: -3px;
+		_margin-right: -3px;
+		width: auto;
+		&:after {
+			content: " . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+			visibility: hidden;
+			clear: both;
+			height: 0 !important;
+			display: block;
+			line-height: 0;
+		}
+	}
+	@else {
+		display: table-cell;
+		@if ($ie7 or $ie8) {
+			*display: block;
+			*zoom: 1;
+		}
+		_position: relative;
+		_left: -3px;
+		_margin-right: -3px;
+		&:after {
+			content: " . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+			visibility: hidden;
+			clear: both;
+			height: 0 !important;
+			display: block;
+			line-height: 0;
+		}
+	}
+}
+
+
+//
+//  use
+//  @include fluid-grid-classes
+//  to generate container and modifier classes
+//
+
+@mixin fluid-grid-classes($gutter: $es-grid-gutter, $direction: $es-grid-direction) {
+
+	// .row
+	//.#{$es-wrap-class}
+	#{$es-wrap-class} {
+		@include fluid-grid-wrap(false, $gutter, $direction);
+
+		//.#{$es-wrap-class}
+		#{$es-wrap-class} {
+			@include fluid-grid-wrap(nested, $gutter, $direction);
+		}
+
+		//> .#{$es-wrap-class}
+		> #{$es-wrap-class} {
+			@include fluid-grid-wrap(false, $gutter, $direction);
+		}
+	}
+
+	// .column
+	//.column, .#{$es-column-class}
+	#{$es-column-class} {
+		//gutter, direction
+		@include column($gutter, $direction);
+	}
+}
+
+
+//
+//  generates all size specific classes
+//
+
+@mixin fluid-size-classes($columns: $es-grid-columns, $gutter: $es-grid-gutter, $direction: $es-grid-direction) {
+
+	// ._centered
+	.#{$es-centered-class} {
+		float: none;
+		margin-#{$direction}: auto;
+		margin-#{opposite($direction)}: auto;
+	}
+
+	// ._uncentered
+	.#{$es-uncentered-class} {
+		float: #{$direction} !important;
+		padding-#{$direction}: rem($gutter) / 2;
+		padding-#{opposite($direction)}: rem($gutter) / 2;
+	}
+
+	// ._last
+	.#{$es-last-class} {
+		@include fluid-last(true);
+	}
+
+	.#{$es-full-width-class} {
+		width: #{fluid-span("full", $columns)};
+		@include float-none;
+	}
+
+	@for $i from 1 through $columns {
+
+		//  generates ._1, ._2 [...] ._n 'width' classes
+		.#{$es-size-prefix}#{$es-grid-prefix}#{$i} {
+			width: #{fluid-span($i, $columns)};
+		}
+
+		@if $i < $columns {
+
+			//  generates ._offset1, ._offset2, [...] ._offset[n-1] push classes
+			.#{$es-offset-class}#{$i} {
+				margin-#{$direction}: fluid-span($i, $columns);
+			}
+
+			//  generates ._push1 [...] ._push[n-1]
+			.#{$es-push-class}#{$i} {
+				float: #{$direction};
+				#{$direction}: fluid-span($i, $columns);
+				#{opposite($direction)}: auto;
+			}
+
+			//  generates ._pull1 [...] ._pull[n-1]
+			.#{$es-pull-class}#{$i} {
+				float: #{opposite($direction)};
+				#{$direction}: auto;
+				#{opposite($direction)}: fluid-span($i, $columns)
+			}
+		}
+	}
+
+	@for $i from 1 through $columns {
+
+		//  alap aránysor 1-től az oszlop maximumig push és pull sorral ._1of12, ._push1of12 [...]
+		@if divmod($columns, $i) == 0 {
+			@for $j from 1 through $columns / $i {
+
+				// ._1of[n] [...] ._[n]of[n]
+				.#{$es-size-prefix}#{$es-grid-prefix}#{$j}of#{$columns / $i} {
+					$m: $columns / ($columns / $i);
+					width: fluid-span($j * $m, $columns);
+				}
+
+				@if $j != ($columns / $i) {
+
+					// ._offset1of[n] [...] ._offset[n-1]of[n]
+					.#{$es-offset-class}#{$j}of#{$columns / $i} {
+						margin-#{$direction}: #{$j / $i * 100}#{"%"};
+					}
+
+					//  generates ._push1of[n] [...] ._push[n-1]of[n]
+					.#{$es-push-class}#{$j}of#{$columns / $i} {
+						float: #{$direction};
+						#{$direction}: fluid-span($i, $columns);
+						#{opposite($direction)}: auto;
+					}
+
+					//  generates ._pull1of[n] [...] ._pull[n-1]of[n]
+					.#{$es-pull-class}#{$j}of#{$columns / $i} {
+						float: #{opposite($direction)};
+						#{$direction}: auto;
+						#{opposite($direction)}: fluid-span($i, $columns)
+					}
+
+				}
+			}
+		}
+
+		//  felírható gyakori arányszámok az oszlopszámtól függetlenül
+		@else if -or($i == 2, $i == 3, $i == 4, $i == 5) {
+			@for $j from 1 through $i {
+
+				// ._1of2, ._1of3, ._1of4, ._1of5 [...] ._4of5
+				.#{$es-size-prefix}#{$es-grid-prefix}#{$j}of#{$i} {
+					width: #{$j / $i * 100}#{"%"};
+				}
+
+				@if $j != $i {
+
+					// ._offset1of2, ._offset1of3, ._offset1of4, ._offset1of5 [...] ._offset[n-1]of5
+					.#{$es-offset-class}#{$j}of#{$i} {
+						margin-#{$direction}: #{$j / $i * 100}#{"%"};
+					}
+
+					//  generates ._push1of[n] [...] ._push[n-1]of[n]
+					.#{$es-push-class}#{$j}of#{$i} {
+						float: #{$direction};
+						#{$direction}: fluid-span($i, $columns);
+						#{opposite($direction)}: auto;
+					}
+
+					//  generates ._pull1of[n] [...] ._pull[n-1]of[n]
+					.#{$es-pull-class}#{$j}of#{$i} {
+						float: #{opposite($direction)};
+						#{$direction}: auto;
+						#{opposite($direction)}: fluid-span($i, $columns);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+//
+//  use
+//  @include init-fluid-grid(12, 3rem); or @include init-fluid-grid(24, 2rem, "_");
+//  to init fluid grid
+//
+
+
+@mixin init-fluid-grid($columns: $es-grid-columns, $gutter: $es-grid-gutter, $size-prefix: $es-size-prefix, $grid-prefix: $es-grid-prefix, $direction: $es-grid-direction) {
+	@include set-grid-prefix($size-prefix, $grid-prefix);
+
+	//$es-grid-columns: $columns;
+	//$es-grid-gutter: rem($gutter);
+
+	//  avoide container class overwrite
+	//@if -not($SET-GRID) {
+		//	generates container classes
+		//@include fluid-grid-classes(rem($gutter), $direction);
+	//}
+	//  20130722
+	//@include fluid-grid-classes(rem($gutter));
+	//@include fluid-size-classes($columns, rem($gutter), $direction);
+	@include fluid-grid-classes($gutter);
+	@include fluid-size-classes($columns, $gutter, $direction);
+
+	$SET-GRID: true !global;
+
+}
+
+//  simplified syntaxes for grid generation for small, medium, large, xlarge
+@mixin init-small-grid($columns: $es-grid-columns, $gutter: $es-grid-gutter) {
+	@include init-fluid-grid($columns, $gutter, small-);
+}
+
+@mixin init-medium-grid($columns: $es-grid-columns, $gutter: $es-grid-gutter) {
+	@include init-fluid-grid($columns, $gutter, medium-);
+}
+
+@mixin init-large-grid($columns: $es-grid-columns, $gutter: $es-grid-gutter) {
+	@include init-fluid-grid($columns, $gutter, large-);
+}
+
+@mixin init-xlarge-grid($columns: $es-grid-columns, $gutter: $es-grid-gutter) {
+	@include init-fluid-grid($columns, $gutter, xlarge-);
+}
+
+
+
+// import debug mode option
+@include debug-grid;
+
+
+
+//
+//  generating media query based grid system
+//
+
+@if $generate-fluid-grid {
+
+	//  mobile first section
+
+	//  makes all elements border box
+	//*, *:before, *:after { @include border-box; }
+	//	* { @include border-box; }
+	.row * { @include border-box; }                         // az előző volt aktív, de kivettem, ne akadjon másokkal
+
+
+	// .row
+	//.#{$es-wrap-class}
+	#{$es-wrap-class} {
+		float: none;
+		@if $es-grid-align == center {
+			margin-left: auto;
+			margin-right: auto;
+		}
+		max-width: $es-max-width;                           // set maximum width
+
+		* html & {
+			overflow-x: hidden;
+		}
+
+		//.#{$es-wrap-class}
+		#{$es-wrap-class} {
+			margin-left: auto;
+			margin-right: auto;
+//			margin-left: $es-grid-gutter / -2;
+//			margin-right: $es-grid-gutter / -2;
+//			border: 1px solid #c71585;
+		}
+
+//		@include clearfix(micro);
+		@extend .clearfix-micro;
+		//@include clearfix;
+	}
+
+	// .column, .columns
+	//.column, .#{$es-column-class}
+	#{$es-column-class} {
+		//width: 100%;
+		position: static;
+		float: none;
+		display: block;
+		@include set-gutter();
+		* html & {
+			overflow-x: hidden;
+		}
+	}
+
+	.gutter-left {
+		padding-left: rem($es-grid-gutter / 2);
+	}
+
+	.gutter-right {
+		padding-right: rem($es-grid-gutter / 2);
+	}
+
+	.gutter {
+		padding-left: rem($es-grid-gutter / 2);
+		padding-right: rem($es-grid-gutter / 2);
+	}
+
+
+	//  below 640px
+	@media #{$screen} {
+		// a phone specific grid can be defined here
+		@include init-small-grid;
+	}
+
+	//  640px – 1024px
+	@media #{$medium} {
+		//@include init-fluid-grid($es-grid-columns, $es-grid-gutter, medium-);
+		@include init-medium-grid;
+	}
+
+	//  1024px – 1440px
+	@media #{$large} {
+		//@include init-fluid-grid($es-grid-columns, $es-grid-gutter, large-);
+		@include init-large-grid;
+	}
+
+	//  1440px and above
+	@media #{$xlarge} {
+		//@include init-fluid-grid($es-grid-columns, $es-grid-gutter, xlarge-);
+		@include init-xlarge-grid;
+	}
+
+
+}

@@ -1,0 +1,16 @@
+//	@desc
+//	@name           Hyphens
+//	@author         Armin
+//	@tested         IE10+, FF6+, Safari 5.1+, Chrome NONE, Opera NONE, iOS Safari 4.2+
+//	@requires		_prefix.scss
+
+
+//	Parameters could be:
+//	@include hyphens( auto | manual | none );
+
+
+//	TODO hyphens-t csekkolni
+
+@mixin hyphens($arg) {
+	@include prefix("hyphens", $arg, all);
+}

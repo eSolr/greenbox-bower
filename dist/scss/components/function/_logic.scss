@@ -1,0 +1,54 @@
+//	todo	törölni kellene és csak a XOR műveletet megtartani
+
+
+//  ------------------------------------------------------------
+// Logical operations
+// ------------------------------------------------------------
+// @functions:
+// 	-not($arg)                      >   bool
+// 	-and($arg1, $arg2[, $arg_n])    >   bool
+// 	-or($arg1, $arg2[, $arg_n])     >   bool
+// 	-xor($arg1, $arg2[, $arg_n])    >   bool
+
+
+//  Logikai NOT
+@function -not($arg) {
+  @if $arg {
+    @return false;
+  }
+  @else if $arg != false {
+    @return false;
+  }
+  @else if $arg != true {
+    @return true;
+  }
+  @return true;
+}
+
+//  Logikai AND
+@function -and($args...) {
+  @each $statement in $args {
+    @if $statement != true {
+      @return false;
+    }
+  }
+  @return true;
+}
+
+//  Logikai OR
+@function -or($args...) {
+  @each $statement in $args {
+    @if $statement {
+      @return true;
+    }
+  }
+  @return false;
+}
+
+//  Logikai XOR
+@function -xor($args...) {
+  @if -or(-and($args...), -not(-or($args...))) {
+    @return false;
+  }
+  @return true;
+}

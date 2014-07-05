@@ -1,0 +1,63 @@
+//	@desc		REM value converter with built in ie8 fallback
+//	@name
+//	@author		Armin
+//	@tested
+//	@requires	_esolr-settings.scss ($ie8, $warning)
+
+
+//	Converts argument or list of arguments to rem value or list of rem value.
+//	The unit of argument and $es-rem-base has to match to get a valid rem value.
+//	Otherwise it returns the original argument. If $ie8 compatibility is set
+//	to true, the px/pt/etc. fallback become active.
+//
+//	Usage:	$es-rem-base: 16px;	@warn rem(16px); 		// 1rem
+//			$es-rem-base: 16pt;	@warn rem(16pt); 		// 1rem
+//			$es-rem-base: 100%;	@warn rem(100%); 		// 1rem
+//			$es-rem-base: 16px;	@warn rem(18pt); 		// 18pt
+//			$es-rem-base: 16px;	@warn rem(8px 24px); 	// 0.5rem 1.5rem
+
+
+@if not global-variable-exists(ie8) { $ie8: false !global; }
+@if not global-variable-exists(warning) { $warning: false !global; }
+
+
+@function rem($arg) {
+
+	$es-f-rem: ();
+
+	@if type_of($arg) != list {
+		@if unit($arg) == unit($es-rem-base) {
+			@return if($ie8, no-rem($arg), $arg / $es-rem-base * 1rem);
+		}
+		@if global-variable-exist(warning) {
+			@if $warning {
+				@warn "Excursive unit between argument and $es-rem-base.";
+			}
+		}
+		@return $arg;
+	}
+
+	@else if type_of($arg) == list {
+		@each $v in $arg {
+			$es-f-rem: append($es-f-rem, rem($v));
+		}
+		@return $es-f-rem;
+	}
+}
+
+
+//	Converts rem value to the unit of $es-rem-base which could be px, pt etc.
+//
+//	Usage:	$es-rem-base: 16px; @warn no-rem(1rem) 		// 16px
+//			$es-rem-base: 16px; @warn no-rem(.5rem) 	// 8px
+//			$es-rem-base: 16pt; @warn no-rem(1.5rem) 	// 24pt
+
+@function no-rem($arg) {
+	@if unit($arg) == rem {
+		@return $es-rem-base * ($arg / 1rem);
+	}
+	@if global-variable-exist(warning) {
+		@if $warning {@warn "Excursive unit. Argument is not a 'rem' value.";}
+	}
+	@return $arg;
+}
