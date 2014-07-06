@@ -4,8 +4,6 @@
 //	@tested
 //	@requires
 //
-//	todo	ezt a file-t CSAK paraméterezésre használni!
-//	todo	a fontbetöltést ügyesebben megoldani, változóba pakolni stb.
 //	todo	font-smoothing-ot itt kellene tudni állítani
 //	todo	legyen egy default settings is beálítva
 //	todo	lowlight színek, reversed színek
@@ -94,6 +92,7 @@ $selection-color:		$color-2;
 
 $init-font: (
 	(esolr-icon, "../font/eSolrIconSquare-Regular", eot woff ttf, 400, normal)
+	//("fontfamily", "../font/fontfile", eot woff ttf, weight [100...900|normal|bold], style [normal|italic], stretch, unicode-range)
 );
 
 
@@ -117,7 +116,6 @@ $base-icon-family:			esolr-icon;
 $es-rem-base:				16pt;
 $base-font-size:			16pt;			//	rem(16pt);
 $baseline:					20pt;			//	rem(20pt);
-
 
 //	Default spacing
 $es-global-radius:			5px;

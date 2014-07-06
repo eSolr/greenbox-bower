@@ -13,8 +13,7 @@
 
 
 body {
-	-webkit-font-smoothing: antialiased;	//	antialias webkit
-	font-smoothing: antialiased;			//	antialias firefox
+	@include font-smoothing(true);
 	font-family: $base-font-family;
 	font-size: 100%;						//	IE
 	font-size: rem($base-font-size);
