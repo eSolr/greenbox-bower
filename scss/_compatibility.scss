@@ -211,3 +211,27 @@
 		margin-left: 0;
 	}
 }
+
+//
+//	patter/wrap
+//
+
+.has-normal-wrap {
+	@extend .wrap-normal;
+}
+
+.has-no-wrap {
+	@extend .nowrap;
+}
+
+.has-pre {
+	@extend .pre;
+}
+
+.has-pre-wrap {
+	@extend .prewrap;
+}
+
+.has-pre-line {
+	@extend .preline;
+}
