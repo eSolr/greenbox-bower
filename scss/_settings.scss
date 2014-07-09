@@ -61,7 +61,7 @@ $attention-color:		#ffa911;
 
 //	link colors
 $link-color:			dodgerblue;
-$link-visited-color:	darken($link-color, .1);
+$link-visited-color:	lighten($link-color, 15%);
 $link-hover-color:		orangered;
 $link-active-color: 	orange;
 $link-focus-color: 		$link-hover-color;

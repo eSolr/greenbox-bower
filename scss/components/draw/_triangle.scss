@@ -8,7 +8,7 @@
 //	resource:	http://codeitdown.com/css-triangles-responsive/
 //				http://css-tricks.com/snippets/css/css-triangle/
 
-//	usage:		@include triangle(300px, 300px, upleft, black;
+//	usage:		@include triangle(300px, 300px, upleft, black);
 
 @mixin triangle($width: 20px, $height: 20px, $direction: up, $color: black) {
 	width: 0;

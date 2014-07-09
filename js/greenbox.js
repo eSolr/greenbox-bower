@@ -4423,7 +4423,7 @@ var esNameday = {
 							//	fetch the img_wrap and content_wrap and adds to scene-item
 							scenesArray.push($(o.slider.scene.item.html).addClass(o.slider.scene.item.class)
 								.append($(this).find(o.img_wrap).clone())
-								.append($(this).find(o.content_wrap)));
+								.append($(this).find(o.content_wrap)).hide());
 						});
 
 						//	scene-ék száma
@@ -4513,7 +4513,8 @@ var esNameday = {
 				//	forrás portlet törlése
 				sourcePortlet.remove();
 
-				//	működés indítása a paramétereknek megfelelően
+				//	Működés indítása a paramétereknek megfelelően.
+				//	Ha a loop be van kapcsolva, akkor beállítja a kezdőt és indítja a loopot
 				if (o.set.loop.status) {
 					setCurrent();
 					loopStart();
@@ -4525,6 +4526,7 @@ var esNameday = {
 
 			//	Beállítja az aktuális állapotot
 			function setCurrent(number) {
+
 
 				//	az aktuális állapot beállítása lekezelve a túlcsordulásokat is
 				switch (true) {
@@ -4541,6 +4543,7 @@ var esNameday = {
 						current = 0;
 						break;
 				}
+				console.log(current);
 
 				//	megfelelő slide beállítása
 				scenes.children().removeClass(o.currentClass).eq(current).addClass(o.currentClass);
@@ -4569,8 +4572,8 @@ var esNameday = {
 
 			function loopStart() {
 				looping = setInterval(function(){
-					setCurrent(current);
 					current++;
+					setCurrent(current);
 				}, o.set.loop.length);
 			}
 
