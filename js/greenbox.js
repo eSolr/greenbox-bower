@@ -4543,7 +4543,6 @@ var esNameday = {
 						current = 0;
 						break;
 				}
-				console.log(current);
 
 				//	megfelelő slide beállítása
 				scenes.children().removeClass(o.currentClass).eq(current).addClass(o.currentClass);
