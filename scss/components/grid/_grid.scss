@@ -13,10 +13,10 @@
 //  Helpers
 
 //  Grid specific imports
-@import "media-queries";
-@import "grid-variables";
-@import "grid-visibility";
-@import "debug";
+//@import "media-queries";
+//@import "grid-variables";
+//@import "grid-visibility";
+//@import "debug";
 
 
 //	Research	http://css-tricks.com/make-sure-columns-dont-collapse-horizontally/
@@ -418,7 +418,7 @@ $SET-GRID: false;
 		}
 
 //		@include clearfix(micro);
-		@extend .clearfix-micro;
+		@include clearfix-micro;
 		//@include clearfix;
 	}
 

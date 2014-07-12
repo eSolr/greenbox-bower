@@ -4,7 +4,8 @@
 //	@tested
 //	@requires
 //
-//	todo		media query specifikus listákat létrehozni, ami egyik nézetben ilyen inline, a másikban normal
+//	todo	media query specifikus listákat létrehozni, ami egyik nézetben ilyen inline, a másikban normal
+//	todo	list-unstyled
 
 //	Research:		http://css-tricks.com/almanac/properties/l/list-style/
 
@@ -29,6 +30,7 @@ ul {
 
 //  horizontal list
 .list-inline {
+	@extend .list;
 
 	> * {
 		@include inline-block;

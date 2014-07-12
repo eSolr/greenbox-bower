@@ -20,16 +20,16 @@
 //$xlarge-screen: 1440px;
 
 //  screen size specific media queries
-$screen:        "only screen"; // - 640px
+$screen:        "only screen" !global; // - 640px
 //$small:         "only screen and (max-width:"#{$medium-screen}")";
-$small:         $screen;
-$medium:        "only screen and (min-width:"#{$medium-screen}")";  // 640px–1024px
-$large:         "only screen and (min-width:"#{$large-screen}")";   // 1024–1440px
-$xlarge:        "only screen and (min-width:"#{$xlarge-screen}")";  // 1440px–
+$small:         $screen !global;
+$medium:        "only screen and (min-width:"#{$medium-screen}")" !global;  // 640px–1024px
+$large:         "only screen and (min-width:"#{$large-screen}")" !global;   // 1024–1440px
+$xlarge:        "only screen and (min-width:"#{$xlarge-screen}")" !global;  // 1440px–
 
 //  orientation specific media queries
-$landscape:     "only screen and (orientation: landscape)";
-$portrait:      "only screen and (orientation: portrait)";
+$landscape:     "only screen and (orientation: landscape)" !global;
+$portrait:      "only screen and (orientation: portrait)" !global;
 
 
 //
