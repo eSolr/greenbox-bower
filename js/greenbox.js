@@ -1,4 +1,44 @@
-/*
+
+//
+//	Makes an item linkable with the value of the attribute
+//
+//	<div data-es-link="link-to-a-webpage"></div>
+//
+//	$("[data-es-link]").esLink({preventdefault:true})
+//
+
+
+(function ( $ ) {
+
+	$.fn.esLink = function ( options ) {
+
+		var o = $.extend({}, $.fn.esLink.defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector),
+			linkSelector = this.selector;
+
+		return wrap.each(function(){
+
+			var linkedItem = $(this).css(o.css);
+			linkHref = linkedItem.attr(linkSelector.replace("[", "").replace("]", ""));
+
+			linkedItem.on("click", function(e) {
+				if (o.preventDefault) {e.preventDefault();}
+				if (linkHref !== "" && linkHref !== undefined) {
+					document.location.href = linkHref;
+				}
+			});
+		});
+	};
+
+	$.fn.esLink.defaultOptions = {
+		selector: "[data-es-link]",		//	default selector
+		preventDefault: false,
+		css: {
+			"cursor": "pointer"
+		}
+	};
+
+} (jQuery));;/*
 	@desc		Ajax source loader
 	@tested
 
