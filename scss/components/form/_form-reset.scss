@@ -94,7 +94,11 @@
 	*/
 
 	%form-element-defaults {
-		box-sizing: content-box !important;
+		@if global-variable-exists(form-module-box-sizing) {
+			box-sizing: #{$form-module-box-sizing} !important;
+		} @else {
+			box-sizing: content-box !important;
+		}
 		display: inline-block;
 		border: 0 none transparent;
 		outline: 0 none transparent;

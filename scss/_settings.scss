@@ -24,7 +24,8 @@ $ie7:					false;		// ie7 compatibility mode for inline-block
 //	Enable modules
 //	----------------------------------------
 
-$enable-form-module: true;
+$enable-form-module: 	true;
+$form-module-box-sizing: "content-box";
 
 
 //	----------------------------------------
