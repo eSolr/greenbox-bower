@@ -4,7 +4,6 @@
 //	@tested
 //	@requires
 //
-//	todo	font-smoothing-ot itt kellene tudni állítani
 //	todo	legyen egy default settings is beálítva
 //	todo	lowlight színek, reversed színek
 
@@ -13,17 +12,20 @@
 
 
 //	----------------------------------------
-//	Debugging
+//	Compatibility
 //	----------------------------------------
 
-//$DEBUG-MESSAGE:		false;
-//$DEBUG:				false;
-//$warning:				false;		// display function and mixin warnings in sass log
-//$ie8:					false;		// ie8 compatibility mode for rem unit
-//$ie7:					false;		// ie7 compatibility mode for inline-block
+$warning:				false;		// display function and mixin warnings in sass log
+$ie8:					false;		// ie8 compatibility mode for rem unit
+$ie7:					false;		// ie7 compatibility mode for inline-block
 
 
-//@if global-variable-exists(variable) {}
+//	----------------------------------------
+//	Enable modules
+//	----------------------------------------
+
+$enable-form-module: true;
+
 
 //	----------------------------------------
 //	Colors
@@ -326,3 +328,10 @@ $placeholder-text-color:		lightgray;*/
 $legend-bg-color:				$bg-color;
 $legend-border-color:			$fieldset-border-color;*/
 
+
+//	----------------------------------------
+//	Debugging
+//	----------------------------------------
+
+$DEBUG-MESSAGE:		false;
+$DEBUG:				false;

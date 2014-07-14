@@ -1,0 +1,254 @@
+//
+//	Research
+//	https://signalvnoise.com/posts/2609-customizing-web-forms-with-css3-and-webkit
+//	http://www.webkit.org/projects/forms/survey.html
+//	http://stackoverflow.com/questions/9620404/styling-a-select-element-in-firefox
+//	http://stackoverflow.com/questions/5912791/how-to-remove-the-arrow-from-a-select-tag-in-firefox/18317228#18317228
+//	http://www.smashingmagazine.com/2013/02/27/css-form-elements-problem/
+//
+//	FF 30 select arrow problem
+//	http://www.currelis.com/hiding-select-arrow-firefox-30.html
+//	http://jsbin.com/pozomu/4/edit
+//
+
+
+@if global-variable-exists(enable-form-module) {
+
+
+	//
+	//	Form defaults
+	//
+
+	form {}
+
+
+	//	Basic size variations
+
+	%size-xsmall {
+		font-size: .8em;
+		height: $baseline;
+		line-height: $baseline;
+	}
+
+	%size-small {
+		font-size: .9em;
+		height: $baseline * 1.2;
+		line-height: $baseline * 1.2;
+	}
+
+	%size-medium {
+		font-size: 1em;
+		height: $baseline * 1.4;
+		line-height: $baseline * 1.4;
+	}
+
+	%size-large {
+		font-size: 1em;
+		height: $baseline * 2;
+		line-height: $baseline * 2;
+	}
+
+	%size-xlarge {
+		font-size: 1.2em;
+		height: $baseline * 2.5;
+		line-height: $baseline * 2.5;
+	}
+
+
+	//	Basic inline size values
+
+	%size-inline-xsmall {
+		padding-left: $es-grid-gutter / 2;
+		padding-right: $es-grid-gutter / 2;
+	}
+
+	%size-inline-small {
+		padding-left: $es-grid-gutter / 1.5;
+		padding-right: $es-grid-gutter / 1.5;
+	}
+
+	%size-inline-medium {
+		padding-left: $es-grid-gutter;
+		padding-right: $es-grid-gutter;
+	}
+
+	%size-inline-large {
+		padding-left: $es-grid-gutter * 1.2;
+		padding-right: $es-grid-gutter * 1.2;
+	}
+
+	%size-inline-xlarge {
+		padding-left: $es-grid-gutter * 1.5;
+		padding-right: $es-grid-gutter * 1.5;
+	}
+
+
+	//
+	//	General form reset
+	//
+	/*
+		• magasság alapja: lineheight
+		• minden elemnek középre igazítottnak kell lenni!
+		• minden formokkal egy sorba kerülő elmet legalább egy spanpa kell tenni a kívül eső borderek miatt
+		•
+	*/
+
+	%form-element-defaults {
+		box-sizing: content-box !important;
+		display: inline-block;
+		border: 0 none transparent;
+		outline: 0 none transparent;
+		vertical-align: middle;
+		@include font-smoothing;
+	}
+
+	label, input, button, select, .btn, .select, .form-item {
+		@extend %size-medium;
+		@extend %form-element-defaults;
+	}
+
+	//	todo FF alatt van egy 2-2px-es felső és alsó border
+	input[type="radio"], input[type="checkbox"] {
+		-moz-border-top: 0px;
+	}
+
+	textarea { @extend %form-element-defaults; }
+
+	input, textarea { padding: 0; }			//	Corrects webkit input 1px padding around
+
+	button, select, .btn, .select {}		//	Border-width needs to be corrected with padding-top if we use border-box
+
+	button, .btn {
+		padding-top: 0;						//	Overwrites default webkit 2px button padding-top
+		padding-bottom: 0;					//	Overwrites default webkit 1px button padding-bottom
+		@extend %size-inline-medium;
+	}
+
+	select {
+		-webkit-appearance: none;			//	Drops the default webkit appearance
+		-moz-appearance: none;				//	Drops the default firefox appearance
+		@extend %size-inline-medium;
+	}
+
+	@-moz-document url-prefix() {
+
+		select {
+
+			&:focus {
+				outline: none;
+			}
+		}
+	}
+
+	select::-ms-expand { display: none; }	//	IE10 specific arrow disabled
+
+
+	//	Fieldset settings
+	fieldset, .fieldset {
+		margin: 0;
+		padding: 0;
+		border: 0 none transparent;
+
+		//	Size variations
+		&.fieldset-xsmall {
+			input, select, button, .btn, label, .form-item { @extend %size-xsmall; }
+			select, button, .btn { @extend %size-inline-xsmall; }
+		}
+		&.fieldset-small {
+			input, select, button, .btn, label, .form-item { @extend %size-small;}
+			select, button, .btn { @extend %size-inline-small; }
+		}
+		&.fieldset-medium {
+			input, select, button, .btn, label, .form-item { @extend %size-medium; }
+			select, button, .btn { @extend %size-inline-medium; }
+		}
+		&.fieldset-large {
+			input, select, button, .btn, label, .form-item { @extend %size-large; }
+			select, button, .btn { @extend %size-inline-large; }
+		}
+		&.fieldset-xlarge {
+			input, select, button, .btn, label, .form-item { @extend %size-xlarge; }
+			select, button, .btn { @extend %size-inline-xlarge; }
+		}
+	}
+
+
+	//	–––––––––––––––––––––––––––––––––––––––––––
+	//	Input fields and textarea
+
+	input {
+
+		&:hover {}
+
+		&:focus {}
+
+		//	Size variations
+		&.input-xsmall { @extend %size-xsmall; }
+		&.input-small { @extend %size-small; }
+		&.input-medium { @extend %size-medium; }
+		&.input-large { @extend %size-large; }
+		&.input-xlarge { @extend %size-xlarge; }
+	}
+
+
+	//	–––––––––––––––––––––––––––––––––––––––––––
+	//	Button settings
+
+	button, .btn, a.btn {
+
+		&:hover {}
+
+		&:active {}
+
+		//	Size variations
+		&.btn-xsmall { @extend %size-xsmall; @extend %size-inline-xsmall; }
+		&.btn-small { @extend %size-small; @extend %size-inline-small; }
+		&.btn-medium { @extend %size-medium; @extend %size-inline-medium; }
+		&.btn-large { @extend %size-large; @extend %size-inline-large; }
+		&.btn-xlarge { @extend %size-xlarge; @extend %size-inline-xlarge; }
+	}
+
+
+	//	–––––––––––––––––––––––––––––––––––––––––––
+	//	Select settings
+
+	select, .select {
+
+		&:hover {}
+
+		//	Size variations
+		&.select-xsmall { @extend %size-xsmall; @extend %size-inline-xsmall; }
+		&.select-small { @extend %size-small; @extend %size-inline-small; }
+		&.select-medium { @extend %size-medium; @extend %size-inline-medium; }
+		&.select-large { @extend %size-large; @extend %size-inline-large; }
+		&.select-xlarge { @extend %size-xlarge; @extend %size-inline-xlarge; }
+	}
+
+
+	//	–––––––––––––––––––––––––––––––––––––––––––
+	//	Label settings
+
+	label, .label {
+
+		//	Size variations
+		&.label-xsmall { @extend %size-xsmall; }
+		&.label-small { @extend %size-small; }
+		&.label-medium { @extend %size-medium; }
+		&.label-large { @extend %size-large; }
+		&.label-xlarge { @extend %size-xlarge; }
+	}
+
+
+	//	–––––––––––––––––––––––––––––––––––––––––––
+	//	Form item settings
+
+	.form-item {
+
+		//	Size variations
+		&.form-item-xsmall { @extend %size-xsmall; }
+		&.form-item-small { @extend %size-small; }
+		&.form-item-medium { @extend %size-medium; }
+		&.form-item-large { @extend %size-large; }
+		&.form-item-xlarge { @extend %size-xlarge; }
+	}
+}
