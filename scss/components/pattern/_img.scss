@@ -4,12 +4,15 @@
 //  @tested
 //  @requires
 
-
-img, embed, object, video, iframe {                         // make it responsive
+.responsive {
 	width: 100%;                                            // to preserv flexibility with esResponsiveImg()
 	max-width: 100%;
 	height: auto;
 	width: auto\9;
+}
+
+img, embed, object, video, iframe {                         // make it responsive
+//	@extend .responsive;
 }
 
 img.static {
