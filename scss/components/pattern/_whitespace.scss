@@ -117,3 +117,58 @@
 .padding-half			{ @extend .hpadding-half;	@extend .vpadding-half; }
 .padding-third			{ @extend .hpadding-third;	@extend .vpadding-third; }
 .padding-dbl			{ @extend .hpadding-dbl;	@extend .vpadding-dbl; }
+
+
+//
+//	Horizontal and vertial spacing
+//
+
+//	Horizontal spacing
+@mixin hspacing($prefix: "hspacing", $spacing: $es-grid-gutter) {
+
+	.#{$prefix} {
+
+		& > * {
+			margin-right: $spacing;
+
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+	}
+}
+
+@include hspacing("hspacing", $es-grid-gutter);
+@include hspacing("hspacing-half", $es-grid-gutter / 2);
+@include hspacing("hspacing-third", $es-grid-gutter / 3);
+@include hspacing("hspacing-quarter", $es-grid-gutter / 4);
+@include hspacing("hspacing-1", 1px);
+@include hspacing("hspacing-2", 2px);
+@include hspacing("hspacing-3", 3px);
+@include hspacing("hspacing-4", 4px);
+@include hspacing("hspacing-5", 5px);
+
+//	Vertical spacing
+@mixin vspacing($prefix: "vspacing", $spacing: $baseline) {
+
+	.#{$prefix} {
+
+		& > * {
+			margin-bottom: $spacing;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+}
+
+@include vspacing("vspacing", $baseline);
+@include vspacing("vspacing-half", $baseline / 2);
+@include vspacing("vspacing-third", $baseline / 3);
+@include vspacing("vspacing-quarter", $baseline / 4);
+@include vspacing("vspacing-1", 1px);
+@include vspacing("vspacing-2", 2px);
+@include vspacing("vspacing-3", 3px);
+@include vspacing("vspacing-4", 4px);
+@include vspacing("vspacing-5", 5px);

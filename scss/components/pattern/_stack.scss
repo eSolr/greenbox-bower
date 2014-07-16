@@ -1,0 +1,27 @@
+//
+//
+//
+
+
+
+//	Vertical blocking (e.g. form label–input pairs)
+.vstack {
+
+	& > * {
+		display: block;
+	}
+
+	label, .label {
+		line-height: 1.6em;
+		height: auto;
+	}
+}
+
+//	Horizontal stacking
+.hstack {
+	@include clearfix;
+
+	& > * {
+		float: left;
+	}
+}
