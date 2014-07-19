@@ -13,7 +13,19 @@
 //
 
 
+
+//	Enable / disable modul
+$show-form-module: true !global;
+
 @if global-variable-exists(enable-form-module) {
+	@if not $show-form-module {
+		$show-form-module: false !global;
+	}
+}
+
+
+
+@if $show-form-module {
 
 
 	//

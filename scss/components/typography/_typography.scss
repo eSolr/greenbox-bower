@@ -4,27 +4,24 @@
 //	@tested
 //	@requires	_esolr-settings.scss
 //
-//	todo		vertikális spacinget rendbetenni
 //	todo		végignyálazni az összes elemet (belső sablon lehetőségeket stb.)
 //	todo		a további alapformázásokat is belőni (cite, abbr, code, q stb.)
 //	todo		kitalálni valamit a notes, hints jellegű szövegeknek is
 //	todo		megoldani a reversed színek esetét is!
-//	todo		font élsimítást kicsatornázni esolr-settings-be
 
 
-body {
-	@include font-smoothing(true);
-	font-family: $base-font-family;
-	font-size: 100%;						//	IE
-	font-size: rem($base-font-size);
-	line-height: $baseline;
-	font-weight: 400;
-	color: $text-color;
+
+//	Enable / disable modul
+$show-typography-module: true !global;
+
+@if global-variable-exists(enable-typography-module) {
+	@if not $enable-typography-module {
+		$show-typography-module: false !global;
+	}
 }
 
 
 //	Responisve selector font-size and line-height generator
-
 @mixin set-font-sizes($arg) {
 
 	//	if list is not empty
@@ -60,61 +57,80 @@ body {
 	}
 }
 
-//	loading media query specific font sizes
-@include set-font-sizes($font-sizes-small);
-@media #{$medium}	{ @include set-font-sizes($font-sizes-medium); }
-@media #{$large}	{ @include set-font-sizes($font-sizes-large); }
-@media #{$xlarge}	{ @include set-font-sizes($font-sizes-xlarge); }
 
 
+@if $show-typography-module {
 
-h1, h2, h3, h4, h5, h6,
-p, blockquote, table, pre, ul, ol, dl {
-//	margin-top: $baseline;
-	margin-bottom: $baseline;
-}
 
-ul, ol {
-	ul, ol {
-//		margin-top: 0;
-		margin-bottom: 0;
+	body {
+		@include font-smoothing(true);
+		font-family: $base-font-family;
+		font-size: 100%;						//	IE
+		font-size: rem($base-font-size);
+		line-height: $baseline;
+		font-weight: 400;
+		color: $text-color;
 	}
+
+
+
+	//	loading media query specific font sizes
+	@include set-font-sizes($font-sizes-small);
+	@media #{$medium}	{ @include set-font-sizes($font-sizes-medium); }
+	@media #{$large}	{ @include set-font-sizes($font-sizes-large); }
+	@media #{$xlarge}	{ @include set-font-sizes($font-sizes-xlarge); }
+
+
+
+	h1, h2, h3, h4, h5, h6,
+	p, blockquote, table, pre, ul, ol, dl {
+	//	margin-top: $baseline;
+		margin-bottom: $baseline;
+	}
+
+	ul, ol {
+		ul, ol {
+	//		margin-top: 0;
+			margin-bottom: 0;
+		}
+	}
+
+
+	//	headers
+	h1, h2, h3, h4, h5, h6 {
+		color: $header-color;
+	}
+
+	.subheader {
+		color: $subheader-color;
+	}
+
+
+	//	paragraph
+	p {}
+
+	//	small sized text
+	small, sub, sup {}
+
+	//	abbreviation
+	abbr {}
+
+	//	address
+	address {}
+
+	//	time format
+	time {}
+
+	//	ordered list
+	ol { li {} }
+
+	//	unordered list
+	ul { li {} }
+
+	//	keyboard input
+	kbd {}
+
+	//	aside text
+	aside {}
+
 }
-
-
-//	headers
-h1, h2, h3, h4, h5, h6 {
-	color: $header-color;
-}
-
-.subheader {
-	color: $subheader-color;
-}
-
-
-//	paragraph
-p {}
-
-//	small sized text
-small, sub, sup {}
-
-//	abbreviation
-abbr {}
-
-//	address
-address {}
-
-//	time format
-time {}
-
-//	ordered list
-ol { li {} }
-
-//	unordered list
-ul { li {} }
-
-//	keyboard input
-kbd {}
-
-//	aside text
-aside {}
