@@ -39,8 +39,8 @@
 	.size-xs	{ font-size: .8em;		height: $baseline;			line-height: $baseline; }
 	.size-sm	{ font-size: .9em;		height: $baseline * 1.2;	line-height: $baseline * 1.2; }
 	.size-md	{ font-size: 1em;		height: $baseline * 1.4;	line-height: $baseline * 1.4; }
-	.size-lg	{ font-size: 1em;		height: $baseline * 2;		line-height: $baseline * 2; }
-	.size-xl	{ font-size: 1.2em;		height: $baseline * 2.5;	line-height: $baseline * 2.5; }
+	.size-lg	{ font-size: 1em;		height: $baseline * 1.7;	line-height: $baseline * 1.7; }
+	.size-xl	{ font-size: 1.2em;		height: $baseline * 2.0;	line-height: $baseline * 2.0; }
 
 	@-moz-document url-prefix() {			//	mozilla specific overrides
 
@@ -57,15 +57,15 @@
 	.size-inline-xs	{ padding-left: $es-grid-gutter / 2;	padding-right: $es-grid-gutter / 2; }
 	.size-inline-sm	{ padding-left: $es-grid-gutter / 1.5;	padding-right: $es-grid-gutter / 1.5; }
 	.size-inline-md	{ padding-left: $es-grid-gutter; 		padding-right: $es-grid-gutter; }
-	.size-inline-lg	{ padding-left: $es-grid-gutter * 1.2;	padding-right: $es-grid-gutter * 1.2; }
-	.size-inline-xl	{ padding-left: $es-grid-gutter * 1.5;	padding-right: $es-grid-gutter * 1.5; }
+	.size-inline-lg	{ padding-left: $es-grid-gutter * 1.1;	padding-right: $es-grid-gutter * 1.1; }
+	.size-inline-xl	{ padding-left: $es-grid-gutter * 1.2;	padding-right: $es-grid-gutter * 1.2; }
 
 	//	Basic inline narrow size values (e.g. input)
-	.size-inline-narrow-xs	{ padding-left: $es-grid-gutter / 3.5;	padding-right: $es-grid-gutter / 4; }
-	.size-inline-narrow-sm	{ padding-left: $es-grid-gutter / 3;	padding-right: $es-grid-gutter / 2.5; }
-	.size-inline-narrow-md	{ padding-left: $es-grid-gutter / 2.5; 	padding-right: $es-grid-gutter / 2; }
-	.size-inline-narrow-lg	{ padding-left: $es-grid-gutter / 2;	padding-right: $es-grid-gutter / 1.5; }
-	.size-inline-narrow-xl	{ padding-left: $es-grid-gutter / 2;	padding-right: $es-grid-gutter; }
+	.size-inline-narrow-xs	{ padding-left: $es-grid-gutter / 3.5;	padding-right: $es-grid-gutter / 3.5; }
+	.size-inline-narrow-sm	{ padding-left: $es-grid-gutter / 3;	padding-right: $es-grid-gutter / 3; }
+	.size-inline-narrow-md	{ padding-left: $es-grid-gutter / 2.5; 	padding-right: $es-grid-gutter / 2.5; }
+	.size-inline-narrow-lg	{ padding-left: $es-grid-gutter / 2;	padding-right: $es-grid-gutter / 2; }
+	.size-inline-narrow-xl	{ padding-left: $es-grid-gutter / 2;	padding-right: $es-grid-gutter / 2; }
 
 	//	Basic inline size values for select
 	.size-inline-select-xs	{ padding-left: $es-grid-gutter / 3;	padding-right: $es-grid-gutter; }
