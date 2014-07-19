@@ -42,7 +42,7 @@
 	.size-lg	{ font-size: 1em;		height: $baseline * 1.7;	line-height: $baseline * 1.7; }
 	.size-xl	{ font-size: 1.2em;		height: $baseline * 2.0;	line-height: $baseline * 2.0; }
 
-	@-moz-document url-prefix() {			//	mozilla specific overrides
+	@-moz-document url-prefix() {			//	mozilla specific overrides to correct padding top
 
 		select {
 			&.size-xs { padding-top: $baseline / 5; }
@@ -101,6 +101,7 @@
 	button, .btn {
 		padding-top: 0;						//	Overwrites default webkit 2px button padding-top
 		padding-bottom: 0;					//	Overwrites default webkit 1px button padding-bottom
+		text-align: center;					//	in case of .btn
 		@extend .size-inline-md;
 	}
 

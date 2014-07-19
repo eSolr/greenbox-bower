@@ -15,5 +15,17 @@
   "license": "MIT",
   "ignore": [
 	  ".gitignore"
-  ]
+  ],
+  "main": [
+    "./css/greenbox",
+    "./js/greenbox.min.js",
+    "./scss/_components.scss",
+    "./font/eSolrIconSquare-Regular.eot",
+    "./font/eSolrIconSquare-Regular.svg",
+    "./font/eSolrIconSquare-Regular.ttf",
+    "./font/eSolrIconSquare-Regular.woff"
+  ],
+  "dependencies": {
+    "jquery": ">= 1.9.0"
+  }
 }
