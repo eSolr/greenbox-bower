@@ -93,6 +93,18 @@ $fw-black:		900;
 //	Color states
 //
 
+//	generates shades of a text color in 5% steps from 5%–95%
+//	output is .color-1--10 ... .color-bg--90
+@mixin generate-color-shades($classprefix, $shadedcolor) {
+
+	$i: 5;
+
+	@while $i < 100 {
+		#{$classprefix}--#{$i}	{ color: transparentize($shadedcolor, $i / 100); }
+		$i: $i + 5;
+	}
+}
+
 //	generates shades of a bgcolor in 5% steps from 5%–95%
 //	output is .classname--10 ... .classname--90
 @mixin generate-bg-shades($classprefix, $shadedcolor) {
@@ -135,6 +147,10 @@ $fw-black:		900;
 .color-bg	{ color: $bg-color; }
 .color-text	{ color: $text-color; }
 
+//	generated shades of bgcolors in 5% steps
+@include generate-color-shades(".color-bg", $bg-color);
+@include generate-color-shades(".color-text", $text-color);
+
 //	border width
 .no-border-width, .border-width-0 { border-width: 0; }
 .border-width, .border-width-1 { border-width: 1px; }
@@ -170,6 +186,7 @@ $fw-black:		900;
 	.color-1	{ color: $color-1; }
 	.border-1	{ @extend .border-width-1; @extend .border-solid; border-color: $color-1; }
 	@include generate-bg-shades(".bg-1", $color-1);
+	@include generate-color-shades(".color-1", $color-1);
 	@include generate-border-shades(".border-1", $color-1);
 }
 @if variable-exists(color-2) {
@@ -177,6 +194,7 @@ $fw-black:		900;
 	.color-2	{ color: $color-2; }
 	.border-2	{ @extend .border-width-1; @extend .border-solid; border-color: $color-2; }
 	@include generate-bg-shades(".bg-2", $color-2);
+	@include generate-color-shades(".color-2", $color-2);
 	@include generate-border-shades(".border-2", $color-2);
 }
 @if variable-exists(color-3) {
@@ -184,6 +202,7 @@ $fw-black:		900;
 	.color-3	{ color: $color-3; }
 	.border-3	{ @extend .border-width-1; @extend .border-solid; border-color: $color-3; }
 	@include generate-bg-shades(".bg-3", $color-3);
+	@include generate-color-shades(".color-3", $color-3);
 	@include generate-border-shades(".border-3", $color-3);
 }
 @if variable-exists(color-4) {
@@ -191,6 +210,7 @@ $fw-black:		900;
 	.color-4	{ color: $color-4; }
 	.border-4	{ @extend .border-width-1; @extend .border-solid; border-color: $color-4; }
 	@include generate-bg-shades(".bg-4", $color-4);
+	@include generate-color-shades(".color-4", $color-4);
 	@include generate-border-shades(".border-4", $color-4);
 }
 @if variable-exists(color-5) {
@@ -198,6 +218,7 @@ $fw-black:		900;
 	.color-5	{ color: $color-5; }
 	.border-5	{ @extend .border-width-1; @extend .border-solid; border-color: $color-5; }
 	@include generate-bg-shades(".bg-5", $color-5);
+	@include generate-color-shades(".color-5", $color-5);
 	@include generate-border-shades(".border-5", $color-5);
 }
 @if variable-exists(color-6) {
@@ -205,6 +226,7 @@ $fw-black:		900;
 	.color-6	{ color: $color-6; }
 	.border-6	{ @extend .border-width-1; @extend .border-solid; border-color: $color-6; }
 	@include generate-bg-shades(".bg-6", $color-6);
+	@include generate-color-shades(".color-6", $color-6);
 	@include generate-border-shades(".border-6", $color-6);
 }
 @if variable-exists(color-7) {
@@ -212,6 +234,7 @@ $fw-black:		900;
 	.color-7	{ color: $color-7; }
 	.border-7	{ @extend .border-width-1; @extend .border-solid; border-color: $color-7; }
 	@include generate-bg-shades(".bg-7", $color-7);
+	@include generate-color-shades(".color-7", $color-7);
 	@include generate-border-shades(".border-7", $color-7);
 }
 @if variable-exists(color-8) {
@@ -219,6 +242,7 @@ $fw-black:		900;
 	.color-8	{ color: $color-8; }
 	.border-8	{ @extend .border-width-1; @extend .border-solid; border-color: $color-8; }
 	@include generate-bg-shades(".bg-8", $color-8);
+	@include generate-color-shades(".color-8", $color-8);
 	@include generate-border-shades(".border-8", $color-8);
 }
 @if variable-exists(color-9) {
@@ -226,6 +250,7 @@ $fw-black:		900;
 	.color-9	{ color: $color-9; }
 	.border-9	{ @extend .border-width-1; @extend .border-solid; border-color: $color-9; }
 	@include generate-bg-shades(".bg-9", $color-9);
+	@include generate-color-shades(".color-9", $color-9);
 	@include generate-border-shades(".border-9", $color-9);
 }
 @if variable-exists(color-10) {
@@ -233,5 +258,6 @@ $fw-black:		900;
 	.color-10	{ color: $color-10; }
 	.border-10	{ @extend .border-width-1; @extend .border-solid; border-color: $color-10; }
 	@include generate-bg-shades(".bg-10", $color-10);
+	@include generate-color-shades(".color-10", $color-10);
 	@include generate-border-shades(".border-10", $color-10);
 }
