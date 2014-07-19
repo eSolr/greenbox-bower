@@ -24,32 +24,35 @@ $show-typography-module: true !global;
 //	Responisve selector font-size and line-height generator
 @mixin set-font-sizes($arg) {
 
-	//	if list is not empty
-	@if length($arg) != 0 {
+	@if $show-typography-module {
 
-		//	if first item is not list – this is a "hack" (hülye sass ha egy listát teszek listába, már nem látja listának)
-		@if type_of(nth($arg, 1)) != list {
+		//	if list is not empty
+		@if length($arg) != 0 {
 
-			#{nth($arg, 1)} {
-				font-size: rem(nth($arg, 2));
-				@if length($arg) >= 3 {
-					line-height: rem(nth($arg, 3));
-				} @else {
-					line-height: $baseline;
-				}
-			}
+			//	if first item is not list – this is a "hack" (hülye sass ha egy listát teszek listába, már nem látja listának)
+			@if type_of(nth($arg, 1)) != list {
 
-		//	if first item is list
-		} @else {
-
-			@each $v in $arg {
-
-				#{nth($v, 1)} {
-					font-size: rem(nth($v, 2));
-					@if length($v) >= 3 {
-						line-height: rem(nth($v, 3));
+				#{nth($arg, 1)} {
+					font-size: rem(nth($arg, 2));
+					@if length($arg) >= 3 {
+						line-height: rem(nth($arg, 3));
 					} @else {
 						line-height: $baseline;
+					}
+				}
+
+				//	if first item is list
+			} @else {
+
+				@each $v in $arg {
+
+					#{nth($v, 1)} {
+						font-size: rem(nth($v, 2));
+						@if length($v) >= 3 {
+							line-height: rem(nth($v, 3));
+						} @else {
+							line-height: $baseline;
+						}
 					}
 				}
 			}
