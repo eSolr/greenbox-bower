@@ -1,98 +1,75 @@
-//	@name		eSolr Component Settings
-//	@desc		Settings file for eSolr component library
-//	@author		Armin
-//	@tested
-//	@requires
-//
-//	todo	legyen egy default settings is beálítva
-//	todo	lowlight színek, reversed színek
-
-
 @charset "UTF-8";
+
+//
+//	eSolr Greenbox
+//
+
+//	todo	lowlight színek, reversed színek
 
 
 //	----------------------------------------
 //	Compatibility
-//	----------------------------------------
 
-$warning:				false;		// display function and mixin warnings in sass log
-$ie8:					false;		// ie8 compatibility mode for rem unit
-$ie7:					false;		// ie7 compatibility mode for inline-block
+$ie8:						false;			// ie8 compatibility mode for rem unit
+$ie7:						false;			// ie7 compatibility mode for inline-block
 
 
 //	----------------------------------------
-//	Enable modules
-//	----------------------------------------
+//	Enable/disable modules
 
-$enable-form-module: 		true;
+$enable-grid-module: 		true;			// there is no effect now
 $enable-typography-module: 	true;
+$enable-icon-module: 		true;
+$enable-form-module: 		true;
+$enable-blueprint-module: 	true;
+$enable-effect-module:		true;			// there is no effect now
+$enable-admin-module:		true;			// there is no effect now
 
 
 //	----------------------------------------
-//	Colors
+//	General variables and base values
+
+$baseline:					20pt;
+$es-global-radius:			5px;
+
+$text-color:				#333333;		// dedicated colors
+$bg-color:					#ffffff;
+$border-color:				$text-color;
+$hr-color:					$text-color;
+$gutter-color:				$text-color;
+$icon-border-color:			$text-color;
+
+$color-1:					#333333;		// accent colors
+$color-2:					#333333;
+$color-3:					#333333;
+$color-4:					#333333;
+$color-5:					#333333;
+$color-6:					#333333;
+$color-7:					#333333;
+$color-8:					#333333;
+$color-9:					#333333;
+$color-10:					#333333;
+
+$alert-color: 				#c9003d;		// supplementary colors
+$success-color: 			#009949;
+$attention-color:			#ffa911;
+
+$link-color:				dodgerblue;		//	link colors
+$link-visited-color:		darken($link-color, 15);
+$link-hover-color:			orangered;
+$link-active-color:		 	orange;
+$link-focus-color: 			$link-hover-color;
+
+//	selected				(more general than nav-sel-..., e.g. calendar selection, pagination etc.)
+$selected-color:			$bg-color;
+$selected-bg-color:			$color-1;
+
+
+
 //	----------------------------------------
-
-//	accent
-$color-1:				#333333;
-$color-2:				#333333;
-$color-3:				#333333;
-$color-4:				#333333;
-$color-5:				#333333;
-$color-6:				#333333;
-$color-7:				#333333;
-$color-8:				#333333;
-$color-9:				#333333;
-$color-10:				#333333;
+//	Init block (google and local fonts)
 
 
-//	dedicated colors
-$text-color:			#333333;
-$bg-color:				#ffffff;
-$border-color:			$color-1;
-$hr-color:				$color-3;
-$gutter-color:			$color-3;
-$icon-border-color:		$color-1;
-
-//	highlight (hover?)
-$hl-text-color:			$bg-color;
-$hl-bg-color:			$color-2;
-
-//	message colors
-$alert-color: 			#ff003f;
-$success-color: 		#349900;
-$attention-color:		#ffa911;
-
-//	link colors
-$link-color:			dodgerblue;
-$link-visited-color:	lighten($link-color, 15%);
-$link-hover-color:		orangered;
-$link-active-color: 	orange;
-$link-focus-color: 		$link-hover-color;
-
-//	navigation colors (e.g. selected menu item)
-$nav-color:				 $color-1;
-$nav-bg-color:			transparent;
-$nav-hover-color:		$bg-color;
-$nav-hover-bg-color:	$color-1;
-$nav-sel-color:		 	$bg-color;
-$nav-sel-bg-color:		$color-2;
-
-//	selected			(more general than nav-sel-..., e.g. calendar selection)
-$selected-color:		$bg-color;
-$selected-bg-color:		$color-2;
-
-//	selection color
-$selection-color:		$color-2;
-
-
-//	---------------------------------------------
-//	Typography
-//	---------------------------------------------
-//	Common font weights with numbers:
-//	thin: 100; extralight: 200; light: 300; book: 350; regular: 400; medium: 500; semibold: 600; bold: 700; extrabold: 800; black: 900;
-
-
-//	Font init
 @import url(http://fonts.googleapis.com/css?family=Source+Code+Pro&subset=latin,latin-ext);
 
 $init-font: (
@@ -101,7 +78,7 @@ $init-font: (
 );
 
 
-//	Common font-families
+//	Common font-families  – DON'T REMOVE
 $helvetica:					Helvetica, Arial, sans-serif;
 $helvetica-neue:			"Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 $arial:						Arial, Helvetica, sans-serif;
@@ -110,32 +87,41 @@ $times:						Times, "Times New Roman", Georgia, serif;
 $monospace:					Courier, "Courier New", Monaco, monospace;
 $sourcecode:				"Source Code Pro", #{$monospace};
 
-//	Base font families
+$base-sans-family:			$helvetica-neue;	// .sans
+$base-serif-family:			$georgia;			// .serif
+$base-monospace-family:		$monospace;			// .monospace
+$base-sourcecode-family:	$sourcecode;		// .sourcecode
+
+
+
+//	----------------------------------------
+//	Typography module
+
+
+//	Common font weights with numbers:
+//	thin:		100;
+//	extralight:	200;
+//	light:		300;
+//	book:		350;
+//	regular:	400;
+//	medium:		500;
+//	semibold:	600;
+//	bold:		700;
+//	extrabold:	800;
+//	black:		900;
+
 $base-font-family:			$helvetica-neue;
-$base-sans-family:			$helvetica-neue;
-$base-serif-family:			$georgia;
-$base-icon-family:			esolr-icon;
+$base-font-size:			16pt;				//	Only pt or px accepted!
+$base-rem-value:			$base-font-size;	//	This is only for IE8 fallback! The unit must be pt or px!
 
-//	Base values
-$es-rem-base:				16pt;
-$base-font-size:			16pt;			//	rem(16pt);
-$baseline:					20pt;			//	rem(20pt);
+$es-rem-base:				$base-font-size;	//	This is only for IE8 fallback! The unit must be pt or px!
 
-//	Default spacing
-$es-global-radius:			5px;
+//	selection color
+$selection-bg-color:		$color-1;
+$selection-color:			$bg-color;
 
-
-//	------------------------
-//	Font size settings
-//	$font-sizes-small is recommended the rest is optional. If you don't need any of them,
-//	leave the list empty: 	$font-sizes-large: ();
-//
-//	Recommended usage:		<h1 class="h1-medium h1-large">...</h1>
-//							<h1 class="h2 h3-medium h1-large">...</h1>
-//							<p class="h5">...</p>
-
-//	Small or general font sizes
-$font-sizes-small:			(("h1, .h1" 2.8rem ($baseline * 3))
+//	Responsive fontsizes
+$font-sizes-small: 			(("h1, .h1" 2.8rem ($baseline * 3))
 							,("h2, .h2" 2rem   ($baseline * 2))
 							,("h3, .h3" 1.5rem $baseline)
 							,("h4, .h4" 1.2rem $baseline)
@@ -146,39 +132,27 @@ $font-sizes-small:			(("h1, .h1" 2.8rem ($baseline * 3))
 							,(form .9rem)
 							);
 
-//	Font sizes for medium media query
 $font-sizes-medium:			(
 //							(".h1-medium" 3rem ($baseline * 3))
 							);
 
-//	Font sizes for large media query
 $font-sizes-large:			(
 //							(".h1-large" 3.2rem ($baseline * 3))
-);
+							);
 
-//	Font sizes for xlarge media query
 $font-sizes-xlarge:			(
 //							(".h1-xlarge" 3.5rem ($baseline * 3))
-);
+							);
 
-
-//	Font families
-$font-family-1:				$base-font-family;
-$font-family-2:				$font-family-1;
-$font-family-3:				$font-family-1;
-$font-family-4:				$font-family-1;
-
-$nav-font-family:			$font-family-1;
 
 //	Header colors
-//	todo minden h1-h6-nak külön font és szín
 $header-font:				inherit;
 $header-color:				$text-color;
 $subheader-font:			inherit;
 $subheader-color:			lighten($text-color, 50%);
 
 //	<pre>, <code> style
-$pre-font:					$monospace;
+$pre-font:					$sourcecode;
 $pre-font-smooth:			auto;
 $pre-color:					inherit;
 $pre-bg:					transparentize($text-color, .95);
@@ -195,11 +169,17 @@ $cite-color:				inherit;
 $cite-bg:					inherit;
 
 
-//	---------------------------------------------
-//	Grid
-//	---------------------------------------------
 
-//	foundation compatible grid syntax in the following order:
+//	----------------------------------------
+//	Icon module
+
+$base-icon-family:			esolr-icon;
+
+
+
+//	----------------------------------------
+//	Grid module
+
 $es-grid-syntax:			".row", ".column, .columns", "full", "offset-", "push-", "pull-", "last", "centered", "uncentered" !default;	//	1. row or wrap; 2. column; 3. full width prefix; 4. offset prefix; 5. push prefix; 6. pull prefix; 7. last column name; 8. centered column name; 9. uncentered column name;
 $es-grid-columns:			12;				//	Number of columns
 $es-grid-gutter:			20px;			//	rem(20px);		//	Gutter size
@@ -212,127 +192,9 @@ $large-screen:  			1024px;			//	1024px
 $xlarge-screen: 			1440px;			//	1440px
 
 
-//	---------------------------------------------
-//	URLs
-//	---------------------------------------------
-//$img-url:					"../" !default;
-
-
-
-//	---------------------------------------------
-//	Forms
-//	---------------------------------------------
-/*$form-item-padding-top:			7px;
-$form-item-padding-right:		10px;
-$form-item-padding-bottom:		7px;
-$form-item-padding-left:		10px;*/
-
-
-//	normal button
-/*$btn-font:						$font-family-2;
-$btn-color:						white;
-$btn-bg: 						#555555;
-$btn-border:					transparent;
-$btn-hover-color:				$btn-color;
-$btn-hover-bg:					darken($btn-bg, 15%);
-$btn-hover-border:				transparent;
-$btn-active-color:				$btn-color;
-$btn-active-bg:					black;
-$btn-active-border:				transparent;*/
-
-//	primary button:
-/*$btn-primary-color:				$btn-color;
-$btn-primary-bg:				dodgerblue;
-$btn-primary-border:			transparent;
-$btn-primary-hover-color:		$btn-color;
-$btn-primary-hover-bg:			darken(dodgerblue, 10%);
-$btn-primary-hover-border:		transparent;
-$btn-primary-active-color:		$btn-color;
-$btn-primary-active-bg:			darken(dodgerblue, 20%);
-$btn-primary-active-border:		transparent;*/
-
-//	secondary button:
-/*$btn-secondary-color:			$text-color;
-$btn-secondary-bg:				$bg-color;
-$btn-secondary-border:			transparentize($border-color, .5);
-$btn-secondary-hover-color:		$btn-secondary-color;
-$btn-secondary-hover-bg:		$bg-color;
-$btn-secondary-hover-border:	transparentize($border-color, .15);
-$btn-secondary-active-color:	$btn-color;
-$btn-secondary-active-bg:		black;
-$btn-secondary-active-border:	transparent;*/
-
-//	alert button:
-/*$btn-alert-color:				$btn-color;
-$btn-alert-bg:					$alert-color;
-$btn-alert-border:				transparent;
-$btn-alert-hover-color:			$btn-color;
-$btn-alert-hover-bg:			darken($alert-color, 5%);
-$btn-alert-hover-border:		transparent;
-$btn-alert-active-color:		$btn-color;
-$btn-alert-active-bg:			darken($alert-color, 15%);
-$btn-alert-active-border:		transparent;*/
-
-//	success button:
-/*$btn-success-color:				$btn-color;
-$btn-success-bg:				$success-color;
-$btn-success-border:			transparent;
-$btn-success-hover-color:		$btn-color;
-$btn-success-hover-bg:			darken($success-color, 5%);
-$btn-success-hover-border:		transparent;
-$btn-success-active-color:		$btn-color;
-$btn-success-active-bg:			darken($success-color, 15%);
-$btn-success-active-border:		transparent;*/
-
-//	Label
-//$label-font:					$font-family-2;
-//$label-color:
-
-//	Input
-/*$input-font:					$font-family-2;
-$input-color:					$text-color;
-$input-bg:						$bg-color;
-$input-border:					transparentize($border-color, .5);
-$input-hover-color:				$text-color;
-$input-hover-bg:				transparentize($border-color, .97);
-$input-hover-border:			transparentize($border-color, .15);
-$input-focus-color:				$text-color;
-$input-focus-bg:				transparentize(yellow, .75);
-$input-focus-border:			transparentize($border-color, .15);*/
-
-//	Texarea
-//$textarea-font:					$font-family-2;
-
-//	Select
-/*$select-font:					$font-family-2;
-$select-color:					$text-color;
-$select-bg:						transparentize($text-color, .95);
-$select-border:					transparentize($border-color, .75);
-$select-hover-color:			$text-color;
-$select-hover-bg:				$select-bg;
-$select-hover-border:			transparentize($border-color, .5);*/
-
-//	select-btn-group
-/*$select-btn-selected-color:		$btn-color;
-$select-btn-selected-bg:		$btn-bg;
-$select-btn-selected-border:	inherit;*/
-
-//	Placeholder
-/*$placeholder-text-font:			$font-family-2;
-$placeholder-text-color:		lightgray;*/
-
-//	Fieldset
-//$fieldset-border-color:			transparentize($border-color, .9);
-
-//	Legend
-/*$legend-text-color:				$text-color;
-$legend-bg-color:				$bg-color;
-$legend-border-color:			$fieldset-border-color;*/
-
-
 //	----------------------------------------
 //	Debugging
-//	----------------------------------------
 
-$DEBUG-MESSAGE:		false;
-$DEBUG:				false;
+$warning:					false;		// display function and mixin warnings in sass log
+$DEBUG-MESSAGE:				false;
+$DEBUG:						false;

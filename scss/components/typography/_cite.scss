@@ -5,9 +5,21 @@
 //	@requires
 
 
-//	hivatkozás (pl. könyv címére)
-cite {
-	font-family: $cite-font;
-	color: $cite-color;
-	background-color: $cite-bg;
+
+@if global-variable-exists(enable-typography-module) {
+	@if not $enable-typography-module {
+		$show-typography-module: false !global;
+	}
 }
+
+@if $show-typography-module {
+
+
+	//	hivatkozás (pl. könyv címére)
+	cite {
+		font-family: $cite-font;
+		color: $cite-color;
+		background-color: $cite-bg;
+	}
+}
+

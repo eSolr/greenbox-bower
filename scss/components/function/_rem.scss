@@ -5,6 +5,10 @@
 //	@requires	_esolr-settings.scss ($ie8, $warning)
 
 
+//	Resource
+//	http://dpi.lv/#17.3″
+
+
 //	Converts argument or list of arguments to rem value or list of rem value.
 //	The unit of argument and $es-rem-base has to match to get a valid rem value.
 //	Otherwise it returns the original argument. If $ie8 compatibility is set
@@ -20,37 +24,82 @@
 @if not global-variable-exists(ie8) { $ie8: false !global; }
 @if not global-variable-exists(warning) { $warning: false !global; }
 
+//
+//	megnézni, hogy rem-e
+//	megnézni, hogy a base px-e
+//
 
-@function rem($arg) {
 
-	$es-f-rem: ();
+$client-dpi-for-rem-base: 96 !global;
 
-	@if type_of($arg) != list {
-		@if unit($arg) == unit($es-rem-base) {
-			@return if($ie8, no-rem($arg), $arg / $es-rem-base * 1rem);
-		}
-		@if global-variable-exist(warning) {
-			@if $warning {
-				@warn "Excursive unit between argument and $es-rem-base.";
-			}
-		}
-		@return $arg;
+@mixin setClientDpi($arg) {
+	$client-dpi-for-rem-base: $arg !global;
+}
+
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1),
+only screen and (min-resolution: 1dppx),
+only screen and (min-resolution: 96dpi) {
+	@include setClientDpi(96);
+}
+
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.3),
+only screen and (min-resolution: 1.3dppx),
+only screen and (min-resolution: 144dpi) {
+	@include setClientDpi(144);
+}
+
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.5),
+only screen and (min-resolution: 1.5dppx),
+only screen and (min-resolution: 196dpi) {
+	@include setClientDpi(196);
+}
+
+
+//	pt 2 px conversion
+@function pt2px($arg) {
+	@if (unit($arg) == pt) {
+		$arg: $arg / ($arg * 0 + 1);
+		@return round($arg * (96 / 72));
 	}
-
-	@else if type_of($arg) == list {
-		@each $v in $arg {
-			$es-f-rem: append($es-f-rem, rem($v));
-		}
-		@return $es-f-rem;
+	@else {
+		@return $arg;
 	}
 }
 
 
-//	Converts rem value to the unit of $es-rem-base which could be px, pt etc.
-//
-//	Usage:	$es-rem-base: 16px; @warn no-rem(1rem) 		// 16px
-//			$es-rem-base: 16px; @warn no-rem(.5rem) 	// 8px
-//			$es-rem-base: 16pt; @warn no-rem(1.5rem) 	// 24pt
+
+//	Convert rem value to px/pt using the unit of base rem value.
+//	Any other unit remains original.
+@function rem($arg) {
+
+	$arg-list: ();
+	$ie7: false !default !global;
+	$ie8: false !default !global;
+
+	@if ($ie8 or $ie7) {
+		@if (type_of($arg) == list) {
+			@each $i in $arg { $arg-list: append($arg-list, rem($i)); }
+			@return $arg-list;
+		}
+		@else if (type-of($arg) == number) {
+
+			@if (unit($arg) == rem and (unit($base-rem-value) == pt or unit($base-rem-value) == px)) {		// if arg is rem and base rem value is pt or px
+				@return ($arg / ($arg * 0 + 1)) * $base-rem-value;
+			}
+			@else {
+				@return $arg;												// if arg is not rem
+			}
+		}
+	}
+	@else {
+		@return $arg;
+	}
+}
+
+
 
 @function no-rem($arg) {
 	@if unit($arg) == rem {

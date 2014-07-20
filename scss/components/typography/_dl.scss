@@ -5,9 +5,19 @@
 //	@requires
 
 
-dl {
-	dt {
-		font-weight: bolder;
+
+@if global-variable-exists(enable-typography-module) {
+	@if not $enable-typography-module {
+		$show-typography-module: false !global;
 	}
-	dd {}
+}
+
+@if $show-typography-module {
+
+	dl {
+		dt {
+			font-weight: bolder;
+		}
+		dd {}
+	}
 }
