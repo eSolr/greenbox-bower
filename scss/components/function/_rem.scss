@@ -2,10 +2,9 @@
 //	@name
 //	@author		Armin
 //	@tested
-//	@requires	_esolr-settings.scss ($ie8, $warning)
+//	@requires	_settings.scss ($ie8, $warning)
 
-
-//	Resource
+//	Research
 //	http://dpi.lv/#17.3″
 
 
@@ -13,27 +12,20 @@
 //	The unit of argument and $es-rem-base has to match to get a valid rem value.
 //	Otherwise it returns the original argument. If $ie8 compatibility is set
 //	to true, the px/pt/etc. fallback become active.
-//
-//	Usage:	$es-rem-base: 16px;	@warn rem(16px); 		// 1rem
-//			$es-rem-base: 16pt;	@warn rem(16pt); 		// 1rem
-//			$es-rem-base: 100%;	@warn rem(100%); 		// 1rem
-//			$es-rem-base: 16px;	@warn rem(18pt); 		// 18pt
-//			$es-rem-base: 16px;	@warn rem(8px 24px); 	// 0.5rem 1.5rem
 
 
-@if not global-variable-exists(ie8) { $ie8: false !global; }
-@if not global-variable-exists(warning) { $warning: false !global; }
 
-//
-//	megnézni, hogy rem-e
-//	megnézni, hogy a base px-e
-//
+$base-font-size:			12pt !default;						//	Only pt or px accepted!
+$base-rem-value:			$base-font-size !default;			//	This is only for IE8 fallback! Only pt or px accepted!
+$ie7:						false !default;
+$ie8:						false !default;
+$warning:					false !default;
+$client-dpi:				96 !default;
 
 
-$client-dpi-for-rem-base: 96 !global;
 
 @mixin setClientDpi($arg) {
-	$client-dpi-for-rem-base: $arg !global;
+	$client-dpi: $arg !global;
 }
 
 @media
@@ -71,13 +63,11 @@ only screen and (min-resolution: 196dpi) {
 
 
 
-//	Convert rem value to px/pt using the unit of base rem value.
-//	Any other unit remains original.
+//	Convert rem value to px/pt using the unit of base rem value
+//	if $ie7 or $ie8 is true. Any other unit remains the original.
 @function rem($arg) {
 
 	$arg-list: ();
-	$ie7: false !default !global;
-	$ie8: false !default !global;
 
 	@if ($ie8 or $ie7) {
 		@if (type_of($arg) == list) {
@@ -90,23 +80,11 @@ only screen and (min-resolution: 196dpi) {
 				@return ($arg / ($arg * 0 + 1)) * $base-rem-value;
 			}
 			@else {
-				@return $arg;												// if arg is not rem
+				@return $arg;	// if arg is not rem
 			}
 		}
 	}
 	@else {
 		@return $arg;
 	}
-}
-
-
-
-@function no-rem($arg) {
-	@if unit($arg) == rem {
-		@return $es-rem-base * ($arg / 1rem);
-	}
-	@if global-variable-exist(warning) {
-		@if $warning {@warn "Excursive unit. Argument is not a 'rem' value.";}
-	}
-	@return $arg;
 }

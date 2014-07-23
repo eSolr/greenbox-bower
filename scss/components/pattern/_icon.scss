@@ -28,13 +28,7 @@
 
 
 //	Enable / disable modul
-$show-icon-module: true !global;
-
-@if global-variable-exists(enable-icon-module) {
-	@if not $enable-icon-module {
-		$show-icon-module: false !global;
-	}
-}
+$enable-icon-module:		true !default;
 
 
 //  Set symbol added as an arguent
@@ -73,7 +67,7 @@ $show-icon-module: true !global;
 
 
 //	Load icon module
-@if $show-icon-module {
+@if $enable-icon-module {
 
 
 	//@include init-font("esolr-icon", "../font/eSolrIconSquare-Regular", eot woff ttf, 400, normal);

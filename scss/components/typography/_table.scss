@@ -5,13 +5,7 @@
 //	@requires
 
 
-@if global-variable-exists(enable-typography-module) {
-	@if not $enable-typography-module {
-		$show-typography-module: false !global;
-	}
-}
-
-@if $show-typography-module {
+@if $enable-typography-module {
 
 	table {
 		h1, h2, h3, h4, h5, h6,

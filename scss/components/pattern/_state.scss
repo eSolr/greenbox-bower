@@ -1,4 +1,33 @@
 
+//	Common font families
+$helvetica:					Helvetica, Arial, sans-serif !default;
+$helvetica-neue:			"Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif !default;
+$arial:						Arial, Helvetica, sans-serif !default;
+$georgia:					Georgia, Times, "Times New Roman", serif !default;
+$times:						Times, "Times New Roman", Georgia, serif !default;
+$monospace:					Courier, "Courier New", Monaco, monospace !default;
+$sourcecode:				"Source Code Pro", #{$monospace} !default;
+
+//	Default font families
+$base-sans-family:			$helvetica-neue !default;	// .sans
+$base-serif-family:			$georgia !default;			// .serif
+$base-monospace-family:		$monospace !default;		// .monospace
+$base-sourcecode-family:	$sourcecode !default;		// .sourcecode
+
+//	Default fontweights;
+$fw-thin:					100 !default;
+$fw-extralight:				200 !default;
+$fw-light:					300 !default;
+$fw-book:					350 !default;
+$fw-regular:				400 !default;
+$fw-medium:					500 !default;
+$fw-semibold:				600 !default;
+$fw-bold:					700 !default;
+$fw-extrabold:				800 !default;
+$fw-black:					900 !default;
+
+
+
 //
 //	Layout specific states
 //
@@ -23,10 +52,7 @@
 .fluid-width { width: 100%; }
 .fluid-height { height: 100%; }
 
-
-//
 //	Box sizing
-//
 .borderbox { @include border-box; }
 .contentbox { @include content-box; }
 
@@ -35,17 +61,6 @@
 //	Typographic states
 //
 
-//	Default fontweights;
-$fw-thin:		100;
-$fw-extralight:	200;
-$fw-light:		300;
-$fw-book:		350;
-$fw-regular:	400;
-$fw-medium:		500;
-$fw-semibold:	600;
-$fw-bold:		700;
-$fw-extrabold:	800;
-$fw-black:		900;
 
 //	Font style
 .regular { font-style: normal; }

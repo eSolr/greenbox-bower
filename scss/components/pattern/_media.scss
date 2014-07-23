@@ -5,6 +5,11 @@
 //  @requires
 
 
+
+$baseline:					18pt;
+$gutter:					$es-grid-gutter;
+
+
 //  Usage in html
 //
 //<div class="media">
@@ -22,7 +27,7 @@
 
 	.media-left {
 		float: left;
-		margin-right: $es-grid-gutter / 2;
+		margin-right: $gutter / 2;
 
 		img { display: block; }
 	}
@@ -33,7 +38,7 @@
 
 	.media-right {
 		float: right;
-		margin-left: $es-grid-gutter / 2;
+		margin-left: $gutter / 2;
 
 		img { display: block; }
 	}

@@ -1,34 +1,18 @@
 //
 //  Defining grid variables and class manipaltig @mixins
-//  NOR FOR DIRECT @IMPORT
+//  NOT FOR DIRECT @IMPORT
 //
-
-
-//@import "esolr/variables";
 
 
 //
 //  Global grid variables
 //
 
-$generate-fluid-grid: true !global;
-
-//  original grid syntax
-//$es-grid-class-names: "wrap", "column", "full", "offset", "push", "pull", "last", "centered", "uncentered" !default;
-
-//  foundation compatible grid syntax
-//$foundation-syntax: ".row", ".column, .columns", "full", "offset-", "push-", "pull-", "last", "centered", "uncentered" !default;  // moved to _variables
-
 //  setting foundation specific names
 $es-grid-class-names: $es-grid-syntax !global;
 
 //  default reading direction
 $es-grid-direction: left !default;
-
-//  Default grid: 12 column x 60px column width / 30px gutter
-//$es-grid-columns: 12 !default;            // moved to _variables
-//$es-grid-width: rem-calc(60px) !default;  // only for static grid
-//$es-grid-gutter: rem-calc(30px) !default; // moved to _variables
 
 //  default prefixes
 $es-grid-prefix: "" !global;

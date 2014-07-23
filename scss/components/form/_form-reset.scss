@@ -14,18 +14,12 @@
 
 
 
-//	Enable / disable modul
-$show-form-module: true !global;
-
-@if global-variable-exists(enable-form-module) {
-	@if not $show-form-module {
-		$show-form-module: false !global;
-	}
-}
+$enable-form-module:		true !default;
+$baseline:					18pt;
+$gutter:					$es-grid-gutter;
 
 
-
-@if $show-form-module {
+@if $enable-form-module {
 
 
 	//
@@ -66,25 +60,25 @@ $show-form-module: true !global;
 	}
 
 	//	Basic inline size values (e.g. buttons)
-	.size-inline-xs	{ padding-left: $es-grid-gutter / 2;	padding-right: $es-grid-gutter / 2; }
-	.size-inline-sm	{ padding-left: $es-grid-gutter / 1.5;	padding-right: $es-grid-gutter / 1.5; }
-	.size-inline-md	{ padding-left: $es-grid-gutter; 		padding-right: $es-grid-gutter; }
-	.size-inline-lg	{ padding-left: $es-grid-gutter * 1.1;	padding-right: $es-grid-gutter * 1.1; }
-	.size-inline-xl	{ padding-left: $es-grid-gutter * 1.2;	padding-right: $es-grid-gutter * 1.2; }
+	.size-inline-xs	{ padding-left: $gutter / 2;	padding-right: $gutter / 2; }
+	.size-inline-sm	{ padding-left: $gutter / 1.5;	padding-right: $gutter / 1.5; }
+	.size-inline-md	{ padding-left: $gutter; 		padding-right: $gutter; }
+	.size-inline-lg	{ padding-left: $gutter * 1.1;	padding-right: $gutter * 1.1; }
+	.size-inline-xl	{ padding-left: $gutter * 1.2;	padding-right: $gutter * 1.2; }
 
 	//	Basic inline narrow size values (e.g. input)
-	.size-inline-narrow-xs	{ padding-left: $es-grid-gutter / 3.5;	padding-right: $es-grid-gutter / 3.5; }
-	.size-inline-narrow-sm	{ padding-left: $es-grid-gutter / 3;	padding-right: $es-grid-gutter / 3; }
-	.size-inline-narrow-md	{ padding-left: $es-grid-gutter / 2.5; 	padding-right: $es-grid-gutter / 2.5; }
-	.size-inline-narrow-lg	{ padding-left: $es-grid-gutter / 2;	padding-right: $es-grid-gutter / 2; }
-	.size-inline-narrow-xl	{ padding-left: $es-grid-gutter / 2;	padding-right: $es-grid-gutter / 2; }
+	.size-inline-narrow-xs	{ padding-left: $gutter / 3.5;	padding-right: $gutter / 3.5; }
+	.size-inline-narrow-sm	{ padding-left: $gutter / 3;	padding-right: $gutter / 3; }
+	.size-inline-narrow-md	{ padding-left: $gutter / 2.5; 	padding-right: $gutter / 2.5; }
+	.size-inline-narrow-lg	{ padding-left: $gutter / 2;	padding-right: $gutter / 2; }
+	.size-inline-narrow-xl	{ padding-left: $gutter / 2;	padding-right: $gutter / 2; }
 
 	//	Basic inline size values for select
-	.size-inline-select-xs	{ padding-left: $es-grid-gutter / 3;	padding-right: $es-grid-gutter; }
-	.size-inline-select-sm	{ padding-left: $es-grid-gutter / 2.5;	padding-right: $es-grid-gutter; }
-	.size-inline-select-md	{ padding-left: $es-grid-gutter / 2; 	padding-right: $es-grid-gutter; }
-	.size-inline-select-lg	{ padding-left: $es-grid-gutter / 1.5;	padding-right: $es-grid-gutter; }
-	.size-inline-select-xl	{ padding-left: $es-grid-gutter;		padding-right: $es-grid-gutter * 1.2; }
+	.size-inline-select-xs	{ padding-left: $gutter / 3;	padding-right: $gutter; }
+	.size-inline-select-sm	{ padding-left: $gutter / 2.5;	padding-right: $gutter; }
+	.size-inline-select-md	{ padding-left: $gutter / 2; 	padding-right: $gutter; }
+	.size-inline-select-lg	{ padding-left: $gutter / 1.5;	padding-right: $gutter; }
+	.size-inline-select-xl	{ padding-left: $gutter;		padding-right: $gutter * 1.2; }
 
 
 	//	Form defaults
@@ -266,6 +260,3 @@ $show-form-module: true !global;
 		&.form-item-xl { @extend .size-xl; }
 	}
 }
-
-
-

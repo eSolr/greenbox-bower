@@ -3,9 +3,14 @@
 //	@name		Whitespace
 //	@author
 //	@tested		Safari, Chrome, Firefox, IE7+
-//	@requires	_esolr-settings.scss
+//	@requires	_settings.scss
 //
 //	todo		negatív értékekre is megcsinálni
+
+
+
+$baseline:					18pt;
+$gutter:					$es-grid-gutter;
 
 
 //	––––––––––––––––––––––––––––––––––––––––––––––––––––––––
@@ -39,17 +44,17 @@
 
 //	margin left
 .no-margin-left		{ margin-left: 0 !important; }
-.margin-left		{ margin-left: $es-grid-gutter; }
-.margin-left-half	{ margin-left: $es-grid-gutter / 2; }
-.margin-left-third	{ margin-left: $es-grid-gutter / 3; }
-.margin-left-dbl	{ margin-left: $es-grid-gutter * 2; }
+.margin-left		{ margin-left: $gutter; }
+.margin-left-half	{ margin-left: $gutter / 2; }
+.margin-left-third	{ margin-left: $gutter / 3; }
+.margin-left-dbl	{ margin-left: $gutter * 2; }
 
 //	margin right
 .no-margin-right	{ margin-right: 0 !important; }
-.margin-right		{ margin-right: $es-grid-gutter; }
-.margin-right-half	{ margin-right: $es-grid-gutter / 2; }
-.margin-right-third	{ margin-right: $es-grid-gutter / 3; }
-.margin-right-dbl	{ margin-right: $es-grid-gutter * 2; }
+.margin-right		{ margin-right: $gutter; }
+.margin-right-half	{ margin-right: $gutter / 2; }
+.margin-right-third	{ margin-right: $gutter / 3; }
+.margin-right-dbl	{ margin-right: $gutter * 2; }
 
 //	horizontal margin
 .no-hmargin			{ @extend .no-margin-left;		@extend .no-margin-right; }
@@ -92,17 +97,17 @@
 
 //	padding left
 .no-padding-left		{ padding-left: 0 !important; }
-.padding-left			{ padding-left: $es-grid-gutter; }
-.padding-left-half		{ padding-left: $es-grid-gutter / 2; }
-.padding-left-third		{ padding-left: $es-grid-gutter / 3; }
-.padding-left-dbl		{ padding-left: $es-grid-gutter * 2; }
+.padding-left			{ padding-left: $gutter; }
+.padding-left-half		{ padding-left: $gutter / 2; }
+.padding-left-third		{ padding-left: $gutter / 3; }
+.padding-left-dbl		{ padding-left: $gutter * 2; }
 
 //	padding right
 .no-padding-right		{ padding-right: 0 !important; }
-.padding-right			{ padding-right: $es-grid-gutter; }
-.padding-right-half		{ padding-right: $es-grid-gutter / 2; }
-.padding-right-third	{ padding-right: $es-grid-gutter / 3; }
-.padding-right-dbl		{ padding-right: $es-grid-gutter * 2; }
+.padding-right			{ padding-right: $gutter; }
+.padding-right-half		{ padding-right: $gutter / 2; }
+.padding-right-third	{ padding-right: $gutter / 3; }
+.padding-right-dbl		{ padding-right: $gutter * 2; }
 
 //	horizontal padding
 .no-hpadding			{ @extend .no-padding-left;		@extend .no-padding-right; }
@@ -124,7 +129,7 @@
 //
 
 //	Horizontal spacing
-@mixin hspacing($prefix: "hspacing", $spacing: $es-grid-gutter) {
+@mixin hspacing($prefix: "hspacing", $spacing: $gutter) {
 
 	.#{$prefix} {
 
@@ -138,10 +143,10 @@
 	}
 }
 
-@include hspacing("hspacing", $es-grid-gutter);
-@include hspacing("hspacing-half", $es-grid-gutter / 2);
-@include hspacing("hspacing-third", $es-grid-gutter / 3);
-@include hspacing("hspacing-quarter", $es-grid-gutter / 4);
+@include hspacing("hspacing", $gutter);
+@include hspacing("hspacing-half", $gutter / 2);
+@include hspacing("hspacing-third", $gutter / 3);
+@include hspacing("hspacing-quarter", $gutter / 4);
 @include hspacing("hspacing-1", 1px);
 @include hspacing("hspacing-2", 2px);
 @include hspacing("hspacing-3", 3px);

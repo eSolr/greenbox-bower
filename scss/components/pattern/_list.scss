@@ -10,6 +10,11 @@
 //	Research:		http://css-tricks.com/almanac/properties/l/list-style/
 
 
+
+$baseline:					18pt;
+$gutter:					$es-grid-gutter;
+
+
 ol,
 ul {
 	padding: 0;
@@ -46,12 +51,12 @@ ul {
 .list-inline-box {
 	@extend .list-inline;
 
-	margin-left: $es-grid-gutter / -2;
-	margin-right: $es-grid-gutter / -2;
+	margin-left: $gutter / -2;
+	margin-right: $gutter / -2;
 
 	> * {
-		padding-left: $es-grid-gutter / 2;
-		padding-right: $es-grid-gutter / 2;
+		padding-left: $gutter / 2;
+		padding-right: $gutter / 2;
 		padding-top: 0;
 		padding-bottom: $baseline;
 		vertical-align: top;

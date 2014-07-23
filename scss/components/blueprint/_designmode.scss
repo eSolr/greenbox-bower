@@ -9,17 +9,13 @@
 
 
 
-//	Enable / disable modul
-$show-blueprint-module: true !global;
+$enable-blueprint-module:	true !default;
+$baseline:					18pt;
+$gutter:					$es-grid-gutter;
 
-@if global-variable-exists(enable-blueprint-module) {
-	@if not $enable-blueprint-module {
-		$show-blueprint-module: false !global;
-	}
-}
 
 //	Load blueprint module
-@if $show-blueprint-module {
+@if $enable-blueprint-module {
 
 	body[data-design-mode="true"] {
 

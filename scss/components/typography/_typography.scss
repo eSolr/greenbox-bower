@@ -2,7 +2,7 @@
 //	@name
 //	@author		Armin
 //	@tested
-//	@requires	_esolr-settings.scss
+//	@requires	_settings.scss
 //
 //	todo		végignyálazni az összes elemet (belső sablon lehetőségeket stb.)
 //	todo		a további alapformázásokat is belőni (cite, abbr, code, q stb.)
@@ -11,14 +11,21 @@
 
 
 
-//	Enable / disable modul
-$show-typography-module: true !global;
+$enable-typography-module:	true !default;
 
-@if global-variable-exists(enable-typography-module) {
-	@if not $enable-typography-module {
-		$show-typography-module: false !global;
-	}
-}
+//	Common font families
+$helvetica:					Helvetica, Arial, sans-serif !default;
+$helvetica-neue:			"Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif !default;
+$arial:						Arial, Helvetica, sans-serif !default;
+$georgia:					Georgia, Times, "Times New Roman", serif !default;
+$times:						Times, "Times New Roman", Georgia, serif !default;
+$monospace:					Courier, "Courier New", Monaco, monospace !default;
+$sourcecode:				"Source Code Pro", #{$monospace} !default;
+
+$base-font-family:			$helvetica-neue !default;
+$base-font-size:			12pt !default;
+$baseline:					18pt;
+$gutter:					$es-grid-gutter;
 
 
 //	Responisve selector font-size and line-height generator
@@ -59,7 +66,7 @@ $show-typography-module: true !global;
 
 
 //	Load typography module
-@if $show-typography-module {
+@if $enable-typography-module {
 
 	body {
 		@include font-smoothing(true);

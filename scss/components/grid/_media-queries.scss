@@ -8,25 +8,14 @@
 //	http://stackoverflow.com/questions/20664684/correct-queries-for-screen-widths-and-device-resolutions
 //	https://gist.github.com/kimroen/4117149#file-high-dpi-media-scss
 //	http://www.w3.org/blog/CSS/2012/06/14/unprefix-webkit-device-pixel-ratio/
+//	https://gist.github.com/mparker17/27ec1d0a770b0ea9218d
+//	http://css-tricks.com/snippets/css/retina-display-media-query/
 
 
-
-
-//@import "esolr/variables";
-//@import "esolr/utility/rem-calc";
-
-
-//  responsivity breakpoints
-//$small-screen:  rem-calc(640px);
-//$medium-screen: 640px;
-//$medium-screen: px-calc(64rem);
-//$large-screen:  px-calc(102.4rem);
-//$xlarge-screen: px-calc(144rem);
-
-//	kivezetve az esolr-settingbe
-//$medium-screen: 640px;
-//$large-screen:  1024px;
-//$xlarge-screen: 1440px;
+//	Default breakingpoints
+$medium-screen: 			640px !default;
+$large-screen:  			1024px !default;
+$xlarge-screen: 			1440px !default;
 
 //  screen size specific media queries
 $screen:        "only screen" !global; // - 640px
