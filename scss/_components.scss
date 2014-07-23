@@ -58,12 +58,13 @@
 @import "components/pattern/list-divider";
 @import "components/pattern/list-style";
 @import "components/pattern/media";
+@import "components/pattern/media-query";			// grid
 @import "components/pattern/navigation";
 @import "components/pattern/ratio";
 @import "components/pattern/stack";
 @import "components/pattern/middle";
 @import "components/pattern/video";
-@import "components/pattern/visibility";
+@import "components/pattern/visibility";			// grid
 @import "components/pattern/wrap";
 @import "components/pattern/alignment";
 @import "components/pattern/state";
@@ -75,12 +76,8 @@
 
 
 // grid
-@import "components/grid/media-queries";
-@import "components/grid/grid-variables";
-@import "components/grid/grid-visibility";
 @import "components/grid/debug";
 @import "components/grid/grid";
-//@import "components/grid2/grid2";
 
 
 // typography
