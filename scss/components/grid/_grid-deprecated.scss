@@ -7,8 +7,6 @@
 //  additional size specific widths.
 //
 
-//  TODO border classokat elkészíteni
-
 //	Research	http://css-tricks.com/make-sure-columns-dont-collapse-horizontally/
 
 //
@@ -21,46 +19,56 @@
 
 
 
-$enable-grid-module: 		true !default;
+$enable-grid-deprecated: 		false !default;
 
-//	Compatibility settings
-$ie8:						false !default;
-$ie7:						false !default;
-
-//	Default values
-$es-grid-syntax:			".row", ".column, .columns", "full", "offset-", "push-", "pull-", "last", "centered", "uncentered" !default;	//	1. row or wrap; 2. column; 3. full width prefix; 4. offset prefix; 5. push prefix; 6. pull prefix; 7. last column name; 8. centered column name; 9. uncentered column name;
-$es-grid-columns:			12 !default;				//	Number of columns
-$es-grid-gutter:			20px !default;				//	Gutter size
-$es-grid-align:				center !default;			//	left / center / right
-$es-max-width:				1280px !default;			//	Maximum width of the page in xlarge view
-
-//	Local settings
-$SET-GRID:					false;
 
 //
-//  Global grid variables
+//	Deprecated ---------------------------------------------------------------------------------------------------------
 //
 
-//  setting foundation specific names
-$es-grid-class-names: $es-grid-syntax !global;
 
-//  default reading direction
-$es-grid-direction: left !default;
+@if $enable-grid-module and $enable-grid-deprecated {
 
-//  default prefixes
-$es-grid-prefix: "" !global;
-$es-size-prefix: "_" !global;
+	//	Compatibility settings
+	$ie8:							false !global !default;
+	$ie7:							false !global !default;
 
-//  defining default class names based on selected syntax
-$es-wrap-class: nth($es-grid-class-names, 1) !global;
-$es-column-class: nth($es-grid-class-names, 2) !global;
-$es-full-width-class: nth($es-grid-class-names, 3) !global;
-$es-offset-class: nth($es-grid-class-names, 4) !global;
-$es-push-class: nth($es-grid-class-names, 5) !global;
-$es-pull-class: nth($es-grid-class-names, 6) !global;
-$es-last-class: nth($es-grid-class-names, 7) !global;
-$es-centered-class: nth($es-grid-class-names, 8) !global;
-$es-uncentered-class: nth($es-grid-class-names, 9) !global;
+	//	Default values
+	$es-grid-syntax:				".row", ".column, .columns", "full", "offset-", "push-", "pull-", "last", "centered", "uncentered" !global !default;	//	1. row or wrap; 2. column; 3. full width prefix; 4. offset prefix; 5. push prefix; 6. pull prefix; 7. last column name; 8. centered column name; 9. uncentered column name;
+	$es-grid-columns:				$grid-columns !global !default;				//	Number of columns
+	$es-grid-gutter:				$grid-gutter !global !default;				//	Gutter size
+	$es-grid-align:					$grid-align !global !default;				//	left / center / right
+	$es-max-width:					$grid-max-width !global !default;			//	Maximum width of the page in xlarge view
+
+	//	Local settings
+	$SET-GRID:						false !global;
+
+	//
+	//  Global grid variables
+	//
+
+	//  setting foundation specific names
+	$es-grid-class-names:			$es-grid-syntax !global;
+
+	//  default reading direction
+	$es-grid-direction:				left !global !default;
+
+	//  default prefixes
+	$es-grid-prefix:				"" !global;
+	$es-size-prefix:				"_" !global;
+
+	//  defining default class names based on selected syntax
+	$es-wrap-class:					nth($es-grid-class-names, 1) !global;
+	$es-column-class:				nth($es-grid-class-names, 2) !global;
+	$es-full-width-class:			nth($es-grid-class-names, 3) !global;
+	$es-offset-class:				nth($es-grid-class-names, 4) !global;
+	$es-push-class:					nth($es-grid-class-names, 5) !global;
+	$es-pull-class:					nth($es-grid-class-names, 6) !global;
+	$es-last-class:					nth($es-grid-class-names, 7) !global;
+	$es-centered-class:				nth($es-grid-class-names, 8) !global;
+	$es-uncentered-class:			nth($es-grid-class-names, 9) !global;
+}
+
 
 
 //
@@ -121,10 +129,7 @@ $es-uncentered-class: nth($es-grid-class-names, 9) !global;
 
 
 
-//
-//  use width: fluid-span(6); to get the width of 6 columns in percent
-//
-
+//  Use width: span(6) to get the width of 6 columns in percent
 @function fluid-span($n, $columns: $es-grid-columns) {
 	@if $n == "full" {
 		$n: $columns;
@@ -468,7 +473,7 @@ $es-uncentered-class: nth($es-grid-class-names, 9) !global;
 //  generating media query based grid system
 //
 
-@if $enable-grid-module {
+@if $enable-grid-module and $enable-grid-deprecated {
 
 	//  mobile first section
 
