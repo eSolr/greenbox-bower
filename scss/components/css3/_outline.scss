@@ -1,0 +1,11 @@
+//	@desc		Draws an outline around elements
+//	@name
+//	@author		Armin
+//	@tested
+//	@requires
+
+
+@mixin outline($args) {
+  outline-style: $args;
+  outline: $args;
+}

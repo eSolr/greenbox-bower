@@ -1,0 +1,37 @@
+//  @desc
+//  @name           Images
+//  @author         Armin
+//  @tested
+//  @requires
+
+
+
+$enable-responsive-img:		true !default;
+
+
+.responsive {
+	width: 100%;                                            // to preserv flexibility with esResponsiveImg()
+	max-width: 100%;
+	height: auto;
+	width: auto\9;
+}
+
+img, embed, object, video, iframe {                         // make it responsive
+
+	@if $enable-responsive-img {
+		@extend .responsive;
+	}
+}
+
+img.static {
+	width: auto;
+	height: auto;
+}
+
+figure img {                                                // avoid space after img
+	display: block;
+}
+
+img {                                                       // IE resizing antialias fix
+	-ms-interpolation-mode: bicubic;
+}

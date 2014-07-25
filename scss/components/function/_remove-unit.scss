@@ -1,0 +1,25 @@
+//	@desc		Makes parameter (number or list with numbers) 'unitless' and returns with a discrete value or list of value
+//	@name
+//	@author		Armin
+//	@requires
+
+
+//	Usage:		remove-unit(18pt)		// 18	> number
+//				remove-unit(45deg)		// 45	> number
+//				remove-unit(3em 5px)	// 3 5	> list
+
+
+@function remove-unit($arg) {
+
+	$unitless-list: ();
+
+	@if type_of($arg != list) {
+		@return $arg / ($arg * 0 + 1);
+	}
+	@else {
+		@each $v in $arg {
+			$unitless-list: append($unitless-list, remove-unit($v));
+		}
+		@return $unitless-list;
+	}
+}

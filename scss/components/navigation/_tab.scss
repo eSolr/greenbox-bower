@@ -1,0 +1,25 @@
+//	@desc		Content tab
+//	@name		Tabs
+//	@author
+//	@tested
+//	@requires
+
+
+.tab-group {
+
+	& > * {
+
+		&:first-child {}
+	}
+}
+
+.tab {
+
+	&:hover {
+	}
+
+	.selected & {
+
+		&:hover {}
+	}
+}

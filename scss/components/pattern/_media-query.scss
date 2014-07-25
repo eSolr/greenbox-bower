@@ -1,0 +1,67 @@
+//  ------------------------------------------------------------
+//  Media query defaults
+//  ------------------------------------------------------------
+
+//	Research
+//	http://dpi.lv/
+//	http://opensourcehacker.com/2012/01/09/including-mobile-specific-css-with-css3-media-queries-setting-mobile-browser-viewport-mobilizing-websites-with-responsive-design-and-html5-part-5/
+//	http://stackoverflow.com/questions/20664684/correct-queries-for-screen-widths-and-device-resolutions
+//	https://gist.github.com/kimroen/4117149#file-high-dpi-media-scss
+//	http://www.w3.org/blog/CSS/2012/06/14/unprefix-webkit-device-pixel-ratio/
+//	https://gist.github.com/mparker17/27ec1d0a770b0ea9218d
+//	http://css-tricks.com/snippets/css/retina-display-media-query/
+
+
+
+//	Breakingpoints
+$mq-small:					480px !default;
+$mq-medium:					768px !default;
+$mq-large:					960px !default;
+$mq-xlarge:					1280px !default;
+$mq-retina:					1920px !default;
+
+//	Mobile first sizing
+//	Closed for smaller, opened for larger screens
+$screen:					"only screen" !global;
+$small:						"only screen and (min-width:"#{$mq-small}")" !global;
+$medium:					"only screen and (min-width:"#{$mq-medium}")" !global;
+$large:						"only screen and (min-width:"#{$mq-large}")" !global;
+$xlarge:					"only screen and (min-width:"#{$mq-xlarge}")" !global;
+$retina:					"only screen and (min-width:"#{$mq-retina}")" !global;
+
+//	Reversed sizing from desktop to mobile
+//	This is only for handling exceptions
+$xsmall-max:				"(max-width:"#{$mq-small - 1}")" !global;
+$small-max:					"(max-width:"#{$mq-medium - 1}")" !global;
+$medium-max:				"(max-width:"#{$mq-large - 1}")" !global;
+$large-max:					"(max-width:"#{$mq-xlarge - 1}")" !global;
+$xlarge-max:				"(max-width:"#{$mq-retina - 1}")" !global;
+
+
+//  Orientation specific media queries
+$landscape:     "only screen and (orientation: landscape)" !global;
+$portrait:      "only screen and (orientation: portrait)" !global;
+
+
+
+//
+//	Deprecated	--------------------------------------------------------------------------------------------------------
+//
+
+$enable-grid-deprecated: 		false !default;
+
+@if $enable-grid-module and $enable-grid-deprecated {
+
+	//	Default breakingpoints
+	$medium-screen: 			$mq-medium !global !default;					// 640px
+	$large-screen:  			$mq-large !global !default;						// 1024px
+	$xlarge-screen: 			$mq-xlarge !global !default;					// 1440px
+
+	//  screen size specific media queries
+	$screen:        "only screen" !global; 										// - 640px
+	//$small:         "only screen and (max-width:"#{$medium-screen}")";
+	$small:         $screen !global;
+	$medium:        "only screen and (min-width:"#{$medium-screen}")" !global;  // 640px–1024px
+	$large:         "only screen and (min-width:"#{$large-screen}")" !global;   // 1024–1440px
+	$xlarge:        "only screen and (min-width:"#{$xlarge-screen}")" !global;  // 1440px–
+}

@@ -1,0 +1,18 @@
+//	@desc		Property prefix helper
+//	@name
+//	@author		Armin
+//	@tested
+//	@requires
+
+
+//	Usage:	@include prefix("user-select", "none")
+//			@include prefix("user-select", "none", webkit moz o)
+//			@include prefix("user-select", "none", all)
+
+@mixin prefix($property, $value, $browsers: all) {
+	@if index($browsers, "webkit") or $browsers == all	{-webkit-#{$property}: $value;}
+	@if index($browsers, "moz") or $browsers == all 	{-moz-#{$property}: $value;}
+	@if index($browsers, "ms") or $browsers == all		{-ms-#{$property}: $value;}
+	@if index($browsers, "o") or $browsers == all		{-o-#{$property}: $value;}
+	#{$property}: $value;
+}

@@ -1,0 +1,65 @@
+//	@desc		Keyframe animation
+//	@name
+//	@author		Armin
+//	@tested		Safari 4+, Chrome, Firefox 5+, Opera 12+, IE 10+
+//	@requires	_prefix.scss
+
+//	Resource:	http://css-tricks.com/snippets/css/keyframe-animation-syntax/
+
+//	Usage:	@include keyframes("myAnim") {
+//				0%   { opacity: 0; }
+//  				100% { opacity: 1; }
+//			}
+//
+//			.animated-class {
+//				@include animation(myAnim $duration $delay infinite);
+//			}
+
+@mixin keyframes($animation-name) {
+	@-webkit-keyframes #{$animation-name}	{ @content; }
+	@-moz-keyframes #{$animation-name} 		{ @content; }
+	@-o-keyframes #{$animation-name}		{ @content; }
+	@keyframes #{$animation-name} 			{ @content; }
+}
+
+
+//	Usage:	@include animation(myAnim 2s infinite);
+//			@include animation(myAnim1 2s infinite, myAnim2 1s infinite);
+
+@mixin animation($params...) {
+	@include prefix("animation", $params, webkit moz o);
+}
+
+@mixin animation-name($arg...) {
+	@include prefix("animation-name", $arg, webkit moz o);
+}
+
+//	Ns, Nms
+@mixin animation-duration($arg...) {
+	@include prefix("animation-duration", $arg, webkit moz o);
+}
+
+//	N, infinite
+@mixin animation-iteration-count($arg...) {
+	@include prefix("animation-iteration-count", $arg, webkit moz o);
+}
+
+//	normal, alternate
+@mixin animation-direction($arg...) {
+	@include prefix("animation-direction", $arg, webkit moz o);
+}
+
+//	ease, ease-out, ease-in, ease-in-out, linear, cubic-bezier(x1, y1, x2, y2) (e.g. cubic-bezier(0.5, 0.2, 0.3, 1.0))
+@mixin animation-timing-function($arg...) {
+	@include prefix("animation-timing-function", $arg, webkit moz o);
+}
+
+//	forwards, backwards, both, none
+@mixin animation-fill-mode($arg...) {
+	@include prefix("animation-fill-mode", $arg, webkit moz o);
+}
+
+//	Ns, Nms
+@mixin animation-delay($arg...) {
+	@include prefix("animation-delay", $arg, webkit moz o);
+}

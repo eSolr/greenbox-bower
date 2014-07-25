@@ -1,0 +1,360 @@
+//
+//	Grid 2.0
+//
+
+//	todo	aranymetszés szerinti arányokat felvenni
+
+
+
+$enable-grid-module: 		true !default;
+$enable-grid-old-module: 	false !default;
+$ie7:						false !default;
+$ie8:						false !default;
+
+$grid-max-width:			1200px !default;	// maximum layout width (.row)
+$grid-align:				center !default;	// center|left|right
+$grid-columns:				12 !default;		// number of columns
+$grid-gutter:				20px !default;		// size of gutter
+$grid-direction:			"left";				// layout direction
+
+$mq-column-prefix:			"col" !default;		// default column prefix is size specific names e.g.: .col-md-5 etc.
+$mq-small-prefix:			"sm" !default;
+$mq-medium-prefix:			"md" !default;
+$mq-large-prefix:			"lg" !default;
+$mq-xlarge-prefix:			"xl" !default;
+$mq-retina-prefix:			"rt" !default;
+
+$mq-offset-prefix:			"offset" !default;
+$mq-push-prefix:			"push" !default;
+$mq-pull-prefix:			"pull" !default;
+$mq-last-prefix:			"last" !default;
+
+
+
+//  Use width: span(6) to get the width of 6 columns in percent, or span("full") etc.
+@function span($n, $columns: $grid-columns) {
+	@if $n == "full" { $n: $columns; }
+	@return unquote($n * 100 / $columns + "%");
+}
+
+
+//	Set row
+@mixin row($behavior: false, $gutter: $grid-gutter, $direction: $grid-direction) {
+
+	// Use @include row(collapsed) to collapse row margins
+	@if unquote($behavior) == collapsed {
+		width: 100%;
+		margin: 0;
+	}
+
+	// Use @include row(nested) to include a nested row and collapse outer margins
+	@else if unquote($behavior) == nested {
+		width: auto;
+		margin-#{$direction}: rem($gutter) / -2;
+		margin-#{opposite($direction)}: rem($gutter) / -2;
+	}
+
+	// Use @include row(nested-collapsed) to collapse outer margins on a nested wrap
+	@else if unquote($behavior) == nested-collapsed {
+		width: auto;
+		margin: 0;
+	}
+
+	// Use @include row to use a container row
+	@else {
+		width: 100%;
+
+		@if $grid-align == center {
+			margin-#{$direction}: auto;
+			margin-#{opposite($direction)}: auto;
+		}
+	}
+
+	// Clearfix
+	@include clearfix-micro;
+}
+
+
+//	Set column
+@mixin column($gutter: $grid-gutter, $direction: $grid-direction) {
+	//  details at the top above $SET-GRID
+	//	@if $SET-GRID == false {
+	position: relative;
+	float: #{$direction};
+
+	//	}
+	padding-#{$direction}: rem($gutter) / 2;
+	padding-#{opposite($direction)}: rem($gutter) / 2;
+	min-height: 1px;													// prevent column collapse if empty
+}
+
+
+//  Use @include last(true); to generate last column properties
+//
+
+@mixin last($display: true) {
+	@if $display {
+		display: table-cell;
+		@if ($ie7 or $ie8) {
+			*display: block;
+			*zoom: 1;
+		}
+		float: none;
+		_position: relative;
+		_left: -3px;
+		_margin-right: -3px;
+		width: auto;
+		&:after {
+			content: " . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+			visibility: hidden;
+			clear: both;
+			height: 0 !important;
+			display: block;
+			line-height: 0;
+		}
+	}
+	@else {
+		display: table-cell;
+		@if ($ie7 or $ie8) {
+			*display: block;
+			*zoom: 1;
+		}
+		_position: relative;
+		_left: -3px;
+		_margin-right: -3px;
+		&:after {
+			content: " . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+			visibility: hidden;
+			clear: both;
+			height: 0 !important;
+			display: block;
+			line-height: 0;
+		}
+	}
+}
+
+
+//	Generate a mediq query specific grid set
+@mixin set-grid($column-prefix: $mq-column-prefix, $size-prefix: "", $columns: $grid-columns, $gutter: $grid-gutter, $direction: $grid-direction) {
+
+	$column-prefix:	$column-prefix + "-";
+	$size-prefix:	if( $size-prefix == "", "", $size-prefix + "-");	// ha size prefix nélkül generálódik az alap
+	$offset-prefix:	$mq-offset-prefix + "-";
+	$push-prefix:	$mq-push-prefix + "-";
+	$pull-prefix:	$mq-pull-prefix + "-";
+
+	// .col-last
+	.#{$column-prefix}#{$mq-large-prefix} {
+		@include last(true);
+	}
+
+	// .col-md-full
+	.#{$column-prefix}#{$size-prefix}full {
+		@include column;
+		width: #{span("full", $columns)};
+		float: none;
+	}
+
+	// .md-full
+	.#{$column-prefix}#{$size-prefix}full {
+		width: #{span("full", $columns)};
+		float: none;
+	}
+
+	//	Generates "standard" column number based class names (e.g. .col-sm-12 .col-xl-4)
+	@for $i from 1 through $columns {
+
+		//  Generates .col-md-1, .col-md-2 [...] .col-md-* 'width' classes
+		.#{$column-prefix}#{$size-prefix}#{$i} {
+			@include column;
+			width: #{span($i, $columns)};
+		}
+
+		//  Generates .md-1, .md-2 [...] .md-* 'width' classes
+		.#{$column-prefix}#{$size-prefix}#{$i} {
+			width: #{span($i, $columns)};
+		}
+
+		@if $i < $columns {
+
+			//  Generates .md-offset-1, .md-offset-2, [...] .md-offset-[n-1] offset classes
+			.#{$size-prefix}#{$offset-prefix}#{$i} {
+				margin-#{$direction}: span($i, $columns);
+			}
+
+			//  Generates .md-push-1 [...] .md-push-[n-1] push classes
+			.#{$size-prefix}#{$push-prefix}#{$i} {
+				float: #{$direction};
+				#{$direction}: span($i, $columns);
+				#{opposite($direction)}: auto;
+			}
+
+			//  Generates .md-pull-1 [...] .md-pull-[n-1] pull classes
+			.#{$size-prefix}#{$pull-prefix}#{$i} {
+				float: #{opposite($direction)};
+				#{$direction}: auto;
+				#{opposite($direction)}: span($i, $columns)
+			}
+		}
+	}
+
+	//	Generates ratio based class names (e.g. .col-sm-1of2 .col-lg-1of4)
+	@for $i from 1 through $columns {
+
+		//  Alap aránysor 1-től az oszlop maximumig push és pull sorral .col-md-1of12, .md-push1of12 [...]
+		@if divmod($columns, $i) == 0 {
+			@for $j from 1 through $columns / $i {
+
+				//	Generates .col-md-1of[n] [...] .col-md-[n]of[n]
+				.#{$column-prefix}#{$size-prefix}#{$j}of#{$columns / $i} {
+					@include column;
+					$m: $columns / ($columns / $i);
+					width: span($j * $m, $columns);
+				}
+
+				@if $j != ($columns / $i) {
+
+					//	Generates .md-offset-1of[n] [...] .md-offset-[n-1]of[n]
+					.#{$size-prefix}#{$offset-prefix}#{$j}of#{$columns / $i} {
+						margin-#{$direction}: #{$j / $i * 100}#{"%"};
+					}
+
+					//  Generates .md-push-1of[n] [...] .md-push-[n-1]of[n]
+					.#{$size-prefix}#{$pull-prefix}#{$j}of#{$columns / $i} {
+						float: #{$direction};
+						#{$direction}: span($i, $columns);
+						#{opposite($direction)}: auto;
+					}
+
+					//  Generates .md-pull-1of[n] [...] .md-pull-[n-1]of[n]
+					.#{$size-prefix}#{$pull-prefix}#{$j}of#{$columns / $i} {
+						float: #{opposite($direction)};
+						#{$direction}: auto;
+						#{opposite($direction)}: span($i, $columns)
+					}
+				}
+			}
+		}
+
+		//  Felírható gyakori arányszámok az oszlopszámtól függetlenül
+		@else if ($i == 2 or $i == 3 or $i == 4 or $i == 5) {
+			@for $j from 1 through $i {
+
+				//	Generates .col-md-1of2, .col-md-1of3, .col-md-1of4, .col-md-1of5 [...] .col-md-4of5
+				.#{$column-prefix}#{$size-prefix}#{$j}of#{$i} {
+					@include column;
+					width: #{$j / $i * 100}#{"%"};
+				}
+
+				@if $j != $i {
+
+					//	Generates .md-offset-1of2, .md-offset-1of3, .md-offset-1of4, .md-offset-1of5 [...] .md-offset-[n-1]of5
+					.#{$size-prefix}#{$offset-prefix}#{$j}of#{$i} {
+						margin-#{$direction}: #{$j / $i * 100}#{"%"};
+					}
+
+					//  Generates .md-push-1of[n] [...] .md-push-[n-1]of[n]
+					.#{$size-prefix}#{$push-prefix}#{$j}of#{$i} {
+						float: #{$direction};
+						#{$direction}: span($i, $columns);
+						#{opposite($direction)}: auto;
+					}
+
+					//  Generates .md-pull-1of[n] [...] .md-pull-[n-1]of[n]
+					.#{$size-prefix}#{$pull-prefix}#{$j}of#{$i} {
+						float: #{opposite($direction)};
+						#{$direction}: auto;
+						#{opposite($direction)}: span($i, $columns);
+					}
+				}
+			}
+		}
+	}
+
+	// .md-centered
+	.#{$size-prefix}centered {
+		float: none;
+		margin-#{$direction}: auto;
+		margin-#{opposite($direction)}: auto;
+	}
+
+	// .md-uncentered
+	.#{$size-prefix}uncentered {
+		float: #{$direction} !important;
+		padding-#{$direction}: rem($gutter) / 2;
+		padding-#{opposite($direction)}: rem($gutter) / 2;
+	}
+}
+
+//
+//	Launch grid module
+//
+@if $enable-grid-module and not $enable-grid-deprecated {
+
+	// Makes all DOM item in grid borderbox
+	.row, .row *, .row-fluid, .row-fluid * {
+		@include border-box;
+	}
+
+	// Handles nested rows for both normal and fluid rows
+	.row, .row-fluid {
+		@include row(false, $grid-gutter, $grid-direction);
+		float: none;
+
+		* html & { overflow-x: hidden; }
+
+		.row, .row-fluid { @include row(nested, $grid-gutter, $grid-direction); }
+
+		> .row, .row-fluid { @include row(false, $grid-gutter, $grid-direction); }
+	}
+
+	// Set max-width for normal row (row-fluid remains flexible)
+	.row {
+		max-width: $grid-max-width;		// set maximum width
+	}
+
+	// By default all "column like" item gets a full width and a gutter
+	[class*="#{$mq-column-prefix}-"] {
+		@include column;
+		width: 100%;
+	}
+
+	// To keep compatibility with older grid system
+	.column {
+		@include column($grid-gutter, $grid-direction);
+	}
+
+//
+//	Rendering media query specific states
+//
+
+//	Generate default column sizes for screens
+	@media #{$screen} {
+		@include set-grid($mq-column-prefix, "");
+	}
+
+//	Generate small column sizes
+	@media #{$small} {
+		@include set-grid($mq-column-prefix, $mq-small-prefix);
+	}
+
+//	Generate medium column sizes
+	@media #{$medium} {
+		@include set-grid($mq-column-prefix, $mq-medium-prefix)
+	}
+
+//	Generate large column sizes
+	@media #{$large} {
+		@include set-grid($mq-column-prefix, $mq-large-prefix)
+	}
+
+//	Generate xlarge column sizes
+	@media #{$xlarge} {
+		@include set-grid($mq-column-prefix, $mq-xlarge-prefix)
+	}
+
+//	Generate retina column sizes
+	@media #{$retina} {
+		@include set-grid($mq-column-prefix, $mq-retina-prefix)
+	}
+}

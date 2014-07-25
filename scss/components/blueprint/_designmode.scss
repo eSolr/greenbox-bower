@@ -1,0 +1,72 @@
+//
+//	Design Mode
+//
+//
+//	Research	image converter: http://websemantics.co.uk/online_tools/image_to_data_uri_convertor/result/
+//				http://lea.verou.me/css3patterns/#lined-paper
+//				http://lea.verou.me/css3patterns/#
+//
+
+
+
+$enable-blueprint-module:	true !default;
+$baseline:					18pt !default;
+$gutter:					$es-grid-gutter !default;
+
+
+//	Load blueprint module
+@if $enable-blueprint-module {
+
+	body[data-design-mode="true"] {
+
+		$esolr-grid-color: transparentize(red, .985);
+		$esolr-baseline-color: transparentize(red, .92);
+		$esolr-subbaseline-color: transparentize(red, .95);
+		$esolr-paragraph-color: transparentize(red, .92);
+
+		background-image: linear-gradient($esolr-baseline-color 1px, transparent 1px), linear-gradient($esolr-subbaseline-color 1px, transparent 1px);
+		background-size: 100% $baseline, 100% $baseline / 2;
+		background-position: 0 0, 0 0;
+
+		//	$.fn.esDesignMode is required to activate this view
+		.esolr-grid-system {
+			position: fixed;
+			z-index: -1;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+
+			.row {
+				height: 100%;
+
+				.column {
+					height: 100%;
+
+					.grid {
+						height: 100%;
+						background-color: $esolr-grid-color;
+					}
+				}
+			}
+		}
+
+		//	makes all backgrounds transparent to help visualizing the baseline grid
+		&[data-design-xray="true"] {
+			* > * {
+				background-color: transparent;
+			}
+		}
+
+		p, h1, h2, h3, h4, h5, h6, blockquote, pre {
+			background-color: $esolr-paragraph-color;
+		}
+
+		&[data-design-xray] {
+
+			p, h1, h2, h3, h4, h5, h6, blockquote, pre {
+				background-color: $esolr-paragraph-color;
+			}
+		}
+	}
+}

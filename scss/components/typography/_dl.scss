@@ -1,0 +1,17 @@
+//	@desc		Description list
+//	@name
+//	@author
+//	@tested
+//	@requires
+
+
+
+@if $enable-typography-module {
+
+	dl {
+		dt {
+			font-weight: bolder;
+		}
+		dd {}
+	}
+}

@@ -1,0 +1,18 @@
+//	@desc		Table
+//	@name
+//	@author
+//	@tested
+//	@requires
+
+
+@if $enable-typography-module {
+
+	table {
+		h1, h2, h3, h4, h5, h6,
+		p, ul, ol, dl, blockquote, .media, pre {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+	}
+
+}

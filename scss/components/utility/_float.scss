@@ -1,0 +1,45 @@
+//	@desc		Float eleemnts
+//	@name		Float
+//	@author		Armin
+//	@tested
+//	@requires
+
+
+//	Usage:		@include float(left);
+//				@include float-left;
+
+@mixin float($arg-float-side: left) {
+	display: inline;
+	float: unquote($arg-float-side);
+}
+
+@mixin float-left {
+	@include float("left");
+}
+
+@mixin float-right {
+	@include float("right");
+}
+
+@mixin float-none {
+	@include float("none");
+}
+
+@mixin float-inherit {
+	@include float("inherit");
+}
+
+
+//	Usage:		<div class="... float-left ...">
+
+.float-left {
+	@include float-left;
+}
+
+.float-right {
+	@include float-right;
+}
+
+.float-none {
+	@include float-none
+}

@@ -1,0 +1,146 @@
+//	@desc		Responsive typography settings
+//	@name
+//	@author		Armin
+//	@tested
+//	@requires	_settings.scss
+//
+//	todo		végignyálazni az összes elemet (belső sablon lehetőségeket stb.)
+//	todo		a további alapformázásokat is belőni (cite, abbr, code, q stb.)
+//	todo		kitalálni valamit a notes, hints jellegű szövegeknek is
+//	todo		megoldani a reversed színek esetét is!
+
+
+
+$enable-typography-module:	true !default;
+
+//	Common font families
+$helvetica:					Helvetica, Arial, sans-serif !default;
+$helvetica-neue:			"Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif !default;
+$arial:						Arial, Helvetica, sans-serif !default;
+$georgia:					Georgia, Times, "Times New Roman", serif !default;
+$times:						Times, "Times New Roman", Georgia, serif !default;
+$monospace:					Courier, "Courier New", Monaco, monospace !default;
+$sourcecode:				"Source Code Pro", #{$monospace} !default;
+
+$base-font-family:			$helvetica-neue !default;
+$base-font-size:			12pt !default;
+$baseline:					18pt !default;
+$gutter:					$grid-gutter !default;
+
+
+//	Responisve selector font-size and line-height generator
+@mixin set-font-sizes($arg) {
+
+	//	if list is not empty
+	@if length($arg) != 0 {
+
+		//	if first item is not list – this is a "hack" (hülye sass ha egy listát teszek listába, már nem látja listának)
+		@if type_of(nth($arg, 1)) != list {
+
+			#{nth($arg, 1)} {
+				font-size: rem(nth($arg, 2));
+				@if length($arg) >= 3 {
+					line-height: rem(nth($arg, 3));
+				} @else {
+					line-height: $baseline;
+				}
+			}
+
+			//	if first item is list
+		} @else {
+
+			@each $v in $arg {
+
+				#{nth($v, 1)} {
+					font-size: rem(nth($v, 2));
+					@if length($v) >= 3 {
+						line-height: rem(nth($v, 3));
+					} @else {
+						line-height: $baseline;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+//	Load typography module
+@if $enable-typography-module {
+
+	body {
+		@include font-smoothing(true);
+		font-family: $base-font-family;
+		font-size: 100%;						//	IE
+		font-size: rem($base-font-size);
+		line-height: $baseline;
+		font-weight: 400;
+		color: $text-color;
+		background-color: $bg-color;
+
+		::selection {
+			background-color: $selection-bg-color;
+			color: $selection-color;
+		}
+	}
+
+	//	loading media query specific –—responsive–— font sizes
+	@include set-font-sizes($font-sizes-small);
+	@media #{$medium}	{ @include set-font-sizes($font-sizes-medium); }
+	@media #{$large}	{ @include set-font-sizes($font-sizes-large); }
+	@media #{$xlarge}	{ @include set-font-sizes($font-sizes-xlarge); }
+
+
+	//	vertival rhythm
+	h1, h2, h3, h4, h5, h6,
+	p, blockquote, table, pre, ul, ol, dl {
+		margin-bottom: $baseline;
+	}
+
+	ul, ol {
+		ul, ol {
+			margin-bottom: 0;
+		}
+	}
+
+	//	headers
+	h1, h2, h3, h4, h5, h6 {
+		color: $header-color;
+
+		a {
+			text-decoration: none;
+		}
+	}
+
+	//	subheader
+	.subheader {
+		color: $subheader-color;
+	}
+
+	//	paragraph
+	p {}
+
+	//	small sized text
+	small, sub, sup {}
+
+	//	abbreviation
+	abbr {}
+
+	//	address
+	address {}
+
+	//	time format
+	time {}
+
+	//	ordered list
+	ol { li {} }
+
+	//	unordered list
+	ul { li {} }
+
+	//	keyboard input
+	kbd {}
+
+	//	aside text
+	aside {}
+}

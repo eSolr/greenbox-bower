@@ -1,0 +1,16 @@
+
+.zindex-1-		{ z-index: -1; }
+
+@for $i from 0 through 10 {
+
+	.zindex-#{$i} {
+		z-index: $i;
+	}
+}
+
+.zindex-9		{ z-index: 9; }
+.zindex-99		{ z-index: 99; }
+.zindex-999		{ z-index: 999; }
+.zindex-9999	{ z-index: 9999; }
+.zindex-99999	{ z-index: 99999; }
+.zindex-999999	{ z-index: 999999; }

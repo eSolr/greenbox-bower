@@ -1,0 +1,44 @@
+//	@desc           Fancy unordered lists
+//	@name           List styles
+//	@author
+//	@tested
+//	@requires
+//
+//	todo	összelőni a bulletes verziókkal
+
+
+.list-style-01 {
+	@extend .margin-top-half;
+
+	> * {
+		border-bottom: 1px dotted lighten($border-color, 30%);
+		@include transition-duration(.2s);
+		@include transition-timing-function(ease-out);
+
+		&:first-child {
+			border-top: 1px dotted lighten($border-color, 30%);
+		}
+
+		&:hover {
+			padding-left: rem(1rem);
+		}
+	}
+}
+
+.list-style-02 {
+	@extend .margin-top-half;
+
+	> * {
+		border-top: 1px dotted transparentize(lighten($border-color, 50%), .5);
+		@include transition-duration(.2s);
+		@include transition-timing-function(ease-out);
+
+		&:first-child {
+			border-top: none;
+		}
+
+		&:hover {
+			padding-left: rem(1rem);
+		}
+	}
+}

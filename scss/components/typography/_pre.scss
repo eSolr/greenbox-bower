@@ -1,0 +1,46 @@
+//	@desc		Preformatted text and inline code
+//	@name
+//	@author
+//	@tested
+//	@requires
+//
+//	todo		modulnál különszedni a code-ot, mert az inline és jól nézne ki neki némi háttér
+
+
+
+@if $enable-typography-module {
+
+	pre, code {
+		font-family: $pre-font;
+		-webkit-font-smoothing: $pre-font-smooth;
+
+		// google prettyprint
+		&.prettyprint {
+			width: 100%;
+			margin-left: 0 !important;
+			font-family: $pre-sourcecode-font;
+			-webkit-font-smoothing: $pre-sourcecode-font-smooth;
+			//		background-color: #333333 !important;
+			//		@include border-radius(3px);
+		}
+		//
+		&.sourcecode {
+			font-family: $pre-sourcecode-font;
+			-webkit-font-smoothing: $pre-sourcecode-font-smooth;
+		}
+	}
+
+	pre {
+		color: $pre-color;
+		background-color: $pre-bg;
+	}
+
+	code {
+		@include inline-block;
+		padding-left: rem(.5rem);
+		padding-right: rem(.5rem);
+		color: $code-color;
+		background-color: $code-bg;
+		@include border-radius(3px);
+	}
+}

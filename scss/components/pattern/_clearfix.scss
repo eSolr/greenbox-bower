@@ -1,0 +1,109 @@
+//	@desc		Clearfix
+//	@name
+//	@author
+//	@tested
+//	@requires
+//
+//	todo 		rendbetenni
+
+
+
+//
+//clearfix     used project wide to clear floats and create a new formatting context
+//usage      @include clearfix-me(<empty|overflow|facebook|micro|stubborn>)
+//$clearfix-method sets default method
+//
+
+
+// set default clearfix method to overflow
+//$clearfix-method: overflow !default;
+// can be one of: overflow, facebook, micro, stubborn
+
+
+@if not global-variable-exists(ie8) { $ie8: false !global; }
+@if not global-variable-exists(ie7) { $ie7: false !global; }
+
+
+// create stub classes for each of the four clearfix methods 
+
+@mixin clearfix-overflow {
+	overflow: hidden;
+	@if ($ie7 or $ie8) {
+		*overflow: visible;
+	}
+	zoom: 1;
+}
+
+.clearfix-overflow { @include clearfix-overflow; }
+
+@mixin clearfix-facebook {
+	display: table-cell;
+	vertical-align: top;
+	width: 10000px !important;
+
+	@if ($ie7 or $ie8) {
+		*display: block;
+		//<=IE7
+		*zoom: 1;
+		//<=IE7
+		*width: auto !important;
+		//<=IE7
+	}
+}
+
+.clearfix-facebook { @include clearfix-facebook; }
+
+@mixin clearfix-micro {                               // can be used with overflow: visible; together
+	zoom: 1;
+	//@include has-default;
+	&:before,
+	&:after {
+		content: " ";
+		display: table;
+	}
+	&:after {
+		clear: both;
+	}
+}
+
+.clearfix-micro {                               // can be used with overflow: visible; together
+	@include clearfix-micro
+}
+
+@mixin clearfix-stubborn {
+	display: table-cell;
+	&:after {
+		clear: both;
+		display: block;
+		visibility: hidden;
+		overflow: hidden;
+		height: 0 !important;
+		line-height: 0;
+		font-size: xx-large;
+		content: "x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x";
+	}
+}
+
+.clearfix-stubborn {
+	@include clearfix-stubborn;
+}
+
+@mixin clearfix {
+	@include clearfix-overflow;
+}
+
+.clearfix {
+	@include clearfix;
+}
+
+// extends so the output will be smaller
+//originally: clearfix-me
+
+//@mixin clearfix($method: $clearfix-method) {
+//	@if $method != overflow and $method != facebook and $method != micro and $method != stubborn {
+//		@warn "The clearfix method #{$method} is unkown";
+//		@extend .clearfix-micro;
+//	} @else {
+//		@extend .clearfix-#{$method};
+//	}
+//}

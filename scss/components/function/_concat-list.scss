@@ -1,0 +1,23 @@
+//	@desc		Concatenate list separated by any character, default is " " space
+//	@name
+//	@author		Armin
+//	@requires
+
+
+//	Usage:		concat-list($list, " ")
+//				concat-list($list, ",")
+
+
+@function concat-list($arg-concatenated-list, $arg-separator-character: " ") {
+  $arg-concatenated-text: "";
+  @for $i from 1 through length($arg-concatenated-list) {
+    @if $i != length($arg-concatenated-list) {
+      $arg-concatenated-text: $arg-concatenated-text + nth($arg-concatenated-list, $i);
+      $arg-concatenated-text: $arg-concatenated-text + unquote($arg-separator-character);
+    }
+    @else {
+      $arg-concatenated-text: $arg-concatenated-text + nth($arg-concatenated-list, $i);
+    }
+  }
+  @return $arg-concatenated-text;
+}

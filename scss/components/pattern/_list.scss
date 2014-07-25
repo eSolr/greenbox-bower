@@ -1,0 +1,68 @@
+//	@desc		Basic list with no bullets and no margins
+//	@name		List
+//	@author
+//	@tested
+//	@requires
+//
+//	todo	media query specifikus listákat létrehozni, ami egyik nézetben ilyen inline, a másikban normal
+//	todo	list-unstyled
+
+//	Research:		http://css-tricks.com/almanac/properties/l/list-style/
+
+
+
+$baseline:					18pt !default;
+$gutter:					$grid-gutter !default;
+
+
+ol,
+ul {
+	padding: 0;
+	list-style-type: none;
+}
+
+
+//  normal vertical list
+.list {
+	list-style-type: none;
+
+	> * {
+		display: list-item;
+		float: none;
+	}
+}
+
+
+//  horizontal list
+.list-inline {
+	@extend .list;
+
+	> * {
+		@include inline-block;
+	}
+
+	> li {                                                  // inline-block hack (only li tag effected)
+		margin-right: -4px;                                 // TODO research, minél fordul elő pontosan
+	}
+}
+
+
+//  inline flowing box list
+.list-inline-box {
+	@extend .list-inline;
+
+	margin-left: $gutter / -2;
+	margin-right: $gutter / -2;
+
+	> * {
+		padding-left: $gutter / 2;
+		padding-right: $gutter / 2;
+		padding-top: 0;
+		padding-bottom: $baseline;
+		vertical-align: top;
+
+		img {
+			max-width: 100%;
+		}
+	}
+}

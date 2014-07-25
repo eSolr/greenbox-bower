@@ -1,0 +1,31 @@
+//	@desc			Basic link styles
+//	@name
+//	@author
+//	@tested
+//	@requires		_settings.scss
+
+//	Research:		http://css-tricks.com/removing-the-dotted-outline/
+
+
+a {
+
+	&:link {
+		color: $link-color;
+	}
+
+	&:visited {
+		color: $link-visited-color;
+	}
+
+	&:hover {
+		color: $link-hover-color;
+	}
+
+	&:active {
+		color: $link-active-color;
+	}
+
+	&:focus {
+		color: $link-focus-color
+	}
+}

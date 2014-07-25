@@ -1,0 +1,46 @@
+//  @desc           Responsive video embed
+//  @name           Video
+//  @author
+//  @tested         Safari
+//  @requires
+
+
+//
+//  Use it to embed responsive videos:
+//
+//      div."video-wrap video-16-9">iframe
+//
+
+
+//responsive video embed
+.video-wrap {
+	height: 0;
+	//@extend .space-1of5;
+	//margin-bottom: 10px;
+	padding-bottom: 57.25%;		// default 16:9
+	position: relative;
+	overflow: hidden;
+
+	//  youtube, vimeo etc.
+	iframe, embed, object {
+		top: 0;
+		left: 0;
+		width: 100% !important;
+		height: 100% !important;
+		position: absolute;
+	}
+
+	//  html5
+	video {
+		max-width: 100%;
+		height: auto;
+	}
+}
+
+.video-4-3 { // 4:3
+	padding-bottom: 67.5%;
+}
+
+.video-16-9 { // 16:9
+	padding-bottom: 57.25%;
+}

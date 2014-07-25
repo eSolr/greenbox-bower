@@ -1,0 +1,280 @@
+
+//	Common font families
+$helvetica:					Helvetica, Arial, sans-serif !default;
+$helvetica-neue:			"Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif !default;
+$arial:						Arial, Helvetica, sans-serif !default;
+$georgia:					Georgia, Times, "Times New Roman", serif !default;
+$times:						Times, "Times New Roman", Georgia, serif !default;
+$monospace:					Courier, "Courier New", Monaco, monospace !default;
+$sourcecode:				"Source Code Pro", #{$monospace} !default;
+
+//	Default font families
+$base-sans-family:			$helvetica-neue !default;	// .sans
+$base-serif-family:			$georgia !default;			// .serif
+$base-monospace-family:		$monospace !default;		// .monospace
+$base-sourcecode-family:	$sourcecode !default;		// .sourcecode
+
+//	Default fontweights;
+$fw-thin:					100 !default;
+$fw-extralight:				200 !default;
+$fw-light:					300 !default;
+$fw-book:					350 !default;
+$fw-regular:				400 !default;
+$fw-medium:					500 !default;
+$fw-semibold:				600 !default;
+$fw-bold:					700 !default;
+$fw-extrabold:				800 !default;
+$fw-black:					900 !default;
+
+
+
+//
+//	Layout specific states
+//
+
+
+//	Block specific type
+.block { display: block; }
+.inline { display: inline; }
+.inline-block { @include inline-block; }
+
+//	Table specific type
+.table { display: table; }
+.table-row { display: table-row; }
+.table-column { display: table-column; }
+.table-cell { display: table-cell; }
+
+.table-layout-auto { table-layout: auto; }
+.table-layout-fixed { table-layout: fixed; }
+.table-layout-inherit { table-layout: inherit; }
+
+//	Fluid dimension
+.fluid-width { width: 100%; }
+.fluid-height { height: 100%; }
+
+//	Box sizing
+.borderbox { @include border-box; }
+.contentbox { @include content-box; }
+
+
+//
+//	Typographic states
+//
+
+
+//	Font style
+.regular { font-style: normal; }
+.italic { font-style: italic; }
+
+//	Font weight
+.bold { font-weight: bold; }
+.bolder { font-weight: bolder; }
+.lighter { font-weight: lighter; }
+
+//	Extended fontweight
+.fw-thin { font-weight: $fw-thin; }
+.fw-extralight { font-weight: $fw-extralight; }
+.fw-light { font-weight: $fw-light; }
+.fw-book { font-weight: $fw-book; }
+.fw-regular { font-weight: $fw-regular; }
+.fw-medium { font-weight: $fw-medium; }
+.fw-semibold { font-weight: $fw-semibold; }
+.fw-bold { font-weight: $fw-bold; }
+.fw-extrabold { font-weight: $fw-extrabold; }
+.fw-black { font-weight: $fw-black; }
+
+//	Font size
+.small { font-size: small; }
+.smaller { font-size: smaller; }
+.large { font-size: large; }
+.larger { font-size: larger; }
+
+//	Capitalization
+.uppercase { text-transform: uppercase; }
+.lowercase { text-transform: lowercase; }
+.capitalize { text-transform: capitalize; }
+
+//	Underline, linethrought
+.no-textdecoration { text-decoration: none; }
+.linethrough { text-decoration: line-through; }
+.underline { text-decoration: underline; }
+
+//	Font family
+.sans { font-family: $base-sans-family; }
+.serif { font-family: $base-serif-family; }
+.monospace { font-family: $base-monospace-family; }
+.sourcecode { font-family: $base-sourcecode-family; }
+
+
+//
+//	Color states
+//
+
+//	generates shades of a text color in 5% steps from 5%–95%
+//	output is .color-1--10 ... .color-bg--90
+@mixin generate-color-shades($classprefix, $shadedcolor) {
+
+	$i: 5;
+
+	@while $i < 100 {
+		#{$classprefix}--#{$i}	{ color: transparentize($shadedcolor, $i / 100); }
+		$i: $i + 5;
+	}
+}
+
+//	generates shades of a bgcolor in 5% steps from 5%–95%
+//	output is .classname--10 ... .classname--90
+@mixin generate-bg-shades($classprefix, $shadedcolor) {
+
+	$i: 5;
+
+	@while $i < 100 {
+		#{$classprefix}--#{$i}	{ background-color: transparentize($shadedcolor, $i / 100); }
+		$i: $i + 5;
+	}
+}
+
+//	generates shades of a border color in 5% steps from 5%–95%
+//	output is .border-text--5 ... .border-text--95
+@mixin generate-border-shades($classprefix, $shadedcolor) {
+
+	$i: 5;
+
+	@while $i < 100 {
+		#{$classprefix}--#{$i}	{
+			@extend .border-width-1;
+			@extend .border-solid;
+			border-color: transparentize($shadedcolor, $i / 100);
+		}
+		$i: $i + 5;
+	}
+}
+
+//	background colors
+.no-bg	{ background-color: transparent; }
+.bg		{ background-color: $bg-color; }
+.bg-text{ background-color: $text-color; }
+
+//	generated shades of bgcolors in 5% steps
+@include generate-bg-shades(".bg", $bg-color);
+@include generate-bg-shades(".bg-text", $text-color);
+
+//	font color
+.no-color	{ color: transparent; }
+.color-bg	{ color: $bg-color; }
+.color-text	{ color: $text-color; }
+
+//	generated shades of bgcolors in 5% steps
+@include generate-color-shades(".color-bg", $bg-color);
+@include generate-color-shades(".color-text", $text-color);
+
+//	border width
+.no-border-width, .border-width-0 { border-width: 0; }
+.border-width, .border-width-1 { border-width: 1px; }
+.border-width-2 { border-width: 2px; }
+.border-width-3 { border-width: 3px; }
+.border-width-4 { border-width: 4px; }
+.border-width-5 { border-width: 5px; }
+
+//	border style
+.border-none { border-style: none; }
+.border-solid { border-style: solid; }
+.border-dotted { border-style: dotted; }
+.border-dashed { border-style: dashed; }
+.border-double { border-style: double; @extend .border-width-3;}
+.border-groove { border-style: groove; @extend .border-width-5;}
+.border-ridge { border-style: ridge; @extend .border-width-5;}
+.border-inset { border-style: inset; @extend .border-width-5;}
+.border-outset { border-style: outset; @extend .border-width-5;}
+
+//	border color
+.no-border		{ @extend .border-width-0; @extend .border-solid; border-color: transparent; }
+.border-bg		{ @extend .border-width-1; @extend .border-solid; border-color: $bg-color; }
+.border-text	{ @extend .border-width-1; @extend .border-solid; border-color: $text-color; }
+
+//	generated shades of bgcolors in 5% steps
+@include generate-border-shades(".border-bg", $bg-color);
+@include generate-border-shades(".border-text", $text-color);
+
+
+//	generating bg, text color and shade of bg if color variable exist
+@if variable-exists(color-1) {
+	.bg-1		{ background-color: $color-1; }
+	.color-1	{ color: $color-1; }
+	.border-1	{ @extend .border-width-1; @extend .border-solid; border-color: $color-1; }
+	@include generate-bg-shades(".bg-1", $color-1);
+	@include generate-color-shades(".color-1", $color-1);
+	@include generate-border-shades(".border-1", $color-1);
+}
+@if variable-exists(color-2) {
+	.bg-2		{ background-color: $color-2; }
+	.color-2	{ color: $color-2; }
+	.border-2	{ @extend .border-width-1; @extend .border-solid; border-color: $color-2; }
+	@include generate-bg-shades(".bg-2", $color-2);
+	@include generate-color-shades(".color-2", $color-2);
+	@include generate-border-shades(".border-2", $color-2);
+}
+@if variable-exists(color-3) {
+	.bg-3		{ background-color: $color-3; }
+	.color-3	{ color: $color-3; }
+	.border-3	{ @extend .border-width-1; @extend .border-solid; border-color: $color-3; }
+	@include generate-bg-shades(".bg-3", $color-3);
+	@include generate-color-shades(".color-3", $color-3);
+	@include generate-border-shades(".border-3", $color-3);
+}
+@if variable-exists(color-4) {
+	.bg-4		{ background-color: $color-4; }
+	.color-4	{ color: $color-4; }
+	.border-4	{ @extend .border-width-1; @extend .border-solid; border-color: $color-4; }
+	@include generate-bg-shades(".bg-4", $color-4);
+	@include generate-color-shades(".color-4", $color-4);
+	@include generate-border-shades(".border-4", $color-4);
+}
+@if variable-exists(color-5) {
+	.bg-5		{ background-color: $color-5; }
+	.color-5	{ color: $color-5; }
+	.border-5	{ @extend .border-width-1; @extend .border-solid; border-color: $color-5; }
+	@include generate-bg-shades(".bg-5", $color-5);
+	@include generate-color-shades(".color-5", $color-5);
+	@include generate-border-shades(".border-5", $color-5);
+}
+@if variable-exists(color-6) {
+	.bg-6		{ background-color: $color-6; }
+	.color-6	{ color: $color-6; }
+	.border-6	{ @extend .border-width-1; @extend .border-solid; border-color: $color-6; }
+	@include generate-bg-shades(".bg-6", $color-6);
+	@include generate-color-shades(".color-6", $color-6);
+	@include generate-border-shades(".border-6", $color-6);
+}
+@if variable-exists(color-7) {
+	.bg-7		{ background-color: $color-7; }
+	.color-7	{ color: $color-7; }
+	.border-7	{ @extend .border-width-1; @extend .border-solid; border-color: $color-7; }
+	@include generate-bg-shades(".bg-7", $color-7);
+	@include generate-color-shades(".color-7", $color-7);
+	@include generate-border-shades(".border-7", $color-7);
+}
+@if variable-exists(color-8) {
+	.bg-8		{ background-color: $color-8; }
+	.color-8	{ color: $color-8; }
+	.border-8	{ @extend .border-width-1; @extend .border-solid; border-color: $color-8; }
+	@include generate-bg-shades(".bg-8", $color-8);
+	@include generate-color-shades(".color-8", $color-8);
+	@include generate-border-shades(".border-8", $color-8);
+}
+@if variable-exists(color-9) {
+	.bg-9		{ background-color: $color-9; }
+	.color-9	{ color: $color-9; }
+	.border-9	{ @extend .border-width-1; @extend .border-solid; border-color: $color-9; }
+	@include generate-bg-shades(".bg-9", $color-9);
+	@include generate-color-shades(".color-9", $color-9);
+	@include generate-border-shades(".border-9", $color-9);
+}
+@if variable-exists(color-10) {
+	.bg-10		{ background-color: $color-10; }
+	.color-10	{ color: $color-10; }
+	.border-10	{ @extend .border-width-1; @extend .border-solid; border-color: $color-10; }
+	@include generate-bg-shades(".bg-10", $color-10);
+	@include generate-color-shades(".color-10", $color-10);
+	@include generate-border-shades(".border-10", $color-10);
+}

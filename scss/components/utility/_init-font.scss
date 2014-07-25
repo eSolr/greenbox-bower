@@ -1,0 +1,112 @@
+//	@desc		Font initialisation
+//	@name
+//	@author
+//	@tested
+//	@requre		_settings.scss, _concat-list.scss
+
+
+//	Usage		+init-font(font-name, physical-name [, weight] [, style] [, fileformats in a list])
+//				+init-font(khikon, "khikon48-monospace", normal, normal, eot ttf woff)
+
+
+//  Release notes
+// 2013-01-21
+// 	*   a soronkénti src:-nél a FireFox nagyon nem szereti ha az svg paraméter az utolsó,
+// 		emiatt külön függvénybe kellett pakolni az összefűzést
+// 	*   font-sretch és unicode-range is bekerült a paraméterek közé
+// 2013-01-12
+// 	*   a stílus és vastagság az url()-ek után kerül listázásra, mert különben némely fonttal nem jól jelenik meg
+
+
+$font-url: "" !default;
+
+
+@function es-font-file($physical-name, $format) {
+  $font-file: "";
+  @if $format == "eot" {
+    $font-file: 'url("' + $physical-name + "." + $format + '"), url("' + $physical-name + "." + $format + '?#iefix") format("embedded-opentype")';
+  }
+  @else if $format == "svg" {
+    $font-file: 'url("' + $physical-name + "." + $format + '") format("svg")';
+  }
+  @else if $format == "woff" {
+    $font-file: 'url("' + $physical-name + "." + $format + '") format("woff")';
+  }
+  @else if $format == "ttf" {
+    $font-file: 'url("' + $physical-name + "." + $format + '") format("truetype")';
+  }
+  @else if $format == "otf" {
+    $font-file: 'url("' + $physical-name + "." + $format + '") format("opentype")';
+  }
+  @else {
+    $font-file: 'url("' + $physical-name + "." + $format + '")';
+  }
+  @return unquote($font-file);
+}
+
+
+@mixin init-font($font-name, $physical-name, $font-types: eot woff ttf, $font-weight: normal, $font-style: normal, $font-strech: normal, $unicode-range: "U+0-10FFFF") {
+
+	//  Ha valaki a „beépített” változóban adta meg a font mappa elérési útját
+	@if $font-url != "" {
+		$physical-name: $font-url + "/" + $physical-name;
+	}
+	$font-files: "";
+	@font-face {
+		font-family: quote($font-name);
+		@each $i in $font-types {
+			@if index($font-types, $i) > 1 {
+				$font-files: $font-files + ", ";
+			}
+			$font-files: $font-files + es-font-file($physical-name, $i);
+		}
+		src: #{$font-files};
+		font-weight: unquote($font-weight);
+		font-style: unquote($font-style);
+		font-strech: unquote($font-strech);
+		unicode-range: unquote($unicode-range);
+	}
+}
+
+
+@mixin init-font-batch($args...) {
+	$font-name: null; $physical-name: null; $font-types: null; $font-weight: null; $font-style: null; $font-strech: null; $unicode-range: null;
+
+	$font-name: nth(nth($args, 1), 1);
+	$physical-name: nth(nth($args, 1), 2);
+	@if length(nth($args, 1)) > 2 { $font-types: nth(nth($args, 1), 3) } @else { $font-types: eot woff ttf; }
+	@if length(nth($args, 1)) > 3 { $font-weight: nth(nth($args, 1), 4) } @else { $font-weight: normal; }
+	@if length(nth($args, 1)) > 4 { $font-style: nth(nth($args, 1), 5) } @else { $font-style: normal; }
+	@if length(nth($args, 1)) > 5 { $font-strech: nth(nth($args, 1), 6) } @else { $font-strech: normal; }
+	@if length(nth($args, 1)) > 6 { $unicode-range: nth(nth($args, 1), 7) } @else { $unicode-range: "U+0-10FFFF"; }
+
+	@include init-font($font-name, $physical-name, $font-types, $font-weight, $font-style, $font-strech, $unicode-range);
+}
+
+//  @font-face {
+//    font-family: 'Fontname';
+//    src: url('Fontname');
+//    src: local('Fontname'),
+//         local('Fontname'),
+//         url('fontname.ttf') format('truetype'),
+//         url('fontname.svg#font') format('svg');
+//	}
+
+
+//	Batch font loading
+@if global-variable-exists(init-font) {
+
+	@if $init-font != "" and $init-font != () {
+
+		@if type-of(nth($init-font, 1)) == "string" {
+			@include init-font-batch($init-font);
+		}
+
+		@if type-of(nth($init-font, 1)) == "list" {
+			@each $i in $init-font {
+				@include init-font-batch($i);
+			}
+		}
+	}
+}
+

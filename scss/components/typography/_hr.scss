@@ -1,0 +1,15 @@
+//	@name
+//	@desc		Horizontal line style
+//	@author		Armin
+//	@tested
+//	@requires
+
+
+
+@if $enable-typography-module {
+
+	hr {
+		border: 0;
+		height: 1px;
+	}
+}

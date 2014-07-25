@@ -1,0 +1,329 @@
+//
+//  Visibility based on media-query pattern
+//
+
+
+//  TODO .touch és nyomtatóbarát, gyengénlátós kapcsolókat betenni
+
+
+//	Show up and range mixin
+@mixin visibility-show-min($display) {
+
+	@media #{$screen} {
+		.show-xs-#{$display} { display: #{$display}; }
+		.show-sm-#{$display} { display: none; }
+		.show-md-#{$display} { display: none; }
+		.show-lg-#{$display} { display: none; }
+		.show-xl-#{$display} { display: none; }
+		.show-rt-#{$display} { display: none; }
+
+		.show-sm-up-#{$display} { display: none; }
+		.show-md-up-#{$display} { display: none; }
+		.show-lg-up-#{$display} { display: none; }
+		.show-xl-up-#{$display} { display: none; }
+		.show-rt-up-#{$display} { display: none; }
+	}
+
+	@media #{$small} {
+		.show-xs-#{$display} { display: none; }
+		.show-sm-#{$display} { display: #{$display}; }
+		.show-sm-up-#{$display} { display: #{$display}; }
+	}
+
+	@media #{$medium} {
+		.show-sm-#{$display} { display: none; }
+		.show-md-#{$display} { display: #{$display}; }
+		.show-md-up-#{$display} { display: #{$display}; }
+	}
+
+	@media #{$large} {
+		.show-md-#{$display} { display: none; }
+		.show-lg-#{$display} { display: #{$display}; }
+		.show-lg-up-#{$display} { display: #{$display}; }
+	}
+
+	@media #{$xlarge} {
+		.show-lg-#{$display} { display: none; }
+		.show-xl-#{$display} { display: #{$display}; }
+		.show-xl-up-#{$display} { display: #{$display}; }
+	}
+
+	@media #{$retina} {
+		.show-xl-#{$display} { display: none; }
+		.show-rt-#{$display} { display: #{$display}; }
+		.show-rt-up-#{$display} { display: #{$display}; }
+	}
+}
+
+//	Show down mixin
+@mixin visibility-show-max($display) {
+
+	@media #{$retina} {
+		.show-xl-down-#{$display} { display: none; }
+		.show-rt-down-#{$display} { display: #{$display}; }
+	}
+
+	@media #{$xlarge-max} {
+		.show-xs-down-#{$display} { display: none; }
+		.show-sm-down-#{$display} { display: none; }
+		.show-md-down-#{$display} { display: none; }
+		.show-lg-down-#{$display} { display: none; }
+		.show-xl-down-#{$display} { display: #{$display}; }
+	}
+
+	@media #{$large-max} {
+		.show-lg-down-#{$display} { display: #{$display}; }
+	}
+
+	@media #{$medium-max} {
+		.show-md-down-#{$display} { display: #{$display}; }
+	}
+
+	@media #{$small-max} {
+		.show-sm-down-#{$display} { display: #{$display}; }
+	}
+
+	@media #{$xsmall-max} {
+		.show-xs-down-#{$display} { display: #{$display}; }
+	}
+}
+
+
+
+
+//	Show up and range
+@include visibility-show-min("block");
+@include visibility-show-min("inline");
+@include visibility-show-min("inline-block");
+
+//	Show down
+@include visibility-show-max("block");
+@include visibility-show-max("inline");
+@include visibility-show-max("inline-block");
+
+//	Hide range
+@media #{$screen} and #{$xsmall-max} {
+	.hide-xs { display: none !important; }
+}
+
+@media #{$small} and #{$small-max} {
+	.hide-sm { display: none !important; }
+}
+
+@media #{$medium} and #{$medium-max} {
+	.hide-md { display: none !important; }
+}
+
+@media #{$large} and #{$large-max} {
+	.hide-lg { display: none !important; }
+}
+
+@media #{$xlarge} and #{$xlarge-max} {
+	.hide-xl { display: none !important; }
+}
+
+@media #{$retina} {
+	.hide-rt { display: none !important; }
+}
+
+//	Hide up
+@media #{$small} {
+	.hide-sm-up { display: none !important; }
+}
+
+@media #{$medium} {
+	.hide-md-up { display: none !important; }
+}
+
+@media #{$large} {
+	.hide-lg-up { display: none !important; }
+}
+
+@media #{$xlarge} {
+	.hide-xl-up { display: none !important; }
+}
+
+@media #{$retina} {
+	.hide-rt-up { display: none !important; }
+}
+
+//	Hide down
+@media #{$xsmall-max} {
+	.hide-xs-down { display: none !important; }
+}
+
+@media #{$small-max} {
+	.hide-sm-down { display: none !important; }
+}
+
+@media #{$medium-max} {
+	.hide-md-down { display: none !important; }
+}
+
+@media #{$large-max} {
+	.hide-lg-down { display: none !important; }
+}
+
+@media #{$xlarge-max} {
+	.hide-xl-down { display: none !important; }
+}
+
+
+//	Orientation specific visibility mixin
+@mixin visibility-show-orientation($display) {
+
+	@media #{$portrait} {
+		.show-portrait-#{$display} { display: #{$display}; }
+		.show-landscape-#{$display} { display: none; }
+	}
+
+	@media #{$landscape} {
+		.show-portrait-#{$display} { display: none; }
+		.show-landscape-#{$display} { display: #{$display}; }
+	}
+}
+
+//
+//	Orientation specific visibility
+//
+
+//	Show
+@include visibility-show-orientation(block);
+@include visibility-show-orientation(inline);
+@include visibility-show-orientation(inline-block);
+
+//	Hide
+@media #{$portrait} {
+	.hide-portrait { display: none !important; }
+}
+
+@media #{$landscape} {
+	.hide-landscape { display: none !important; }
+}
+
+//
+//	Touch specific visibility – require Modernizr
+//
+
+//	Hide
+html.no-touch {
+	.show-touch-block, .show-touch-inline, .show-touch-inline-block { display: none; }
+}
+
+html.touch {
+	// Show
+	.show-touch-block { display: block; }
+	.show-touch-inline { display: inline; }
+	.show-touch-inline-block { display: inline-block; }
+	//	Hide
+	.hide-touch { display: none !important; }
+}
+
+
+//  Basic visibility options
+.visible	{ visibility: visible; }
+.hidden		{ visibility: hidden; }
+.show		{ display: block !important; }
+.hide		{ display: none !important; }
+
+
+
+//
+//	Deprecated	--------------------------------------------------------------------------------------------------------
+//
+
+$enable-grid-deprecated: 		false !default;
+
+@if $enable-grid-module and $enable-grid-deprecated {
+
+	//  below 640px = small
+	@media #{$screen} {
+
+		// show --------------------------------------------------
+		.show-for-medium { display: none !important; }
+		.show-for-large { display: none !important; }
+		.show-for-xlarge { display: none !important; }
+		.show-for-medium-up { display: none !important; }
+		.show-for-large-up { display: none !important; }
+
+		// hide --------------------------------------------------
+		.hide-for-small { display: none !important; }
+		.hide-for-medium-down { display: none !important; }
+		.hide-for-large-down { display: none !important; }
+		.hide-for-xlarge-down { display: none !important; }
+	}
+
+	//  640px – 1024px
+	@media #{$medium} {
+
+		// show --------------------------------------------------
+		.show-for-small { display: none !important; }
+		.show-for-medium { display: inherit !important; }
+		.show-for-medium-down { display: none !important; }
+		.show-for-medium-up { display: inherit !important; }
+
+		// hide --------------------------------------------------
+		.hide-for-small { display: inherit !important; }
+		.hide-for-medium { display: none !important; }
+		.hide-for-medium-down { display: inherit !important; }
+		.hide-for-medium-up { display: none !important; }
+	}
+
+	//	1024px – 1440px
+	@media #{$large} {
+
+		// show --------------------------------------------------
+		.show-for-medium { display: none !important; }
+		.show-for-large { display: inherit !important; }
+		.show-for-large-down { display: none !important; }
+		.show-for-medium-up { display: inherit !important; }
+
+		// hide --------------------------------------------------
+		.hide-for-medium { display: inherit !important; }
+		.hide-for-large { display: none !important; }
+		.hide-for-large-down { display: inherit !important; }
+		.hide-for-large-up { display: none !important; }
+	}
+
+	//  1440px and above
+	@media #{$xlarge} {
+
+		// show --------------------------------------------------
+		.show-for-large { display: none !important; }
+		.show-for-xlarge { display: inherit !important; }
+		.show-for-xlarge-down { display: none !important; }
+		.show-for-large-up { display: inherit !important; }
+
+		// hide --------------------------------------------------
+		.hide-for-large { display: inherit !important; }
+		.hide-for-xlarge { display: none !important; }
+		.hide-for-xlarge-down { display: inherit !important; }
+	}
+
+	//  Orientation specific visibility
+	//	todo funkciót beépíteni
+	.show-for-landscape,
+	.hide-for-portrait { display: inherit !important; }
+	.hide-for-landscape,
+	.show-for-portrait { display: none !important; }
+
+	//  landscape specific visibility
+	@media #{$landscape} {
+		.show-for-landscape,
+		.hide-for-portrait { display: inherit !important; }
+		.hide-for-landscape,
+		.show-for-portrait { display: none !important; }
+	}
+
+	//  portrait specific visibility
+	@media #{$portrait} {
+		.show-for-portrait,
+		.hide-for-landscape { display: inherit !important; }
+		.hide-for-portrait,
+		.show-for-landscape { display: none !important; }
+	}
+
+	//  Touch-enabled device targeting
+	.touch .show-for-touch { display: inherit !important; }
+	.touch .hide-for-touch { display: none !important; }
+}
