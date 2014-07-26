@@ -27,6 +27,12 @@ $base-font-size:			12pt !default;
 $baseline:					18pt !default;
 $gutter:					$grid-gutter !default;
 
+$font-sizes-xsmall:			() !default;
+$font-sizes-small:			() !default;
+$font-sizes-medium:			() !default;
+$font-sizes-large:			() !default;
+$font-sizes-xlarge:			() !default;
+$font-sizes-retina:			() !default;
 
 //	Responisve selector font-size and line-height generator
 @mixin set-font-sizes($arg) {
@@ -85,10 +91,12 @@ $gutter:					$grid-gutter !default;
 	}
 
 	//	loading media query specific –—responsive–— font sizes
-	@include set-font-sizes($font-sizes-small);
+	@include set-font-sizes($font-sizes-xsmall);
+	@media #{$small}	{ @include set-font-sizes($font-sizes-small); }
 	@media #{$medium}	{ @include set-font-sizes($font-sizes-medium); }
 	@media #{$large}	{ @include set-font-sizes($font-sizes-large); }
 	@media #{$xlarge}	{ @include set-font-sizes($font-sizes-xlarge); }
+	@media #{$retina}	{ @include set-font-sizes($font-sizes-retina); }
 
 
 	//	vertival rhythm
@@ -105,7 +113,7 @@ $gutter:					$grid-gutter !default;
 
 	//	headers
 	h1, h2, h3, h4, h5, h6 {
-		color: $header-color;
+//		color: $header-color;
 
 		a {
 			text-decoration: none;

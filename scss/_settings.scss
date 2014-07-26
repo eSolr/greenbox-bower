@@ -142,7 +142,7 @@ $selection-bg-color:		$color-1;
 $selection-color:			$bg-color;
 
 //	Responsive fontsizes
-$font-sizes-small: 			(("h1, .h1" 2.8rem ($baseline * 3))
+$font-sizes-xsmall: 		(("h1, .h1" 2.8rem ($baseline * 3))
 							,("h2, .h2" 2rem   ($baseline * 2))
 							,("h3, .h3" 1.5rem $baseline)
 							,("h4, .h4" 1.2rem $baseline)
@@ -153,22 +153,16 @@ $font-sizes-small: 			(("h1, .h1" 2.8rem ($baseline * 3))
 							,(form .9rem)
 							);
 
-$font-sizes-medium:			(
-//							(".h1-medium" 3rem ($baseline * 3))
-							);
-
-$font-sizes-large:			(
-//							(".h1-large" 3.2rem ($baseline * 3))
-							);
-
-$font-sizes-xlarge:			(
-//							(".h1-xlarge" 3.5rem ($baseline * 3))
-							);
+$font-sizes-small:			();
+$font-sizes-medium:			();
+$font-sizes-large:			();
+$font-sizes-xlarge:			();
+$font-sizes-retina:			();
 
 
 //	Header colors
 $header-font:				inherit;
-$header-color:				$text-color;
+//$header-color:			$text-color;
 $subheader-font:			inherit;
 $subheader-color:			lighten($text-color, 50%);
 

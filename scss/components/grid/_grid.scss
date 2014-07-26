@@ -292,7 +292,7 @@ $mq-last-prefix:			"last" !default;
 @if $enable-grid-module and not $enable-grid-deprecated {
 
 	// Makes all DOM item in grid borderbox
-	.row, .row *, .row-fluid, .row-fluid * {
+	.row, .row *, .row *:before, .row *:after, .row-fluid, .row-fluid *, .row-fluid *:before, .row-fluid *:after {
 		@include border-box;
 	}
 
