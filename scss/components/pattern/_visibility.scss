@@ -3,7 +3,8 @@
 //
 
 
-//  TODO .touch és nyomtatóbarát, gyengénlátós kapcsolókat betenni
+//  todo	gyengénlátó kapcsolókat betenni
+//
 
 
 //	Show up and range mixin
@@ -326,4 +327,30 @@ $enable-grid-deprecated: 		false !default;
 	//  Touch-enabled device targeting
 	.touch .show-for-touch { display: inherit !important; }
 	.touch .hide-for-touch { display: none !important; }
+
+
+//
+//	Print specific visibility
+//
+	@media screen {
+
+		.show-print-block {
+			display: block;
+		}
+
+		.show-print-inline {
+			display: inline;
+		}
+
+		.show-print-inline-block {
+			display: inline-block;
+		}
+	}
+
+	@media print {
+
+		.hide-print {
+			display: none !important;
+		}
+	}
 }
