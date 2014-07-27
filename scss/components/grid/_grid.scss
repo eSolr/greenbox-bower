@@ -171,8 +171,10 @@ $mq-last-prefix:			"last" !default;
 		}
 
 		//  Generates .md-1, .md-2 [...] .md-* 'width' classes
-		.#{$column-prefix}#{$size-prefix}#{$i} {
-			width: #{span($i, $columns)};
+		@if $size-prefix != "" {
+			.#{$size-prefix}#{$i} {
+				width: #{span($i, $columns)};
+			}
 		}
 
 		@if $i < $columns {
@@ -212,6 +214,15 @@ $mq-last-prefix:			"last" !default;
 					width: span($j * $m, $columns);
 				}
 
+				//	Generates .md-1of[n] [...] .md-[n]of[n]
+				@if $size-prefix != "" {
+					.#{$size-prefix}#{$j}of#{$columns / $i} {
+						@include column;
+						$m: $columns / ($columns / $i);
+						width: span($j * $m, $columns);
+					}
+				}
+
 				@if $j != ($columns / $i) {
 
 					//	Generates .md-offset-1of[n] [...] .md-offset-[n-1]of[n]
@@ -244,6 +255,14 @@ $mq-last-prefix:			"last" !default;
 				.#{$column-prefix}#{$size-prefix}#{$j}of#{$i} {
 					@include column;
 					width: #{$j / $i * 100}#{"%"};
+				}
+
+				//	Generates .md-1of2, .md-1of3, .md-1of4, .md-1of5 [...] .md-4of5
+				@if $size-prefix != "" {
+					.#{$size-prefix}#{$j}of#{$i} {
+						@include column;
+						width: #{$j / $i * 100}#{"%"};
+					}
 				}
 
 				@if $j != $i {
