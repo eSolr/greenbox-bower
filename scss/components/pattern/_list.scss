@@ -41,10 +41,20 @@ ul {
 		@include inline-block;
 	}
 
-	> li {                                                  // inline-block hack (only li tag effected)
+	> li {
 		margin-right: -4px;                                 // TODO research, minél fordul elő pontosan
 	}
 }
+
+//	the old way
+/*.list-inline {
+	@extend .list;
+	@include clearfix;
+
+	> * {
+		float: left;
+	}
+}*/
 
 
 //  inline flowing box list

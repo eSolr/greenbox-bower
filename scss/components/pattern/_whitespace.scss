@@ -128,10 +128,10 @@ $gutter:					$grid-gutter !default;
 //	Horizontal and vertial spacing
 //
 
-//	Horizontal spacing
+//	Horizontal spacing with list-inline "hack"
 @mixin hspacing($prefix: "hspacing", $spacing: $gutter) {
 
-	.#{$prefix} {
+	.#{$prefix}, .list-inline.#{$prefix} {
 
 		& > * {
 			margin-right: $spacing;

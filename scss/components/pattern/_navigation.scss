@@ -17,6 +17,7 @@ nav, .nav {
 
 //  use it for the top parent if you want to make a multi level ul/ol li list
 .nav-dropdown {
+	@extend .nav;
 	@extend .inline-block;                      // display-block + IE7 fix
 	overflow: visible;
 	white-space: nowrap;
@@ -52,6 +53,7 @@ nav, .nav {
 }
 
 .list-inline.nav-dropdown {
+	@extend .nav;
 
 	ul, ol {                                            // second levels and above
 		li {
