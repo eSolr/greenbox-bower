@@ -38,11 +38,12 @@
 		}
 	};
 
-} (jQuery));;//
+} (jQuery));
+;//
 //	Sticky footer
 //
 //	Add a {class:"..."} class as parameter to footer if content doesn't fit the window,
-//	or –if class is not set– a default sticky setting will be attcjed to the footer.
+//	or –if class is not set– a default sticky setting will be attached to the footer.
 //
 //	Usage:
 //	$.fn.esStickyFooter();
