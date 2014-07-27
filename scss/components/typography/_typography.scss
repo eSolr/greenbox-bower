@@ -4,6 +4,8 @@
 //	@tested
 //	@requires	_settings.scss
 //
+//	Research	http://snook.ca/archives/html_and_css/font-size-with-rem
+//
 //	todo		végignyálazni az összes elemet (belső sablon lehetőségeket stb.)
 //	todo		a további alapformázásokat is belőni (cite, abbr, code, q stb.)
 //	todo		kitalálni valamit a notes, hints jellegű szövegeknek is
@@ -74,13 +76,16 @@ $font-sizes-retina:			() !default;
 //	Load typography module
 @if $enable-typography-module {
 
+	html {
+		font-size: $base-font-size;
+		line-height: $baseline;
+	}
+
 	body {
 		@include font-smoothing(true);
 		font-family: $base-font-family;
 		font-size: 100%;						//	IE
-		font-size: $base-font-size;
-		line-height: $baseline;
-		font-weight: 400;
+//		font-weight: 400;
 		color: $text-color;
 		background-color: $bg-color;
 
