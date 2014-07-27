@@ -78,7 +78,7 @@ $font-sizes-retina:			() !default;
 		@include font-smoothing(true);
 		font-family: $base-font-family;
 		font-size: 100%;						//	IE
-		font-size: rem($base-font-size);
+		font-size: $base-font-size;
 		line-height: $baseline;
 		font-weight: 400;
 		color: $text-color;
