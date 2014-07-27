@@ -102,6 +102,7 @@ $font-sizes-retina:			() !default;
 	//	vertival rhythm
 	h1, h2, h3, h4, h5, h6,
 	p, blockquote, table, pre, ul, ol, dl {
+		margin-top: 0;
 		margin-bottom: $baseline;
 	}
 

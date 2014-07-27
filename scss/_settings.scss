@@ -92,7 +92,7 @@ $mq-retina:					1920px;			// default: 1920ox
 @import url(http://fonts.googleapis.com/css?family=Source+Code+Pro&subset=latin,latin-ext);
 
 $init-font: (
-	(esolr-icon, "../font/eSolrIconSquare-Regular", eot woff ttf, 400, normal)
+	(esolr-icon, "../lib/greenbox/font/eSolrIconSquare-Regular", eot woff ttf, 400, normal)
 	//("fontfamily", "../font/fontfile", eot woff ttf, weight [100...900|normal|bold], style [normal|italic], stretch, unicode-range)
 );
 
