@@ -76,7 +76,6 @@
 				winHeight = $(window).height();
 				contentBottom = content.position().top + content.outerHeight();
 				footerHeight = footer.outerHeight();
-				console.log(contentBottom + footerHeight, winHeight);
 
 				if ( winHeight >= (contentBottom + footerHeight) ) {
 					if (o.class !== undefined) {
@@ -4709,46 +4708,6 @@ var esNameday = {
 			}
 		}
 	};
-
-} (jQuery));;/*
-	Sticky footer
-
-	If the content part is not long enough the footer to reach the bottom of the page,
-	sticky footer keeps it there.
-
-	todo	lekódolni
-	todo	azonosítani mit szeretnénk stickyvé tenni
-	todo	azonosítani mihez képest (default az előző elem lehet, hm?)
-*/
-
-
-
-(function ( $ ) {
-
-	$.fn.esStickyFooter = function( options ) {
-
-		var defaults = {
-			dom_wrap:	"data-es-stickyfooter"
-		};
-
-		var o = $.extend(true, defaults, options);
-		var wrap = this;
-
-		//	if there is no wrap added at fn call use default
-		if (this.length === 0) {
-			wrap = $(o.dom_wrap);
-		}
-
-		return wrap.each( function () {
-
-
-		});
-	};
-
-	//	to apply on ajax loaded content
-//	$(document).on("ready.esolr.tab ajaxComplete.esolr.tab", function(){
-//		$.fn.esTab();
-//	});
 
 } (jQuery));;/*
 	Sticky header
