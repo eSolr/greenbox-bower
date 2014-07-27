@@ -38,7 +38,76 @@
 		}
 	};
 
-} (jQuery));;/*
+} (jQuery));;//
+//	Sticky footer
+//
+//	Add a {class:"..."} class as parameter to footer if content doesn't fit the window,
+//	or –if class is not set– a default sticky setting will be attcjed to the footer.
+//
+//	Usage:
+//	$.fn.esStickyFooter();
+//	or
+//	$(“footer”).esStickyFooter();
+//	or
+//	$.fn.esStickyFooter({selector: "footer"});
+//	or
+//	$(“footer”).esStickyFooter({class: ”sticky”});
+//
+
+
+
+(function ( $ ) {
+
+	$.fn.esStickyFooter = function ( options ) {
+
+		var o = $.extend(true, $.fn.esStickyFooter.defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector);
+
+		return wrap.each(function(){
+
+			var footer = $(this),
+				content = footer.prev(),
+				contentBottom,
+				footerHeight,
+				winHeight;
+
+			function setSticky() {
+				winHeight = $(window).height();
+				contentBottom = content.position().top + content.outerHeight();
+				footerHeight = footer.outerHeight();
+				console.log(contentBottom + footerHeight, winHeight);
+
+				if ( winHeight >= (contentBottom + footerHeight) ) {
+					if (o.class !== undefined) {
+						footer.addClass(o.class);
+					} else {
+						footer.attr("style", o.style);
+					}
+				} else {
+					if (o.class !== undefined) {
+						footer.removeClass(o.class);
+					} else {
+						footer.removeAttr("style");
+					}
+				}
+			}
+
+			$(window).on("resize.esolr.stickyfooter", function () {
+				setSticky();
+			});
+
+			setSticky();
+		});
+	};
+
+	$.fn.esStickyFooter.defaultOptions = {
+		selector: ".footer-sticky",									//	default selector
+		class: undefined,											//	attached at sticky state
+		style: "position: fixed; width: 100%; bottom: 0; left: 0;"	//	if class added this css is ignored
+	};
+
+} (jQuery));
+;/*
 	@desc		Ajax source loader
 	@tested
 
