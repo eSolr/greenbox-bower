@@ -79,6 +79,10 @@ $font-sizes-retina:			() !default;
 	html {
 		font-size: $base-font-size;
 		line-height: $baseline;
+
+		*, * > *, *:before, *:after {
+			@include border-box;
+		}
 	}
 
 	body {

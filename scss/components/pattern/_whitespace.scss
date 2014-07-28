@@ -72,6 +72,53 @@ $gutter:					$grid-gutter !default;
 
 
 //	––––––––––––––
+//	outer negative spacing
+
+
+//	margin top
+.margin-top--			{ margin-top: $baseline * -1; }
+.margin-top-half--		{ margin-top: $baseline / -2; }
+.margin-top-third--		{ margin-top: $baseline / -3; }
+.margin-top-dbl--		{ margin-top: $baseline * -2; }
+
+//	margin bottom
+.margin-bottom--		{ margin-bottom: $baseline * -1; }
+.margin-bottom-half--	{ margin-bottom: $baseline / -2; }
+.margin-bottom-third--	{ margin-bottom: $baseline / -3; }
+.margin-bottom-dbl--	{ margin-bottom: $baseline * -2; }
+
+//	vertical margin
+.vmargin--				{ @extend .margin-top--;		@extend .margin-bottom--; }
+.vmargin-half--			{ @extend .margin-top-half--;	@extend .margin-bottom-half--; }
+.vmargin-third--		{ @extend .margin-top-third--;	@extend .margin-bottom-third--; }
+.vmargin-dbl--			{ @extend .margin-top-dbl--;	@extend .margin-bottom-dbl--; }
+
+//	margin left
+.margin-left--			{ margin-left: $gutter * -1; }
+.margin-left-half--		{ margin-left: $gutter / -2; }
+.margin-left-third--	{ margin-left: $gutter / -3; }
+.margin-left-dbl--		{ margin-left: $gutter * -2; }
+
+//	margin right
+.margin-right--			{ margin-right: $gutter * -1; }
+.margin-right-half--	{ margin-right: $gutter / -2; }
+.margin-right-third--	{ margin-right: $gutter / -3; }
+.margin-right-dbl--		{ margin-right: $gutter * -2; }
+
+//	horizontal margin
+.hmargin--				{ @extend .margin-left--;		@extend .margin-right--; }
+.hmargin-half--			{ @extend .margin-left-half--;	@extend .margin-right-half--; }
+.hmargin-third--		{ @extend .margin-left-third--;	@extend .margin-right-third--; }
+.hmargin-dbl--			{ @extend .margin-left-dbl--;	@extend .margin-right-dbl--; }
+
+//	margin
+.margin--				{ @extend .hmargin--;		@extend .vmargin--; }
+.margin-half--			{ @extend .hmargin-half--;	@extend .vmargin-half--; }
+.margin-third--			{ @extend .hmargin-third--;	@extend .vmargin-third--; }
+.margin-dbl--			{ @extend .hmargin-dbl--;	@extend .vmargin-dbl--; }
+
+
+//	––––––––––––––
 //	inner spacing
 
 //	padding top
@@ -131,7 +178,7 @@ $gutter:					$grid-gutter !default;
 //	Horizontal spacing with list-inline "hack"
 @mixin hspacing($prefix: "hspacing", $spacing: $gutter) {
 
-	.#{$prefix}, .list-inline.#{$prefix} {
+	.#{$prefix}, .list-inline.#{$prefix} {						// if list-inline is inline-block
 
 		& > * {
 			margin-right: $spacing;

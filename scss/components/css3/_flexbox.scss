@@ -6,7 +6,10 @@
 
 //	Research	http://css-tricks.com/using-flexbox/
 //				http://css-tricks.com/flexbox-cheat-sheet/
+//				http://css-tricks.com/snippets/css/a-guide-to-flexbox/
+//				http://css-tricks.com/fluid-width-equal-height-columns/
 //				http://www.sketchingwithcss.com/samplechapter/cheatsheet.html
+//				http://umaar.github.io/css-flexbox-demo/
 
 @mixin flexbox($args...) {
 	@include prefix("flexbox", $args, webkit moz o ms);
