@@ -23,6 +23,7 @@ $mq-retina:					1920px !default;
 //	Mobile first sizing
 //	Closed for smaller, opened for larger screens
 $screen:					"only screen" !global;
+$xsmall:					"only screen" !global;
 $small:						"only screen and (min-width:"#{$mq-small}")" !global;
 $medium:					"only screen and (min-width:"#{$mq-medium}")" !global;
 $large:						"only screen and (min-width:"#{$mq-large}")" !global;

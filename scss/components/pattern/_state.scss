@@ -151,7 +151,7 @@ $fw-black:					900 !default;
 }
 
 //	background colors
-.no-bg	{ background-color: transparent; }
+.no-bg	{ background-color: transparent !important; }
 .bg		{ background-color: $bg-color; }
 .bg-text{ background-color: $text-color; }
 
@@ -160,7 +160,7 @@ $fw-black:					900 !default;
 @include generate-bg-shades(".bg-text", $text-color);
 
 //	font color
-.no-color	{ color: transparent; }
+.no-color	{ color: transparent !important; }
 .color-bg	{ color: $bg-color; }
 .color-text	{ color: $text-color; }
 
@@ -169,7 +169,7 @@ $fw-black:					900 !default;
 @include generate-color-shades(".color-text", $text-color);
 
 //	border width
-.no-border-width, .border-width-0 { border-width: 0; }
+.no-border-width, .border-width-0 { border-width: 0 !important; }
 .border-width, .border-width-1 { border-width: 1px; }
 .border-width-2 { border-width: 2px; }
 .border-width-3 { border-width: 3px; }
@@ -177,7 +177,7 @@ $fw-black:					900 !default;
 .border-width-5 { border-width: 5px; }
 
 //	border style
-.border-none { border-style: none; }
+.border-none { border-style: none !important; }
 .border-solid { border-style: solid; }
 .border-dotted { border-style: dotted; }
 .border-dashed { border-style: dashed; }

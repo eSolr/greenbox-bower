@@ -18,6 +18,7 @@ $grid-gutter:				20px !default;		// size of gutter
 $grid-direction:			"left";				// layout direction
 
 $mq-column-prefix:			"col" !default;		// default column prefix is size specific names e.g.: .col-md-5 etc.
+$mq-xsmall-prefix:			"xs" !default;		// kind of synonym of phone version (e.g. .col-4 etc)
 $mq-small-prefix:			"sm" !default;
 $mq-medium-prefix:			"md" !default;
 $mq-large-prefix:			"lg" !default;
@@ -350,6 +351,11 @@ $mq-last-prefix:			"last" !default;
 //	Generate default column sizes for screens
 	@media #{$screen} {
 		@include set-grid($mq-column-prefix, "");
+	}
+
+//	Generate xsmall column sizes
+	@media #{$xsmall} {
+		@include set-grid($mq-column-prefix, $mq-xsmall-prefix);
 	}
 
 //	Generate small column sizes
