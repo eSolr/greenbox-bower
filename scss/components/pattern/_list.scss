@@ -39,9 +39,6 @@ ul {
 
 	> * {
 		@include inline-block;
-	}
-
-	> li {
 		margin-right: -4px;                                 // TODO research, minél fordul elő pontosan
 	}
 }
