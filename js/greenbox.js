@@ -4316,6 +4316,7 @@ var esNameday = {
 	todo		navigációs bogyókák generálása
 	todo		Play/Pause button true|false
 	todo		a nagy kép rálinkelése a valamelyik elemre, mert alapból azt nem viszi magával
+	todo		egy kép esetén ne legyen anim
 */
 
 /*
@@ -4569,6 +4570,9 @@ var esNameday = {
 			}
 
 			function loopStart() {
+
+				if (sceneLength == 1) { return; }		// ha csak egy elem van ne indítson loopot
+
 				looping = setInterval(function(){
 					current++;
 					setCurrent(current);
@@ -4576,6 +4580,7 @@ var esNameday = {
 			}
 
 			function loopStop() {
+				if (sceneLength == 1) { return; }		// ha csak egy elem van ne stoppoljon loopot – ami nincs
 				clearInterval(looping);
 			}
 
