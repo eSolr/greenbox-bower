@@ -33,3 +33,7 @@
 @mixin transform($args...) {
 	@include prefix("transform", $args, all);
 }
+
+@mixin transform-origin($args...) {
+	@include prefix("transform-origin", $args, webkit ms);
+}
