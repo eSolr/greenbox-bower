@@ -4511,13 +4511,15 @@ var esNameday = {
 					sceneSource.hide();
 				}
 
+				console.log(o.set.current);
+
 				//	Működés indítása a paramétereknek megfelelően.
 				//	Ha a loop be van kapcsolva, akkor beállítja a kezdőt és indítja a loopot
 				if (o.set.loop.status) {
-					setCurrent();
+					setCurrent(o.set.current);
 					loopStart();
 				} else {
-					setCurrent();
+					setCurrent(o.set.current);
 				}
 			}
 
@@ -4601,6 +4603,7 @@ var esNameday = {
 		currentClass:		"current",	// van különbség?
 
 		set: {
+			current:		0,
 			loop: {
 				label:		"Looping",
 				status:		true,
