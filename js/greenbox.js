@@ -4368,8 +4368,11 @@ var esNameday = {
 
 
 		var o = $.extend(true, $.fn.esSliderPro.defaultOptions, options);
-		var wrap = this,
-			wrap = this[0] ? $(this) : $(o.dom_wrap);
+		var wrap = this;
+//			wrap = this[0] ? $(this) : $(o.dom_wrap);						// letiltva, mert különben olyan slidert is elindít, amit nem kellene neki
+
+		console.log(wrap);
+
 
 		//	if there is no wrap added at fn call use default
 
