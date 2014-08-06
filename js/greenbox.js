@@ -4371,7 +4371,7 @@ var esNameday = {
 		var wrap = this;
 //			wrap = this[0] ? $(this) : $(o.dom_wrap);						// letiltva, mert különben olyan slidert is elindít, amit nem kellene neki
 
-		console.log(wrap);
+//		console.log(wrap);
 
 
 		//	if there is no wrap added at fn call use default
@@ -4514,7 +4514,7 @@ var esNameday = {
 					sceneSource.hide();
 				}
 
-				console.log(o.set.current);
+//				console.log(o.set.current);
 
 				//	Működés indítása a paramétereknek megfelelően.
 				//	Ha a loop be van kapcsolva, akkor beállítja a kezdőt és indítja a loopot
