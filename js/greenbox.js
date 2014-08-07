@@ -4379,6 +4379,486 @@ var esNameday = {
 
 		return wrap.each( function () {
 
+			var sliderFn = $(this),											// alap wrapper
+				target = $(o.slider.target.selector).length > 0 ? $(o.slider.target.selector) : sliderFn,	// ha van target megadva, akkor oda hozza létre a slidert, ha nincs, akkor a fő wrapperen belül első elemként
+				sourcePortlet = $(this).find(o.portlet_wrap),				// forrás portlet azonosítása
+				sceneSource = sliderFn.find(o.container_wrap).children(),	// ezek maguk a slider scene feldolgozandó elemei
+				slider,														// generált slider (lesz)
+				scenes,														// scene konténer
+				sceneLength,												// scene-ek száma
+				thumbs,														// thumbnailek konténer
+				visibleThumbs,												// egyszerre látható thumbnailek és/vagy entry-k száma: vagy annyi ahány elem van (az összes), vagy a thumbnail max értéke
+				current,													// az aktuálisan kiválasztott elem
+				looping;													// setInterval változója
+
+
+			//	Alapleképezés legenerálása
+			function init() {
+
+				/*
+					Létrehozás sorrendje:
+					1. létrehozza a scene containert
+					2. létrehozza a scene-item-et
+					3. klónozza a forrásképet a scenébe
+					4. bemozgatja a forrástartalmat a scenébe
+					5. bemozgatja a forrásképet a thumbnailbe
+				*/
+
+				slider = $(o.slider.wrap.html).addClass(o.slider.wrap.class);
+				thumbs = $(o.slider.thumb.wrap.html).addClass(o.slider.thumb.wrap.class);
+
+//				console.log( $(o.slider.target.selector).length );
+//				console.log( slider );
+
+				target.prepend( slider.append(function(){
+
+					//	a scene-eket egy konténerben adja vissza
+					return $(this).append( $(o.slider.scene.wrap.html).addClass(o.slider.scene.wrap.class).append(function(){
+
+						var scenesArray = [];	// ebbe gyűlnek az átpakolandó scene elemek
+
+						//	feltöltődik a scenesArray táblázat a létrehozandó elemekkel
+						sceneSource.each(function(){
+							//	fetch the img_wrap and content_wrap and adds to scene-item
+							scenesArray.push($(o.slider.scene.item.html).addClass(o.slider.scene.item.class)
+								.append($(this).find(o.img_wrap).clone())												// hozzáadja a klón képet
+								.append($(this).find(o.content_wrap).clone()).hide());									// hozzáadja a klón szöveget
+						});
+
+						//	scene-ék száma
+						sceneLength = scenesArray.length;
+
+						current = -1 < o.set.current && o.set.current < sceneLength ? o.set.current : 0,
+
+						//	egyszerre látható thumbnailek és/vagy entry-k száma
+						visibleThumbs = o.set.thumbnail.max || sceneLength;
+
+						return scenesArray;
+					}) );
+
+				}).append(thumbs.append(function(){
+
+						var images = [];	// ebbe gyűlnek az átpakolandó image elemek
+
+						//	feltöltődik az images táblázat a képek klónjaival ha be van kapcsolva a thumbnailek megjelenítése
+						if (o.set.thumbnail.show) {
+							sceneSource.each(function(){
+								images.push(
+									$(o.slider.thumb.item.html).addClass(o.slider.thumb.item.class)
+										.append($(this).find(o.img_wrap).clone()										// hozzáadja a klón képet
+											.on("click.esolr.sliderpro", function(e){
+												e.preventDefault();
+												setCurrent($(this).parent().index());									// az aktuális indexnek megfelelő
+												loopStop();
+//											})).css("width", (100 / sceneLength) + "%")
+											}))
+										.css("width", 100 / visibleThumbs + "%")										// a thumbnailek szélességét az elemszámnak, vagy a paraméterként megadott max elemszámnak megfelelően állítja be
+								);
+							});
+						} else {
+							images = "";
+						}
+
+						return images;
+					}))
+				);
+
+//
+				//	a létrehozott scene konténer azonosítása
+				scenes = slider.find("." + o.slider.scene.wrap.class);
+
+				//	lapozógombok megjelenítése
+				if (o.set.navigation.show && sceneLength > 1) {
+
+					slider.append($(o.slider.pager.prev.html).addClass(o.slider.pager.prev.class).on("click.esolr.sliderpro", function(e){
+							e.preventDefault();
+							loopStop();
+							//	a loop miatt mindig + 1, ezért a bal gombra nem csinálna semmi, amit így megelőzhetünk
+							if (looping !== undefined) {
+								setCurrent(current - 2);
+							} else {
+								setCurrent(current - 1);
+							}
+							looping = undefined;
+
+						})).append($(o.slider.pager.next.html).addClass(o.slider.pager.next.class).on("click.esolr.sliderpro", function(e){
+							e.preventDefault();
+							loopStop();
+
+							//	a loop miatt mindig + 1, ezért a jobb gombra kettőt ugrana, amit így megelőzhetünk
+							if (looping !== undefined) {
+								setCurrent(current);
+							} else {
+								setCurrent(current + 1);
+							}
+							looping = undefined;
+						}));
+				}
+
+				//	todo beépíteni
+				//	play/pause button
+				if (o.set.pause.show) {
+
+					var pauseButton = $(o.slider.pause.html).addClass(o.slider.pause.class).on("click.esolr.sliderpro", function(e){
+						e.preventDefault();
+						loopStop();
+					});
+
+					var playButton = $(o.slider.play.html).addClass(o.slider.play.class).on("click.esolr.sliderpro", function(e){
+						e.preventDefault();
+						loopStart();
+					});
+
+//					slider.append( pauseButton );
+
+//					if (o.set.navigation.show) {
+//						slider.find("." + o.slider.pager.prev.class).after( pauseButton );
+//					}
+				}
+
+				//	forrás portlet elrejtése
+				if (!o.set.source.show) {
+//					sourcePortlet.remove();
+					sceneSource.hide();
+				}
+
+//				console.log(o.set.current);
+
+				//	Működés indítása a paramétereknek megfelelően.
+				//	Ha a loop be van kapcsolva, akkor beállítja a kezdőt és indítja a loopot
+				if (o.set.loop.status) {
+					setCurrent(current);
+					loopStart();
+				} else {
+					setCurrent(current);
+				}
+			}
+
+
+			//	Beállítja az aktuális állapotot
+			function setCurrent(number) {
+
+				//	az aktuális állapot beállítása lekezelve a túlcsordulásokat is
+				switch (true) {
+					case (number == undefined):
+						current = 0;
+						break;
+					case (number < 0):
+						current = sceneLength - 1;
+						break;
+					case (0 <= number && number < sceneLength):
+						current = number;
+						break;
+					case (sceneLength == number):
+						current = 0;
+						break;
+				}
+
+				//	megfelelő slide beállítása
+				scenes.children().removeClass(o.currentClass).eq(current).addClass(o.currentClass);
+
+				//	megfelelő thumbnail beállítása
+//				thumbs.children().removeClass(o.currentClass).eq(current).addClass(o.currentClass);
+
+				//	megfelelő thumbnail beállítása
+				setCurrentThumbnail(current);
+//				sceneSource.removeClass(o.currentClass).eq(current).addClass(o.currentClass);
+
+				switch (o.set.effect.type) {
+					case "none":
+						scenes.children().hide().eq(current).show();
+						break;
+					case "dissolve":
+						scenes.children().fadeOut(o.set.effect.length).eq(current).fadeIn(o.set.effect.length);
+						break;
+					case "slide":
+						//	todo megcsinálni slide-olósra
+						break;
+					case "class":
+						//	todo megcsinálni class cserélgetősre
+						break;
+				}
+
+				//	ha responsive image is van benne
+				$(window).trigger("resize.esolr.responsive-img");
+			}
+
+			//	megfelelő thumbnail beállítása annak függvényében, hogy hány elem van és/vagy hányat engedélyeztünk megjeleníteni egy időben
+			function setCurrentThumbnail(current) {
+
+				var centerShift,															// megjelenített thumbnailek vagy entry-k fixen álló középpontja
+					rangeStart,
+					rangeEnd;
+
+				if (o.set.thumbnail.max && o.set.thumbnail.max < sceneLength) {				// ha van megadva maximum és több elem van mint ahány az elemmaximum
+
+					centerShift = Math.ceil(o.set.thumbnail.max / 2);						// ha páratlan – ha páros, lent felülíródik
+					rangeStart = current - (centerShift - 1);								// range Start ha páratlan vagy páros
+					rangeEnd = current + centerShift;									// range End ha páratlen – a páros, lent felülíródik
+
+					if (Math.ceil(o.set.thumbnail.max / 2) == o.set.thumbnail.max / 2) {	// ha páros, akkor a képzeletbeli középtől egyel jobbra legyen a fókuszpont
+						centerShift++;
+						rangeStart = current - centerShift + 1;
+						rangeEnd = current + centerShift - 1;
+					}
+
+					//	A current  pozíciójának megfelelően elrejti és megjeleníti a látható thumb range-et
+					if (o.set.thumbnail.show) {
+
+						if (current <= centerShift - 1) {																	// az elején vagyunk: elejétől visibleThumb-ig
+							thumbs.children().show().slice(visibleThumbs).hide();
+						}
+						if (centerShift - 1 < current && current < sceneLength - centerShift) {								// középen vagyunk: középső sáv
+							thumbs.children().hide().slice(rangeStart, rangeEnd).show();
+						}
+						if (sceneLength - centerShift - 1 < current) {														// végén vagyunk
+							thumbs.children().show().slice(0, sceneLength - visibleThumbs).hide();
+						}
+					}
+
+					//	A current  pozíciójának megfelelően elrejti és megjeleníti a látható entry range-et
+					if (o.set.source.show) {
+
+						if (current <= centerShift - 1) {																	// az elején vagyunk: elejétől visibleThumb-ig
+							sceneSource.show().slice(visibleThumbs).hide();
+						}
+						if (centerShift - 1 < current && current < sceneLength - centerShift) {								// középen vagyunk: középső sáv
+							sceneSource.hide().slice(rangeStart, rangeEnd).show();
+						}
+						if (sceneLength - centerShift - 1 < current) {														// végén vagyunk
+							sceneSource.show().slice(0, sceneLength - visibleThumbs).hide();
+						}
+					}
+				}
+
+				thumbs.children().removeClass(o.currentClass).eq(current).addClass(o.currentClass);
+				sceneSource.removeClass(o.currentClass).eq(current).addClass(o.currentClass);
+			}
+
+			function loopStart() {
+
+				if (sceneLength == 1) { return; }		// ha csak egy elem van ne indítson loopot
+
+				looping = setInterval(function(){
+					current++;
+					setCurrent(current);
+				}, o.set.loop.length);
+			}
+
+			function loopStop() {
+				if (sceneLength == 1) { return; }		// ha csak egy elem van ne stoppoljon loopot – ami nincs
+				clearInterval(looping);
+			}
+
+			init();
+
+			//	csak akkor jelennek meg a vezérlők, ha több lapozható elem is van
+
+		});
+	};
+
+	$.fn.esSliderPro.defaultOptions = {
+		dom_wrap:			"[data-es-fn='sliderpro']",
+		portlet_wrap:		".portlet",
+		container_wrap:		".portlet-content",
+		img_wrap:			".entry-featured",
+		content_wrap:		".entry-content",
+
+		currentClass:		"current",	// van különbség?
+
+		set: {
+			current:		0,
+			loop: {
+				label:		"Looping",
+				status:		true,
+				length:		3000
+			},
+			thumbnail: {
+				label:		"Thumbnails",
+				show:		false,
+				max:		undefined
+			},
+			counter: {
+				label:		"Counter",
+				show:		false			// még inaktív
+			},
+			timer: {
+				label:		"Timer visibility",
+				show:		false			// még inaktív
+			},
+			effect:	{
+				label:		"Slider effect",
+				type:		"none",			// none, dissolve, slide, class
+				length:		2000			// length in ms
+			},
+			navigation: {
+				label:		"Navigation elements",
+				show:		true
+			},
+			pause: {
+				label:		"Play/Pause button",
+				show:		false			// még inaktív
+			},
+			source: {
+				show:		false
+			}
+		},
+
+		slider: {
+			wrap: {
+				html:		"<div></div>",
+				class:		"portlet slider",
+				attr:		""
+			},
+			target: {
+				selector:	undefined
+			},
+			scene: {
+				wrap: {
+					html:	"<div></div>",
+					class:	"slider-scene",
+					attr:	""
+				},
+				item: {
+					html:	"<div></div>",
+					class:	"slider-scene-item",
+					attr:	""
+				}
+			},
+			pager: {
+				prev: {
+					html:	"<a href='#'>‹</a>",
+					class:	"slider-pager slider-pager-prev",
+					attr:		""
+				},
+				next: {
+					html:	"<a href='#'>›</a> ",
+					class:	"slider-pager slider-pager-next",
+					attr:		""
+				}
+			},
+			counter: {
+				html:		"<ul></ul>",
+				class:		"slider-counter",
+				attr:		"",
+				item: {
+					html:	"<li></li>",
+					class:	"slider-counter-item",
+					attr:		""
+				}
+			},
+			thumb: {
+				wrap: {
+					html:	"<div></div>",
+					class:	"slider-thumb",
+					attr:	""
+				},
+				item: {
+					html:	"<div></div>",
+					class:	"slider-thumb-item",
+					attr:	""
+				}
+			},
+			timer: {
+				html:		"<div></div>",
+				class:		"slider-timer",
+				attr:		"",
+				progress: {
+					html:	"<div></div>",
+					class:	"slider-timer-progress",
+					attr:		""
+				}
+			},
+			play: {
+				html:		"<div>play</div>",
+				class:		"slider-playpause slider-play",
+				attr:		""
+			},
+			pause: {
+				html:		"<div>pause</div>",
+				class:		"slider-playpause slider-pause",
+				attr:		""
+			}
+		}
+	};
+
+} (jQuery));;/*
+	@name:		Slider pro plugin for eSolr
+	@version:	1.0
+
+	todo		slider létrehozása után törölni a portletet
+	todo		lekezelni, hogy van-e kép, mekkora a minimum magasság
+	done		kapcsolható thumbnail
+	todo		automatikus betöltés?
+	todo		preloader: true|false
+	todo		a thumbnailek szélességét automatára állítani [minimum és maximum szám]
+	todo		mi van ha túl sok a thumbnail? thumbnailOverflow: enabled|disabled
+	todo		navigációs bogyókák generálása
+	todo		Play/Pause button true|false
+	todo		a nagy kép rálinkelése a valamelyik elemre, mert alapból azt nem viszi magával
+	todo		egy kép esetén ne legyen anim
+*/
+
+/*
+	Megjegyzés:
+	A slider jobb és bal bármilyen léptetése esetén trigger-eli a responsive image újraszámolását,
+	mert különben nem frissülnek azok a képméretek.
+*/
+
+(function ( $ ) {
+
+	$.fn.esSliderProOld = function ( options ) {
+
+		/*
+		Azonosítani
+
+			1) egy konténert, amin belül az ismétlődő elemek vannak (.portlet-content) > ebből lesz a tartalom
+			2) a képeket vagy azok konténerét > ebből lesz a háttérkép, a többit a helyén hagyja
+
+		Mechanizmus
+
+			A konténer(ek)-ből az elemeket az új helyükre másolom különválasztva a háttérképeket
+			a szöveges tartalmaktól és
+			A dom_wrap-en belüli elemeket azonnal elrejtjük!!! Így nem lesz a kellemetlen villódzás.
+
+		Beállítani
+
+			1) az első állapotot ha van kezdőérték, vagy ha nincs (.selected)
+			2) autoloop be/ki
+				a) loop hosszát [szám]
+				b) timer be/ki
+					• timer típusát (töltőcsík, számláló stb.)
+				c) overStop be/ki – megáll-e rolloverre
+			3) thumbnail be/ki
+				a) thumbnail szélességét 100% / megjelenített elemre
+				b) thumbnail-re hint?, szöveg?
+			4) állapot pontok be/ki
+
+		Lekezelni
+			1) ha csak egy elem van
+			2) maximum elemek számát
+			3) a maximálisan megjelenített elemek számát, ami nem kell, hogy egyenlő legyen a 2-vel
+		*/
+		/*
+			Állapotok
+			• current [szám]
+			• áttűnés effekt [fade, slide, cube stb]
+			• preloader (?)
+		*/
+
+
+		var o = $.extend(true, $.fn.esSliderProOld.defaultOptions, options);
+		var wrap = this;
+//			wrap = this[0] ? $(this) : $(o.dom_wrap);						// letiltva, mert különben olyan slidert is elindít, amit nem kellene neki
+
+//		console.log(wrap);
+
+
+		//	if there is no wrap added at fn call use default
+
+
+		return wrap.each( function () {
+
 			var sliderFn = $(this);											// alap wrapper
 			var target = $(o.slider.target.selector).length > 0 ? $(o.slider.target.selector) : sliderFn;	// ha van target megadva, akkor oda hozza létre a slidert, ha nincs, akkor a fő wrapperen belül első elemként
 			var sourcePortlet = $(this).find(o.portlet_wrap);				// forrás portlet azonosítása
@@ -4553,7 +5033,8 @@ var esNameday = {
 				thumbs.children().removeClass(o.currentClass).eq(current).addClass(o.currentClass);
 
 				//	megfelelő thumbnail beállítása
-				sceneSource.removeClass(o.currentClass).eq(current).addClass(o.currentClass);
+				setCurrentThumbnail(number);
+//				sceneSource.removeClass(o.currentClass).eq(current).addClass(o.currentClass);
 
 				switch (o.set.effect.type) {
 					case "none":
@@ -4572,6 +5053,11 @@ var esNameday = {
 
 				//	ha responsive image is van benne
 				$(window).trigger("resize.esolr.responsive-img");
+			}
+
+			function setCurrentThumbnail(current) {
+				//	megfelelő thumbnail beállítása
+				sceneSource.removeClass(o.currentClass).eq(current).addClass(o.currentClass);
 			}
 
 			function loopStart() {
@@ -4596,7 +5082,7 @@ var esNameday = {
 		});
 	};
 
-	$.fn.esSliderPro.defaultOptions = {
+	$.fn.esSliderProOld.defaultOptions = {
 		dom_wrap:			"[data-es-fn='sliderpro']",
 		portlet_wrap:		".portlet",
 		container_wrap:		".portlet-content",
@@ -4614,7 +5100,8 @@ var esNameday = {
 			},
 			thumbnail: {
 				label:		"Thumbnails",
-				show:		false
+				show:		false,
+				max:		undefined
 			},
 			counter: {
 				label:		"Counter",
