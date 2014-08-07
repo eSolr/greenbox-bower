@@ -4557,12 +4557,8 @@ var esNameday = {
 				//	megfelelő slide beállítása
 				scenes.children().removeClass(o.currentClass).eq(current).addClass(o.currentClass);
 
-				//	megfelelő thumbnail beállítása
-//				thumbs.children().removeClass(o.currentClass).eq(current).addClass(o.currentClass);
-
-				//	megfelelő thumbnail beállítása
+				//	megfelelő thumbnail és/vagy entry beállítása
 				setCurrentThumbnail(current);
-//				sceneSource.removeClass(o.currentClass).eq(current).addClass(o.currentClass);
 
 				switch (o.set.effect.type) {
 					case "none":
@@ -4606,13 +4602,13 @@ var esNameday = {
 					if (o.set.thumbnail.show) {
 
 						if (current <= centerShift - 1) {																	// az elején vagyunk: elejétől visibleThumb-ig
-							thumbs.children().show().slice(visibleThumbs).hide();
+							thumbs.children().hide().slice(0, visibleThumbs).show();
 						}
 						if (centerShift - 1 < current && current < sceneLength - centerShift) {								// középen vagyunk: középső sáv
 							thumbs.children().hide().slice(rangeStart, rangeEnd).show();
 						}
 						if (sceneLength - centerShift - 1 < current) {														// végén vagyunk
-							thumbs.children().show().slice(0, sceneLength - visibleThumbs).hide();
+							thumbs.children().hide().slice(sceneLength - visibleThumbs, sceneLength).show();
 						}
 					}
 
@@ -4620,13 +4616,13 @@ var esNameday = {
 					if (o.set.source.show) {
 
 						if (current <= centerShift - 1) {																	// az elején vagyunk: elejétől visibleThumb-ig
-							sceneSource.show().slice(visibleThumbs).hide();
+							sceneSource.hide().slice(0, visibleThumbs).show();
 						}
 						if (centerShift - 1 < current && current < sceneLength - centerShift) {								// középen vagyunk: középső sáv
 							sceneSource.hide().slice(rangeStart, rangeEnd).show();
 						}
 						if (sceneLength - centerShift - 1 < current) {														// végén vagyunk
-							sceneSource.show().slice(0, sceneLength - visibleThumbs).hide();
+							sceneSource.hide().slice(sceneLength - visibleThumbs, sceneLength).show();
 						}
 					}
 				}
