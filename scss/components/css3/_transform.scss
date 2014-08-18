@@ -35,5 +35,5 @@
 }
 
 @mixin transform-origin($args...) {
-	@include prefix("transform-origin", $args, webkit ms);
+	@include prefix("transform-origin", $args, webkit moz ms);
 }
