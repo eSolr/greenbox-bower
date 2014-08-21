@@ -912,7 +912,7 @@ var esDate = {
 				dragstart: function(e){
 
 					e.stopPropagation();
-					e.dataTransfer.effectAllowed = "move";
+//					e.dataTransfer.effectAllowed = "move";				// if this is allowed, dnd in chrome not working
 					e.dataTransfer.setData("none", undefined);			// setting data is required to fire firefox's drag'n'drop events
 
 					selectedPortlet = $(this);
@@ -923,7 +923,7 @@ var esDate = {
 					//	show drog helper
 					$(o.helper.scroll.top.selector + ", " + o.helper.scroll.bottom.selector).show();
 				},
-//				dragenter: function(e){},
+				dragenter: function(e){},
 				dragover: function(e){
 
 					e.preventDefault();									// necessary to catch drop event
@@ -951,19 +951,15 @@ var esDate = {
 					e.stopPropagation();
 //					e.dataTransfer.dropEffect = "copy";
 
-//					dragend();						// moved to dragend
-//					removeHover(targetPortlet);		// moved to dragend
-//					removeHover(targetArea);		// moved to dragend
+					dragend();
+					removeHover(targetPortlet);
+					removeHover(targetArea);
 
 //					return false;
 				},
 				dragend: function(e){
 					e.stopPropagation();
 //					e.dataTransfer.dropEffect = "copy";
-
-					dragend();						// moved to here from drop
-					removeHover(targetPortlet);		// moved to here from drop
-					removeHover(targetArea);		// moved to here from drop
 
 					selectedPortlet = undefined;
 
@@ -978,6 +974,9 @@ var esDate = {
 		area
 			.on({
 				dragstart: function(e){},
+				dragenter: function(e){
+					e.preventDefault();
+				},
 				dragover: function(e){
 
 					e.preventDefault();
