@@ -39,74 +39,6 @@
 	};
 
 } (jQuery));
-;//
-//	Sticky footer
-//
-//	Add a {class:"..."} class as parameter to footer if content doesn't fit the window,
-//	or –if class is not set– a default sticky setting will be attached to the footer.
-//
-//	Usage:
-//	$.fn.esStickyFooter();
-//	or
-//	$(“footer”).esStickyFooter();
-//	or
-//	$.fn.esStickyFooter({selector: "footer"});
-//	or
-//	$(“footer”).esStickyFooter({class: ”sticky”});
-//
-
-
-
-(function ( $ ) {
-
-	$.fn.esStickyFooter = function ( options ) {
-
-		var o = $.extend(true, $.fn.esStickyFooter.defaultOptions, options),
-			wrap = this[0] ? $(this) : $(o.selector);
-
-		return wrap.each(function(){
-
-			var footer = $(this),
-				content = footer.prev(),
-				contentBottom,
-				footerHeight,
-				winHeight;
-
-			function setSticky() {
-				winHeight = $(window).height();
-				contentBottom = content.position().top + content.outerHeight();
-				footerHeight = footer.outerHeight();
-
-				if ( winHeight >= (contentBottom + footerHeight) ) {
-					if (o.class !== undefined) {
-						footer.addClass(o.class);
-					} else {
-						footer.attr("style", o.style);
-					}
-				} else {
-					if (o.class !== undefined) {
-						footer.removeClass(o.class);
-					} else {
-						footer.removeAttr("style");
-					}
-				}
-			}
-
-			$(window).on("resize.esolr.stickyfooter", function () {
-				setSticky();
-			});
-
-			setSticky();
-		});
-	};
-
-	$.fn.esStickyFooter.defaultOptions = {
-		selector: ".footer-sticky",									//	default selector
-		class: undefined,											//	attached at sticky state
-		style: "position: fixed; width: 100%; bottom: 0; left: 0;"	//	if class added this css is ignored
-	};
-
-} (jQuery));
 ;/*
 	@desc		Ajax source loader
 	@tested
@@ -3744,4 +3676,216 @@ var esNameday = {
 		return !!clientSize && ((compareBottom <= viewBottom) && (compareTop >= viewTop));
 	};
 
-})(jQuery);
+})(jQuery);;//
+//	Sticky footer
+//
+//	Add a {class:"..."} class as parameter to footer if content doesn't fit the window,
+//	or –if class is not set– a default sticky setting will be attached to the footer.
+//
+//	Usage:
+//	$.fn.esStickyFooter();
+//	or
+//	$(“footer”).esStickyFooter();
+//	or
+//	$.fn.esStickyFooter({selector: "footer"});
+//	or
+//	$(“footer”).esStickyFooter({class: ”sticky”});
+//
+
+
+
+(function ( $ ) {
+
+	$.fn.esStickyFooter = function ( options ) {
+
+		var o = $.extend(true, $.fn.esStickyFooter.defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector);
+
+		return wrap.each(function(){
+
+			var footer = $(this),
+				content = footer.prev(),
+				contentBottom,
+				footerHeight,
+				winHeight;
+
+			function setSticky() {
+				winHeight = $(window).height();
+				contentBottom = content.position().top + content.outerHeight();
+				footerHeight = footer.outerHeight();
+
+				if ( winHeight >= (contentBottom + footerHeight) ) {
+					if (o.class !== undefined) {
+						footer.addClass(o.class);
+					} else {
+						footer.attr("style", o.style);
+					}
+				} else {
+					if (o.class !== undefined) {
+						footer.removeClass(o.class);
+					} else {
+						footer.removeAttr("style");
+					}
+				}
+			}
+
+			$(window).on("resize.esolr.stickyfooter", function () {
+				setSticky();
+			});
+
+			setSticky();
+		});
+	};
+
+	$.fn.esStickyFooter.defaultOptions = {
+		selector: ".footer-sticky",									//	default selector
+		class: undefined,											//	attached at sticky state
+		style: "position: fixed; width: 100%; bottom: 0; left: 0;"	//	if class added this css is ignored
+	};
+
+} (jQuery));
+;
+//
+//	Makes a panel-group accordion
+//
+//	todo	kívülről hívható pluginekkel kapcsolgatni a panel elemeit
+
+
+(function ( $ ) {
+
+	$.fn.panelAccordion = function ( options ) {
+
+		var o = $.extend(true, $.fn.panelAccordion.defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector),
+			linkSelector = this.selector,
+			windowHash = window.location.hash;
+
+		return wrap.each(function(){
+
+			var panelGroup = $(this),
+				panels = panelGroup.find(".panel"),
+				hashPanel = panels.find(windowHash).closest(".panel");
+
+			init();
+
+//			Beállítja a paramétereknek vagy URL hash-nek megfelelő megjelenést
+			function init() {
+
+				// Set status default, expand all or collapse all
+				if (o.set.status == "expanded") {
+					expandAllPanel();
+				} else if (o.set.status == "collapsed") {
+					collapseAllPanel();
+				}
+
+				// Set expanded panels by option. This has higher priority than expand/collapse all
+				if (o.set.expanded.length > 0) {
+					for (var i in o.set.expanded) {
+						if (i >= 0 && i < panels.length) {
+							panels.eq(i).addClass("expanded");
+						}
+					}
+				}
+
+				// Set URL Hashed panel expanded if exists. This overwrites everything else before
+				if (o.set.hashAutoExpand && windowHash !== "" && hashPanel.length > 0) {
+					expandPanel(panels.index(hashPanel))
+					document.location.href = windowHash;
+				}
+
+				// Event handlers
+				// Toggle
+				panelGroup.find(o.selectors.toggle).on("click", function(e) {
+					e.preventDefault();
+					var parentPanel = $(this).closest(".panel");
+
+					// Ha autoCollapse be van kapcsolva
+					if (o.set.autoCollapse) {
+						if (parentPanel.is(".expanded")) {
+							collapsePanel(parentPanel.index());
+						} else {
+							expandPanel(parentPanel.index());
+							collapseAllPanel(parentPanel.index());
+						}
+
+					// Ha autoCollapse nincs bekapcsolva
+					} else {
+						togglePanel(parentPanel.index());
+					}
+				});
+
+				// Expand
+				panelGroup.find(o.selectors.expand).on("click", function(e) {
+					e.preventDefault();
+					var parentPanel = $(this).closest(".panel");
+					expandPanel(parentPanel.index());
+
+					if (o.set.autoCollapse) {
+						collapseAllPanel(parentPanel.index())
+					}
+				});
+
+				// Collapse
+				panelGroup.find(o.selectors.collapse).on("click", function(e) {
+					e.preventDefault();
+					collapsePanel($(this).closest(".panel").index());
+				});
+
+				// Expand all
+				panelGroup.find(o.selectors.expandAll).on("click", function(e) {
+					e.preventDefault();
+					expandAllPanel();
+				});
+
+				// Collapse all
+				panelGroup.find(o.selectors.collapseAll).on("click", function(e) {
+					e.preventDefault();
+					collapseAllPanel();
+				});
+			}
+
+//			Kinyit vagy bezár egy panelt állapotától függően
+			function togglePanel(panelCounter) {
+				panels.eq(panelCounter).toggleClass("expanded");
+			}
+
+//			Kinyit egy panelt
+			function expandPanel(panelCounter) {
+				panels.eq(panelCounter).addClass("expanded");
+			}
+
+//			Bezár egy panelt
+			function collapsePanel(panelCounter) {
+				panels.eq(panelCounter).removeClass("expanded");
+			}
+
+//			Kinyitja mindegyiket, kivéve a paraméterben megadottat ha van
+			function expandAllPanel(except) {
+				panels.not( panels.eq(except) ).addClass("expanded");
+			}
+
+//			Bezárja mindegyiket, kivéve a paraméterben megadottat ha van
+			function collapseAllPanel(except) {
+				panels.not( panels.eq(except) ).removeClass("expanded");
+			}
+		});
+	};
+
+	$.fn.panelAccordion.defaultOptions = {
+		selector: ".panel-group.accordion",		//	default selector
+		set: {
+			status: "default",					//	default|expanded|collapsed – first or selected is expanded|all expanded|all collapsed
+			hashAutoExpand: false,				//	opens for mydomain.com#hash if available in page-title
+			expanded: [0],						//	expands these items on launch
+			autoCollapse: false					//	when a panel opens, all others closes automatically
+		},
+		selectors: {
+			toggle:		"[data-panel-toggle]",
+			expand:		"[data-panel-expand]",
+			collapse:	"[data-panel-collapse]",
+			expandAll:	"[data-panel-expandAll]",
+			collapseAll:"[data-panel-collapseAll]"
+		}
+	};
+
+} (jQuery));

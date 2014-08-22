@@ -2,7 +2,33 @@
 //	Schematic portlet model
 //
 
+.panel-group {
+	margin-bottom: $baseline;
+
+	.panel {
+		margin-bottom: 0;
+	}
+
+//	default accordion panel status is collapsed
+//	to expand a panel within a panel group use .panel .expanede together
+	&.accordion {
+
+		.panel {
+
+			&:not(.expanded) > *:not(.panel-header) {
+				height: 0;
+				margin-top: 0;
+				margin-bottom: 0;
+				padding-top: 0;
+				padding-bottom: 0;
+				overflow: hidden;
+			}
+		}
+	}
+}
+
 .panel {
+	margin-bottom: $baseline;
 
 	.panel-header {
 
@@ -11,7 +37,7 @@
 
 	.panel-body {}
 
-	.panel-footer {}
-
 	.table {}
+
+	.panel-footer {}
 }
