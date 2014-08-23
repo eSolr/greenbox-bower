@@ -9,19 +9,38 @@
 		margin-bottom: 0;
 	}
 
-//	default accordion panel status is collapsed
-//	to expand a panel within a panel group use .panel .expanede together
+	//	default accordion panel status is collapsed
+	//	to expand a panel within a panel group use .panel .expanede together
 	&.accordion {
 
 		.panel {
 
-			&:not(.expanded) > *:not(.panel-header) {
-				height: 0;
+			&, * {
+				@include transition(all .2s linear);
+			}
+
+			& > * {
+				position: relative;
+				overflow: hidden;
+			}
+
+			&:not(.expanded) > .panel-header ~ * {
 				margin-top: 0;
 				margin-bottom: 0;
 				padding-top: 0;
 				padding-bottom: 0;
-				overflow: hidden;
+				border-top: 0 none transparent;
+				border-bottom: 0 none transparent;
+//				@include opacity(0);
+
+				* {
+					margin-top: -100%;
+					margin-bottom: 0;
+					padding-top: 0;
+					padding-bottom: 0;
+					border-top: 0 none transparent;
+					border-bottom: 0 none transparent;
+				}
 			}
 		}
 	}
@@ -31,13 +50,10 @@
 	margin-bottom: $baseline;
 
 	.panel-header {
-
 		.panel-title {}
 	}
 
 	.panel-body {}
-
-	.table {}
 
 	.panel-footer {}
 }
