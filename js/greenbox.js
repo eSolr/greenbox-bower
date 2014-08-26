@@ -1,4 +1,591 @@
+/*
+ Makes a select autocomplete
 
+ Inputok:
+ 1. select tartalma
+ 2. generált json átadva üres selectnek, eredmények visszaírva selectbe
+ 3. kintről felszippantott json kattintásra, üres selectnek, eredmények visszaírása selectbe
+
+ ------------
+ Leírás
+
+ Forrás:
+ Az autocomplete egyelőre csal selecttel működik. Három forrásból szippantja fel:
+ • forrásból a select option-jeit felhasználva,
+ • json formátumú változóból
+ • azonos szerverről hívott json-ból
+
+ Két állása lehet:
+ • normál – sima select –, vagy
+ • multiple.
+ Utóbbi esetén a kiválasztott elemek tagként jelennek meg.
+ Ha a select inputja maga a forrás, akkor a select változásai tükrözése kerülnek a virtuális selectből a selected property megjelölésével.
+ Ha a select tartalma úgy került betöltésre változóból vagy jsonból, akkor egyrészt a benne lévő tartalom törlésre kerül és a selectbe csak
+ a form postolásához szükséges option-ök kerülnek átvezetése megjelölve őket a selected propery-vel.
+
+ Elvárt objektumnevek
+
+ Események
+ Változások esetén a forrás selecten elsüti a change() event-et.
+
+ Research:
+ http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+
+ done ha multiple ÉS saját a forrás, akkor a selectbe való visszaírást le kell kezelni!
+
+ todo betöltéshez class rendelés, hogy látványosabb lehessen az állapot
+ todo ha van value nélküli első elem, azt ne is emelje át!
+ todo sima selectnél lehessen beállítani olyat is, hogy „egyik sem”, ami legelsőként épül be!
+ todo lekezelni az értékkel rendelkező, de megjelenítés nélkli elemeket
+ todo a keresés indítását eseménykezelőhöz kötni, hogy a gépelést ne fogja meg
+ todo tömb sorbarendezés
+ todo tömb bontás abc szerinti résztömbökre
+ todo disabled állapot lekezelése select alapján
+ todo hoverre ne a hovert állítsa, hanem a rendes highlightot, amit billentyűütésre csekkoljunk, jó helyen van-e
+ done a select legenerálását szétválasztani a tartalommal való feltöltéstől > lehessen kezelni a betöltés eseményt
+ todo ha az alap select NEM multiple, akkor a generált select sem lehet az, mert a visszaírás nem fog működni! ha az alap input, akkor ez nem gond
+ done select visszaíráskor triggelni rajta egy onChange-et
+ todo összekötés több mezőn keresztüli szűréshez (egyik eredménye alapján módosul a következő)
+ todo már betöltött ac_select tartalmának frissítése|resetelése
+ todo tag törlése x-szel
+ todo megadni mi legyen a target (input és akkor hogy szerparálja az eredményeket) vagy select
+ done szippantsa fel a selected elemeket a selectből
+ todo kezdőérték megadás
+ todo valós idejű beleírás lehetősége
+ todo csak szókező egyezés|bárhol egyezés
+ todo késleltetés
+ todo lista fel/lenyílás pozíciótól függően
+ todo mobil megjelenés
+ todo opt groupos/kétszintű feldolgozás > kétszintű json feldolgozás
+ todo átvenni a select szélesség beállításait
+ todo maximális magasságot megadni listaelemszámban
+ todo a select feletti klikkelést – inputWrap
+ todo alternatív outputot megadni és abba milyen módon generálja a listát
+ */
+
+(function ( $ ) {
+
+	$.fn.autoComplete = function ( options ) {
+
+		var defaultOptions = {
+			id:					"id",					// string|number – az option value érték alapértelmezett elvárt objektumneve
+			text:				"text",					// string|number – az option-ben megjelenített szöveg alapértelmezett elvárt objektumneve
+			placeholderLoading:	"loading...",
+			placeholder: 		"",						// input placeholder szöveg
+			minimumCaracter:	0,						// minimum karakterszám, ami után elkezd szűrni
+			typeDelay: 			0,						// billentyűleütés utáni késleltetés
+			multiple:			false,					// true|false – az alap select alapján állítja be
+//			caseSensitive:		false,					// ture|false – egyezésnél számítson-e a kis és nagybetű
+			preload:			true,					// true|false – ha true, akkor a dokival együtt töltődik be, false esetén kattintásra
+			firstLetterMatch:	false,					// true|false – szó eleji egyezés
+			preSelected:		[],						// ha az inputban van egyezés, akkor ezeket megjelöli. Ha több adat van és a select nem multiple, akkor csak az elsőt
+			filterEmptyValues:	true,					// kiszedi az value nélküli vagy üres value-val rendelkező elemeket elemeket
+			data: {
+				src:			undefined,
+				dataType:		"object"				// object|array
+			},
+			json: {
+				src:			undefined,
+//				type:			"json",					// json|jsonp
+				dataType:		"object"				// object|array
+			},
+			selectors: {
+				wrapID:					"ac-select-",
+				wrapClass:				"ac-select",
+				multiWrapClass:			"ac-select-multi-wrap",
+				tagWrapClass:			"ac-select-tag-wrap",
+				inputWrapClass:			"ac-select-input-wrap",
+				multiTagClass: 			"ac-select-tag",
+				multiTagTextClass: 		"ac-select-tag-text",
+				multiTagRemoveClass: 	"ac-select-tag-remove",
+				multiTagRemoveHTML: 	"×",
+				inputClass:				"ac-select-input",
+				inputFieldClass:		"ac-select-input-field",
+				listClass:				"ac-select-list",
+				hiddenSelectClass:		"ac-hidden-select",
+				showClass:				"ac-show",
+				multipleClass: 			"ac-select-multiple",
+				multipleSelectedHide: 	"ac-multi-hide",		// ez az a hide, amikor multiple selectben a listából el akarom tüntetni
+				listHighlight: 			"ac-select-hl"
+			}
+		};
+
+		var o = $.extend(true, defaultOptions, options),
+			wrap = $(this),
+			selectorType = this.selector.substr(0,1),	// selector típusa, de szinte felesleges, mert csak id lehet
+			selectID = this.selector.substr(1);			// selector neve; később ez belekerül az egyedi azonosítókba
+
+
+		return wrap.each(function() {
+
+			var selectItem = $(this),					// kiválasztott select
+				selectWrap,								// létrehozott virtuális automplete-es select wrappere
+				selectMultiWrap,
+				selectTagWrap,
+				selectInput,
+				selectInputWrap,
+				selectInputField,
+				selectList,
+				selectListItems,
+				current,								// billentyűn való lépdelés aktuális pozíciója a fileterdList-en belül
+				data = [],								// json formátumú tömb
+				dataList = [],							// html lista tömbje
+				selectedData = [],						// ebbe gyűlnek a kiválasztott értékpárok
+				filteredList,							// a billentyűzetről való lépdeléshez kell egy aktuális szűrt lista
+				isOver = false,							// jelzi ha a select felett állunk; a precízebb kinyílás-becsuks miatt kell
+				charCounter;							// filternél char counter
+
+
+			// Alapbeállítások -----------------------------------------------------------------------------------------
+
+			// selector elrejtése, hogy ne legyen „pislogás”
+			selectItem.addClass(o.selectors.hiddenSelectClass);
+
+			// multiselect beállításe az eredeti select alapján
+			if (selectItem.attr("multiple") == undefined) {
+				o.multiple = false;
+			} else {
+				o.multiple = true;
+			}
+
+			// ha nem külső forrásból töli be a json-t, akkor nem jelenik meg a betöltő szöveg
+			if (!o.json.src && !o.data.src) {
+				o.placeholderLoading = o.placeholder;
+			}
+
+			// Feldolgozás ---------------------------------------------------------------------------------------------
+
+			// kiüríti a select tartalmát, akármi is volt benne
+			function emptySelect() {
+				selectItem.empty();
+			}
+
+
+			// kezdő adatokkal való feltöltés
+			function setPreselected() {
+
+				if (o.preSelected.length > 0) {
+
+					// ha nem multiple, de több elem van megadva, akkor csak a tömb első eleme maradjon, a többi törlésre kerül
+					if (!o.multiple) {
+						o.preSelected.splice(1);
+					}
+
+					for (var i = 0; i < o.preSelected.length; i++) {
+						selectListItems.filter("[data-value='" + o.preSelected[i] + "']").first().trigger("click");
+					}
+				}
+			}
+
+
+			// külső fileból betölti a json tartalmát és elindítja a feldolgozást
+			function loadData() {
+
+				initACSelect();							// lista legenerálása html string alapján
+
+				$.getJSON(o.json.src, function (data) {
+					dataToHTML(data);					// átalakítás html stringgé (tömb)
+					generateList();
+					setEvents();						// általános eseménykezelők beállításe
+					setSelectEvents();					// lista elmeinek eseménykezelője
+					setPreselected();					// ha vannak indítóelemek kiválasztva, akkor azokat beteszi
+				})
+			}
+
+
+			// json formátumú tömbből html listát generál
+			function dataToHTML(dataArray) {
+
+				if (dataArray.length > 0) {
+					for (var i = 0; i < dataArray.length; i++) {
+						dataList.push("<li data-value='" + dataArray[i][o.id] + "'>" + dataArray[i][o.text] + "</li>")
+					}
+				}
+			}
+
+
+			// a sima select tartalmából html listát generál
+			function selectToHTML() {
+
+				if (selectItem.children().length > 0) {
+					selectItem.children().each(function() {
+//							data.push({"id": this.value, "text": this.text })								// select alapján készít egy jsont
+						dataList.push("<li data-value='" + this.value + "'>" + this.text + "</li>")		// select alapján leképez egy html listát
+					});
+				}
+			}
+
+
+			// legenerálja a html string (tömb) alapján a listát
+			function initACSelect() {
+
+				o.selectors.wrapID = selectorType + o.selectors.wrapID + selectID;						// egyedi ac_select-esített id, amibe belefűzi az eredeti id-t is
+
+				// ac_select_multiple
+				selectWrap = $("<div/>").attr("id", o.selectors.wrapID).addClass(function() {
+					var classes = o.selectors.wrapClass;
+					if (o.multiple == true) { classes += " " + o.selectors.multipleClass}				// ha multiple, akkor az ac_select kap egy plusz class-t is
+					return classes;
+				});
+
+				// kijön
+//				selectMultiWrap = $("<div/>").addClass(o.selectors.multiWrapClass);
+
+				selectInput = $("<div/>").addClass(o.selectors.inputClass);
+				selectTagWrap = $("<ul/>").addClass(o.selectors.tagWrapClass);
+				selectInputWrap = $("<div/>").addClass(o.selectors.inputWrapClass);
+				selectInputField = $("<input/>").attr({"placeholder": o.placeholderLoading}).addClass(o.selectors.inputFieldClass);
+				selectList = $("<ul/>").addClass(o.selectors.listClass);
+
+				if (o.multiple) {
+//					selectItem.after( selectWrap.append( selectMultiWrap.append( selectTagWrap).append( selectInputWrap.append( selectInputField ) ) ).append( selectList ) );				// az új listaelemek beágyazása
+					selectItem.after( selectWrap.append( selectInput.append( selectTagWrap).append( selectInputWrap.append( selectInputField ) ) ).append( selectList ) );				// az új listaelemek beágyazása
+				} else {
+					selectItem.after( selectWrap.append( selectInput.append( selectInputField ) ).append( selectList ) );				// az új listaelemek beágyazása
+				}
+			}
+
+
+			// a betöltött json vagy változó alapján html lista generálása
+			function generateList() {
+				selectList.html( dataList.join("") );
+				selectListItems = selectList.children();
+				selectInputField.attr("placeholder", o.placeholder);
+			}
+
+
+			// eseménykezelők definiálása
+			function setEvents() {
+
+				// billentyűlenyomásra vár
+
+				$(window).on({
+					keydown: function (e) {
+						// esc – bezárja a listákat és leveszi a fókuszt az inputról
+						if (e.keyCode == 27) {
+							selectList.removeClass(o.selectors.showClass);
+							selectInputField.blur();
+						}
+					},
+					click: function () {
+						if (!isOver) {
+							selectList.removeClass(o.selectors.showClass);
+							selectInputField.blur();
+						}
+					}
+				});
+
+				$(document).on({
+//					click: function (e) {
+//						selectList.removeClass(o.selectors.showClass);
+//					}
+				});
+
+				selectWrap.hover(
+					function (e) {
+						isOver = true;
+					},
+					function (e) {
+						isOver = false;
+					}
+				);
+
+				selectList.on({
+					mousemove: function(e) {
+//						selectListItems.removeClass(o.selectors.listHighlight);	// hogy ne legyen egyszerre két highlight
+					}
+				});
+
+				selectInputField.on({
+					click: function (e) {
+						e.stopPropagation();
+//						selectList.addClass(o.selectors.showClass);
+					},
+					keydown: function (e) {
+
+						if (!filteredList) {
+							filteredList = selectListItems.not("." + o.selectors.listHighlight);
+							current = 0;
+						}
+
+						// lista kinyitása ha még nem volna nyitva ha a billentyű nem: shift, backspace (8), tab (9), ctrl (17), alt (18), capslock (20), del (46), bal cmd/win (91), jobb cmd (93)
+						if (!e.shiftKey && [8, 9, 17, 18, 20, 46, 91, 93].indexOf(e.keyCode) < 0) {
+							selectList.addClass(o.selectors.showClass);
+						}
+
+						// backspace – tag-et töröl ha üres az input és van tag
+						if (e.keyCode == 8 && selectInputField.val() == "" && selectTagWrap.children().length > 0) {
+							removeTag( selectTagWrap.children().last() );
+						}
+
+						// enter – a listában legelsőt hozzáadja a tagekhez
+						if (e.keyCode == 13) {
+							e.preventDefault();
+							listItemSelected( filteredList.filter("." + o.selectors.listHighlight).first() );			// a highlighttal rendelkezőt hozzáadja
+							selectList.removeClass(o.selectors.showClass);												// lista bezására
+						}
+
+						// page up
+//								if (e.keyCode == 33) {}
+						// page down
+//								if (e.keyCode == 34) {}
+						// left arrow
+//								if (e.keyCode == 37) {}
+						// right arrow
+//								if (e.keyCode == 39) {}
+
+						// arrow up
+						if (e.keyCode == 38) {
+
+							// ha több mint egy szűrt elem van
+							if (filteredList.length > 1) {
+
+								current = filteredList.index( filteredList.filter("." + o.selectors.listHighlight) );
+
+								if (current > 0) {
+									filteredList.eq(current).removeClass(o.selectors.listHighlight).end().eq(current - 1).addClass(o.selectors.listHighlight);
+								} else {
+									filteredList.eq(current).removeClass(o.selectors.listHighlight).end().eq(filteredList.length - 1).addClass(o.selectors.listHighlight);
+								}
+							}
+						}
+
+						// arrow down
+						if (e.keyCode == 40) {
+
+							var current;
+
+							// ha több mint egy szűrt elem van
+							if (filteredList.length > 1) {
+
+								current = filteredList.index( filteredList.filter("." + o.selectors.listHighlight) );
+
+								if (current < filteredList.length - 1) {
+									filteredList.eq(current).removeClass(o.selectors.listHighlight).end().eq(current + 1).addClass(o.selectors.listHighlight);
+								} else {
+									filteredList.eq(current).removeClass(o.selectors.listHighlight).end().eq(0).addClass(o.selectors.listHighlight);
+								}
+							}
+						}
+
+						return;
+					},
+					focus: function () {
+						// megjeleníti a listákat
+						selectList.addClass(o.selectors.showClass);
+					},
+					keyup: function (e) {
+
+						if ([33,38,40].indexOf(e.keyCode) < 0) {
+							selectFilter(selectInputField.val());					// szűri a listát az input tartalma alapján
+						}
+					},
+					blur: function () {
+						if (!isOver) {
+							selectList.removeClass(o.selectors.showClass);
+						}
+//						$(this).off("keyup");
+					}
+				});
+
+//				selectListItems.on({
+//					click: function(e) {
+//						e.preventDefault();
+//						listItemSelected( $(this) );
+//						selectList.removeClass(o.selectors.showClass);			// lista elrejtése
+//					},
+//					mouseout: function () {
+//						$(this).removeClass(o.selectors.listHighlight);			// eltünteti az esetlegsen megjelenő highlightot
+//					}
+//				});
+			}
+
+			function setSelectEvents() {
+				selectListItems.on({
+					click: function(e) {
+						e.preventDefault();
+						listItemSelected( $(this) );
+						selectList.removeClass(o.selectors.showClass);			// lista elrejtése
+					},
+					mouseover: function (e) {
+//						e.preventDefault();
+						e.stopPropagation();
+						$(this).addClass(o.selectors.listHighlight);
+					},
+					mouseout: function () {
+						$(this).removeClass(o.selectors.listHighlight);			// eltünteti az esetlegsen megjelenő highlightot
+					}
+				});
+			}
+
+
+			// kattintás egy listaelemen
+			function listItemSelected(item) {
+
+				// ha van egyáltalán megjeleníthető elem
+				if (item.length > 0) {
+
+					// ha multiple a select
+					if (o.multiple) {
+						addTag(item);																// tag hozzáadása
+
+						// ha csak egy elemet lehet kiválasztani
+					} else {
+						selectedData = [];															// selected reset
+						selectedData.push({"id": item.attr("data-value"), "text": item.text()});	// az új elem pusholása
+						selectInputField.val(item.text());												// inputba visszaírni
+						selectList.removeClass(o.selectors.showClass);								// panel elrejtve
+
+						// attól függően hogy betöltött vagy forrásban lévő selectről van szó csak megjelöl és change elsüt vagy létrehoz/töröl/change elsüt
+						if (!o.json.src && !o.data.src) {
+							selectItem.children().prop('selected', false).end().find("[value='" + item.attr("data-value") + "']").prop('selected', true).end().change();	// select jelölés mindenről töröl, kiválasztott megjelölés select-ként, select change elsüt
+						} else {
+							emptySelect();															// select ürítése
+							var option = $("<option/>").attr("value", item.attr("data-value")).text(item.text()).prop('selected', true);	// selectedre állított option létrehozása
+							selectItem.append( option ).change();									// option beállítása, change elsütése
+						}
+					}
+				}
+			}
+
+			// tag hozzáadása a taglistához
+			function addTag(item) {
+
+				// ha nem az első üres elemen állunk
+				if (item.is("[data-value]") && item.attr("data-value") !== "") {
+
+					// tag létrehozása az item property-k alapján törlő gombbal és eseménykezelővel
+					var tag = $("<li/>").addClass(o.selectors.multiTagClass).attr("data-value", item.attr("data-value"))
+						.append( $("<div/>").addClass(o.selectors.multiTagTextClass).text(item.text()) )
+						.append( $("<div/>").addClass(o.selectors.multiTagRemoveClass).html(o.selectors.multiTagRemoveHTML).on("click", function(e) {
+							e.preventDefault();
+							removeTag( $(this).closest("." + o.selectors.multiTagClass) );
+						}) );
+
+					selectedData.push({"id": item.attr("data-value"), "text": item.text()});	// selected pusholva
+					selectTagWrap.append( tag );												// tab beszúrása
+					selectInputField.val("");														// input tartalmának törlése, miután a tag „felhasználódott”
+					item.addClass(o.selectors.multipleSelectedHide);							// kiválasztott elem elrejtése a listából
+
+					// ha a forrás a kódban van, azaz nem betöltött option-ök alapján, akkor selected-re állítja a megfelelő option-t
+					if (!o.json.src && !o.data.src) {
+						selectItem.find("[value='" + item.attr("data-value") + "']").prop('selected', true).end().change();
+
+						// ha a forrás betöltött jsonból vagy változóból, akkor a selectbe bemozgatja a selectedre állított option-t
+					} else {
+						var option = $("<option/>").attr("value", item.attr("data-value")).text(item.text()).prop('selected', true);	// selectedre állított option létrehozása
+						selectItem.append( option ).change();									// option beállítása, change elsütése
+					}
+				}
+			}
+
+			// törli az átadott tag-et és visszaállítja a listaelemet;
+			function removeTag(item) {
+				selectedData.splice(searchObjectInArray(selectedData, item.attr("data-value")), 1);	// kiveszi a selectData tömbből a törölt elemet
+				item.remove();																		// törli a megjelenített tag-et
+				selectListItems.filter("[data-value='" + item.attr("data-value") + "']").removeClass(o.selectors.multipleSelectedHide);	// a listában visszaállítja a törölt tag listaelemét
+
+				if (!o.json.src && !o.data.src) {
+					selectItem.find("[value='" + item.attr("data-value") + "']").prop('selected', false).end().change();;				// törli a kijelölést a normál selectből
+				} else {
+					selectItem.find("[value='" + item.attr("data-value") + "']").remove().end().change();				// törli az elemet a selectből és elsüti a change-et
+				}
+			}
+
+			// visszaadja, hogy adott json tömb hanyadik elemének ID-jével egyezik a keresett string
+			function searchObjectInArray(arrayItem, searchString) {
+				var result = -1;
+				for (var i = 0; i < arrayItem.length; i++) {
+					if (arrayItem[i].id == searchString) {
+						return i;
+					}
+				}
+				return result;
+			}
+
+			// a billentyűleütéseknek megfelelően leszűri a listát beállítva a láthatóságot
+			function selectFilter(filter) {
+
+				// ha a beírt karakterszám elérte a paraméterként megadott minimumot
+				if (filter.length >= o.minimumCaracter) {
+
+					selectListItems.each(function () {
+
+						var listItem = $(this);
+
+						// ha nincs egyezés
+						if (listItem.text().toUpperCase().indexOf(filter.toUpperCase()) < 0) {
+							listItem.hide();
+
+							// ha van egyezés, akkor megjeleníti
+						} else {
+							listItem.show();
+						}
+					});
+
+					// megjelöli az első nem rejtett, nem hide-olt elemet ha még nincs
+					selectListItems.removeClass(o.selectors.listHighlight).not(":hidden").not("." + o.selectors.multipleSelectedHide).first().addClass(o.selectors.listHighlight);
+
+					// ha a karakterszám alatta van, akkor mindet megjelöli és leveszi a highlightot, különben visszatörlésnél az első megmaradna kijelöltnek
+				} else {
+					selectListItems.show().removeClass(o.selectors.listHighlight);
+				}
+
+				// a billentyűzeten való lépdeléshez a leszűrt aktuális lista értékadása
+				filteredList = selectListItems.not(":hidden").not("." + o.selectors.multipleSelectedHide);
+			}
+
+			// autocomplete inicializálása
+			function init() {
+
+				// ha küldő json a forrás
+				if (o.json.src) {
+
+					// ha a json előtöltött, azaz nem kattintásra tölti be az adott json-t
+					if (o.preload) {
+						emptySelect();		// kipucolja a select tartalmát
+						loadData();			// indítja a betöltést és feldolgozást
+
+						// ha a json-t az inputba történő első kattintáskor töltjük be
+					} else {
+						emptySelect();
+						initACSelect();
+						generateList();
+						setEvents();
+						setSelectEvents();
+						setPreselected();
+					}
+
+				// ha json formátumú sima tömb a forrás
+				} else if (o.data.src) {
+					emptySelect();			// kipucolja a select tartalmát
+					dataToHTML(o.data.src);	// json formátumból html „stringet” generál
+					initACSelect();			// legenerálja a select általános elemeit
+					generateList();			// legenerálja a html listát a html „string” alapján
+					setEvents();			// általános eseménykezelők beállítás
+					setSelectEvents();		// legenerált lista eseménykezelőinek beállítása
+					setPreselected();		// ha vannak indítóelemek kiválasztva, akkor azokat beteszi
+
+					// ha a select tartalma maga a forrás
+				} else {
+					selectToHTML();
+					initACSelect();
+					generateList();
+					setEvents();
+					setSelectEvents();
+					setPreselected();
+				}
+				return;
+			}
+
+			init();
+		});
+	};
+
+} (jQuery));/**
+ * Created by arminpolecsak on 2014.08.25..
+ */
+;
 //
 //	Makes an item linkable with the value of the attribute
 //
