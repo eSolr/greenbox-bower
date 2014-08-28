@@ -1774,60 +1774,7 @@ var esDate = {
 			}, delay || defaultDelay);
 		});
 	}
-}(jQuery));;
-//
-//
-//
-
-
-(function ( $ ) {
-
-	$.fn.esFluidHeight = function ( options ) {
-
-		var o = $.extend(true, $.fn.esFluidHeight.defaultOptions, options),
-			wrap = this[0] ? $(this) : $(o.dom.selector);
-
-		wrap.each(function () {
-
-			var item = $(this),
-				itemParent = item.parent();
-
-			function setHeight() {
-
-				//	calculating heights doing care of margins
-				var itemMargin = Number(item.css("margin-top").replace("px","")) + Number(item.css("margin-bottom").replace("px","")),
-//					itemPadding = Number(item.css("padding-top").replace("px","")) + Number(item.css("padding-bottom").replace("px","")),
-					parentHeight = itemParent.innerHeight();
-
-				//	if parent is higher then current item
-//				if (item.outerHeight() < parentHeight - itemMargin) {
-//					item.outerHeight(parentHeight - itemMargin);
-//					return true;
-//				}
-
-				item.outerHeight(parentHeight - itemMargin);
-
-				return false;
-			}
-
-			setHeight();
-
-			$(window).on("resize.esolr.fluidheight", function () {
-				setHeight();
-			});
-		});
-	};
-
-
-//	--------------------------------------------------------------------------------------------------------------------
-//	Default values
-
-	$.fn.esFluidHeight.defaultOptions = {
-		dom: {
-			selector:		".js-fluid-height"
-		}
-	};
-} (jQuery));;/*
+}(jQuery));;/*
 	@desc		Reset input field on parameter event (default is blure)
 	@version	1.0
 */
@@ -4263,7 +4210,63 @@ var esNameday = {
 		return !!clientSize && ((compareBottom <= viewBottom) && (compareTop >= viewTop));
 	};
 
-})(jQuery);;//
+})(jQuery);;
+//
+//	todo megadni, hogy mihez képes állítsa be magát
+//
+
+
+(function ( $ ) {
+
+	$.fn.esFluidHeight = function ( options ) {
+
+		var o = $.extend(true, $.fn.esFluidHeight.defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.dom.selector);
+
+		wrap.each(function () {
+
+			var item = $(this),
+				itemParent = item.parent();
+
+			function setHeight() {
+
+				// visszaállítás alapra, hogy méretcsökkenéskor ne önmaga feszítse ki a parent-et
+				item.outerHeight("auto");
+
+				//	calculating heights doing care of margins
+				var itemMargin = Number(item.css("margin-top").replace("px","")) + Number(item.css("margin-bottom").replace("px","")),
+//					itemPadding = Number(item.css("padding-top").replace("px","")) + Number(item.css("padding-bottom").replace("px","")),
+					parentHeight = itemParent.innerHeight();
+
+				//	if parent is higher then current item
+//				if (item.outerHeight() < parentHeight - itemMargin) {
+//					item.outerHeight(parentHeight - itemMargin);
+//					return true;
+//				}
+
+				item.outerHeight(parentHeight - itemMargin);
+
+				return false;
+			}
+
+			setHeight();
+
+			$(window).on("resize.esolr.fluidheight", function () {
+				setHeight();
+			});
+		});
+	};
+
+
+//	--------------------------------------------------------------------------------------------------------------------
+//	Default values
+
+	$.fn.esFluidHeight.defaultOptions = {
+		dom: {
+			selector:		".js-fluid-height"
+		}
+	};
+} (jQuery));;//
 //	Sticky footer
 //
 //	Add a {class:"..."} class as parameter to footer if content doesn't fit the window,
