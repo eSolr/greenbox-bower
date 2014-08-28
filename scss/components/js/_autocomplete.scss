@@ -27,6 +27,10 @@ $enable-autocomplete-module:true !default;
 		background-color: #eeeeee;
 		vertical-align: top;
 
+		// szimulálja a focus eseményt
+		&.ac-select--focus {
+		}
+
 		// a rend kedvéért
 		* {
 			box-sizing: border-box;

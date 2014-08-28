@@ -33,6 +33,7 @@
 
  done ha multiple ÉS saját a forrás, akkor a selectbe való visszaírást le kell kezelni!
 
+ todo a focus-szal egyszerre az ac-select is kapjon egy focus class-t
  todo betöltéshez class rendelés, hogy látványosabb lehessen az állapot
  todo ha van value nélküli első elem, azt ne is emelje át!
  todo sima selectnél lehessen beállítani olyat is, hogy „egyik sem”, ami legelsőként épül be!
@@ -106,7 +107,8 @@
 				showClass:				"ac-show",
 				multipleClass: 			"ac-select-multiple",
 				multipleSelectedHide: 	"ac-multi-hide",		// ez az a hide, amikor multiple selectben a listából el akarom tüntetni
-				listHighlight: 			"ac-select-hl"
+				listHighlight: 			"ac-select-hl",
+				selectFocus: 			"ac-select--focus"
 			}
 		};
 
@@ -372,6 +374,7 @@
 					},
 					focus: function () {
 						// megjeleníti a listákat
+						selectWrap.addClass(o.selectors.selectFocus);
 						selectList.addClass(o.selectors.showClass);
 					},
 					keyup: function (e) {
@@ -384,6 +387,7 @@
 						if (!isOver) {
 							selectList.removeClass(o.selectors.showClass);
 						}
+						selectWrap.removeClass(o.selectors.selectFocus);
 //						$(this).off("keyup");
 					}
 				});
