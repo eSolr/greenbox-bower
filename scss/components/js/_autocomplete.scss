@@ -1,144 +1,155 @@
-$highlight-color: white;
-$highlight-bg: #5897FB;
+//
+//	Autocomplete
+//
+
+//	todo	szinkronba hozni a fomméretezővel
 
 
-// eredeti select elrejtése
-.ac-hidden-select {
-	display: none;
-}
+$enable-autocomplete-module:true !default;
 
-// a létrehozott új select wrappere
-.ac-select {
-	position: relative;
-//	width: 100%;
-	display: inline-block;
-	line-height: 1.5em;
-	background-color: #eeeeee;
-	vertical-align: top;
 
-	// a rend kedvéért
-	* {
-		box-sizing: border-box;
+//
+//	Launch autocomplete module
+//
+@if $enable-autocomplete-module {
+
+	// eredeti select elrejtése
+	.ac-hidden-select {
+		display: none;
 	}
 
-	// input általános formázás
-	.ac-select-input {
-		padding: 2px;
-		border: 1px solid #aaaaaa;
-//		border-bottom: 0px none transparent;
-	}
+	// a létrehozott új select wrappere
+	.ac-select {
+		position: relative;
+		//	width: 100%;
+		display: inline-block;
+		line-height: 1.5em;
+		background-color: #eeeeee;
+		vertical-align: top;
 
+		// a rend kedvéért
+		* {
+			box-sizing: border-box;
+		}
 
-	// input field
-	.ac-select-input-field {
-		width: 100%;
-		min-width: 50px;
-		margin: 0;
-		background-color: transparent;
-		outline: 0 none transparent;
-		border: 0 none transparent;
-	}
-
-	// multiple esetén
-	&.ac-select-multiple {
-
-		// input
+		// input általános formázás
 		.ac-select-input {
-			zoom: 1;
-			&:before,
-			&:after {
-				content: " ";
-				display: table;
-			}
-			&:after {
-				clear: both;
-			}
+			padding: 2px;
+			border: 1px solid #aaaaaa;
+		}
 
-			// tag konténer
-			.ac-select-tag-wrap {
-				float: left;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
 
-				// tag
-				.ac-select-tag {
-					display: inline-block;
-					color: white;
-					background-color: skyblue;
-					font-size: smaller;
-					margin-right: 1px;
-					padding: 0 7px;
-					vertical-align: top;
-					border-radius: 3px;
-					-moz-border-radius: 3px;
-					-webkit-border-radius: 3px;
+		// input field
+		.ac-select-input-field {
+			width: 100%;
+			min-width: 50px;
+			margin: 0;
+			background-color: transparent;
+			outline: 0 none transparent;
+			border: 0 none transparent;
+		}
 
-					// tag szövege
-					.ac-select-tag-text {
+		// multiple esetén
+		&.ac-select-multiple {
+
+			// input
+			.ac-select-input {
+				zoom: 1;
+				&:before,
+				&:after {
+					content: " ";
+					display: table;
+				}
+				&:after {
+					clear: both;
+				}
+
+				// tag konténer
+				.ac-select-tag-wrap {
+					float: left;
+					list-style-type: none;
+					margin: 0;
+					padding: 0;
+
+					// tag
+					.ac-select-tag {
 						display: inline-block;
-						margin-right: 4px;
-						white-space: nowrap;
-					}
+						color: white;
+						background-color: skyblue;
+						font-size: smaller;
+						margin-right: 1px;
+						padding: 0 7px;
+						vertical-align: top;
+						border-radius: 3px;
+						-moz-border-radius: 3px;
+						-webkit-border-radius: 3px;
 
-					// bezás gomb > a gomb html-he js paraméterből cserélhető
-					.ac-select-tag-remove {
-						display: inline-block;
-						float: right;
-						cursor: pointer;
+						// tag szövege
+						.ac-select-tag-text {
+							display: inline-block;
+							margin-right: 4px;
+							white-space: nowrap;
+						}
 
-						&:hover {
-							color: transparentize($highlight-color, .5);
+						// bezás gomb > a gomb html-he js paraméterből cserélhető
+						.ac-select-tag-remove {
+							display: inline-block;
+							float: right;
+							cursor: pointer;
+
+							&:hover {
+								//							color: transparentize(white, .5);
+							}
 						}
 					}
 				}
+
+				// input wrap csak multiple esetén
+				.ac-select-input-wrap {
+					display: table-cell;
+					vertical-align: top;
+					width: 10000px !important;
+				}
 			}
 
-			// input wrap csak multiple esetén
-			.ac-select-input-wrap {
-				display: table-cell;
-				vertical-align: top;
-				width: 10000px !important;
+			// ha muliple esetén kiválasztásra kerül egy elem és tagként megjelenik, akkor a listtából ezzel tüntethető el
+			// azért nem sima hide, mert a display: none-t használja a gépelés közbeni szűréshez
+			.ac-multi-hide {
+				height: 0;
+				padding: 0;
+				overflow: hidden;
 			}
 		}
 
-		// ha muliple esetén kiválasztásra kerül egy elem és tagként megjelenik, akkor a listtából ezzel tüntethető el
-		// azért nem sima hide, mert a display: none-t használja a gépelés közbeni szűréshez
-		.ac-multi-hide {
-			height: 0;
+		// legördülő lista általános megjelenés
+		.ac-select-list {
+			display: none;
+			list-style-type: none;
+			width: 100%;
+			margin: -1px 0 0;
 			padding: 0;
-			overflow: hidden;
-		}
-	}
+			position: absolute;
+			max-height: 400px;
+			background-color: #eeeeee;
+			overflow: auto;
+			border: 1px solid #aaaaaa;
+			border-top: 0 none transparent;
+			z-index: 99;
 
-	// legördülő lista általános megjelenés
-	.ac-select-list {
-		display: none;
-		list-style-type: none;
-		width: 100%;
-		margin: -1px 0 0;
-		padding: 0;
-		position: absolute;
-		max-height: 400px;
-		background-color: #eeeeee;
-		overflow: auto;
-		border: 1px solid #aaaaaa;
-		border-top: 0 none transparent;
-		z-index: 99;
+			li {
+				padding: 5px 10px;
+				cursor: pointer;
 
-		li {
-			padding: 5px 10px;
-			cursor: pointer;
-
-			&.ac-select-hl {
-				color: $highlight-color;
-				background-color: $highlight-bg;
+				&.ac-select-hl {
+					color: white;
+					background-color: #5897FB;
+				}
 			}
-		}
 
-		// lista megjelnítésére szolgála, alapból rejtett
-		&.ac-show {
-			display: block;
+			// lista megjelnítésére szolgála, alapból rejtett
+			&.ac-show {
+				display: block;
+			}
 		}
 	}
 }
