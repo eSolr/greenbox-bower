@@ -209,8 +209,8 @@
 			// a sima select tartalmából html listát generál
 			function selectToHTML() {
 
-				if (selectItem.children("option").length > 0) {
-					selectItem.children("option").each(function() {
+				if (selectItem.find("option").length > 0) {
+					selectItem.find("option").each(function() {
 //							data.push({"id": this.value, "text": this.text })								// select alapján készít egy jsont
 						dataList.push("<li data-value='" + this.value + "'>" + this.text + "</li>")		// select alapján leképez egy html listát
 					});
