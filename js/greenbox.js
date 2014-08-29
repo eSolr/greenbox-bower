@@ -31,9 +31,9 @@
  Research:
  http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 
+ todo törlés gombot normál select viselkedéshez
+ done a focus-szal egyszerre az ac-select is kapjon egy focus class-t
  done ha multiple ÉS saját a forrás, akkor a selectbe való visszaírást le kell kezelni!
-
- todo a focus-szal egyszerre az ac-select is kapjon egy focus class-t
  todo betöltéshez class rendelés, hogy látványosabb lehessen az állapot
  todo ha van value nélküli első elem, azt ne is emelje át!
  todo sima selectnél lehessen beállítani olyat is, hogy „egyik sem”, ami legelsőként épül be!
@@ -209,8 +209,8 @@
 			// a sima select tartalmából html listát generál
 			function selectToHTML() {
 
-				if (selectItem.children().length > 0) {
-					selectItem.children().each(function() {
+				if (selectItem.children("option").length > 0) {
+					selectItem.children("option").each(function() {
 //							data.push({"id": this.value, "text": this.text })								// select alapján készít egy jsont
 						dataList.push("<li data-value='" + this.value + "'>" + this.text + "</li>")		// select alapján leképez egy html listát
 					});
