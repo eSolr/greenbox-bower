@@ -31,6 +31,8 @@
  Research:
  http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 
+ todo showFirstAsDefault kellene, hogy a legelsőt is mint opciót mutassa
+ todo showFirstEmpty, amikor manuálisan betenne egy üres elemet a tetejére
  todo törlés gombot normál select viselkedéshez
  done a focus-szal egyszerre az ac-select is kapjon egy focus class-t
  done ha multiple ÉS saját a forrás, akkor a selectbe való visszaírást le kell kezelni!
@@ -409,6 +411,7 @@
 					click: function(e) {
 						e.preventDefault();
 						listItemSelected( $(this) );
+						selectWrap.removeClass(o.selectors.selectFocus);		// leveszi a fókuszt jelző class-t
 						selectList.removeClass(o.selectors.showClass);			// lista elrejtése
 					},
 					mouseover: function (e) {
