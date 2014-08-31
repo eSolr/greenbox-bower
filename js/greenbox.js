@@ -988,7 +988,7 @@
 
 				// ha az óraválasztó is be van kapcsolva
 				if (o.timeSelector) {
-					console.log(modalTimeSelectorField);
+//					console.log(modalTimeSelectorField);
 					value += lang.dateTimeDivider + modalTimeSelectorField.val();
 				}
 
