@@ -908,8 +908,6 @@
 				var emptyDaysBefore = new Date([dateObj.year, dateObj.month + 1, 1].join("/")).getDay() - 1,
 					emptyDaysAfter = 6 - getTrueDay(new Date([dateObj.year, dateObj.month + 1, getMonthLength(dateObj)].join("/")));
 
-				console.log(emptyDaysAfter);
-
 				// hónap ürítése
 				modalMonth = modalBody.find("." + o.selector.monthClass);
 
@@ -976,10 +974,17 @@
 				setDayEventhandler();
 			}
 
+//			felhúzza leading zeroval a megadott számot a size-ban megadott méretig
+			function pad(number, size) {
+				var num = number.toString();
+				for (var i = 1; i <= (size - number.toString().length); i++) { num = "0" + num; }
+				return num;
+			}
+
 //			visszaírja az eredményt
 			function writeResult(item) {
 
-				var value = item.attr("data-year") + "-" + item.attr("data-month") + "-" + item.attr("data-day");
+				var value = item.attr("data-year") + "-" + pad(item.attr("data-month"), 2) + "-" + pad(item.attr("data-day"), 2);
 
 				// ha az óraválasztó is be van kapcsolva
 				if (o.timeSelector) {
@@ -987,8 +992,8 @@
 					value += lang.dateTimeDivider + modalTimeSelectorField.val();
 				}
 
-				hideModal();				// panel elrejtése
-				datePicker.val(value);		// eredmény visszaírása az inputba
+				hideModal();										// panel elrejtése
+				datePicker.val(value).attr("datetime", value);		// eredmény visszaírása az inputba
 			}
 
 //			beállítja az eseménykezelőket
