@@ -1067,6 +1067,7 @@
 				});
 
 				datePickerModal.find(o.selector.prev).on("mousedown", function(e) {
+					e.stopPropagation();
 					e.preventDefault();
 					current.month--;
 					if (current.month < 0) {
@@ -1076,6 +1077,7 @@
 					setMonth(current);
 				});
 				datePickerModal.find(o.selector.next).on("mousedown", function(e) {
+					e.stopPropagation();
 					e.preventDefault();
 					current.month++;
 					if (current.month > 11) {
