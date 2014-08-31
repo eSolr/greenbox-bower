@@ -1,0 +1,18 @@
+/*
+	A kompatibilitás miatt ennek alapszerkezete megegyezik a Bootstrapével
+*/
+
+.modal {
+
+	.modal-dialog {
+
+		.modal-content {}
+		.modal-header {
+
+			.modal-title {}
+		}
+
+		.modal-body {}
+		.modal-footer {}
+	}
+}

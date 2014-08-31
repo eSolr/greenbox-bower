@@ -31,6 +31,7 @@
  Research:
  http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 
+ todo sima selectre is működjön, hogy módosítoom az id-t, mert pl nem a value-ba teszem a cuccokar
  todo showFirstAsDefault kellene, hogy a legelsőt is mint opciót mutassa
  todo showFirstEmpty, amikor manuálisan betenne egy üres elemet a tetejére
  todo törlés gombot normál select viselkedéshez
@@ -592,6 +593,511 @@
 } (jQuery));/**
  * Created by arminpolecsak on 2014.08.25..
  */
+;/*
+ Makes an input datePicker
+
+ Általános leírás
+  Van egy keret, illetve azon belül egy „body”, amibe belegenerálódik a funkcionalitás. Minden más szabadon variálható a defaultként átadott forrásan.
+  Fontos, hogy az abban szereplő classok alapján azonosítja a funkciógombokat és funkcióhelyeket.
+  Azaz ha pl. egy előző hónapra mutató gombot törlünk, akkor az nem jelenik meg.
+
+ Ami azonosításra kerül:
+ • keret
+ • dp-modal-body ami a tartalom konténer
+ • minden elem külön külön a kerethez képes kerül megkeresésre
+
+ todo chrome-os megoldást körüljárni, hogy csak abban lehet-e tiltani
+ todo onfocusra automatikusan felnyíljon vagy csak kattintásra
+ todo destroy kapcsolót bevezetni, ha valami miatt megszüntetném akár menet közben a működést
+ todo placeholder automatikusan mutassa a nyelvfüggő dátumformátumot
+ todo menet közbeni frissítés | vagy rákattintásra inicializálás!
+ todo megoldani a kezdőéték megadást ha nem mai nappal indul
+ todo év és hónap sorrend
+ todo ha van id-ja, akkor esetleg a .dp-modal-ja is kaphatna kiegészített nevűt külön azonosítás miatt
+ todo későbbiekben autotomplete-hez hasonló idválasztó bekötése
+ todo touch eszközön csekkolni hogy legyen
+ todo ha manual ÉS modal is engedélyezett, akkor
+ todo angol na, hónap neveknél a kis- és nagybetűket egy szintre hozni, ne ezen múljon
+ done modalt ne csak ablakba tegye, hanem lehessen neki targetet is megadni!
+ todo mai napra ugrás
+ todo a generált napokhoz data-day és data-dayshort property-ként belegenerálni a nap nevét
+ todo februárt lekezelni!!!
+ todo year selector esetén tól-if értéket megadni: csak tól, csak ig, range pl: ["today", "..."], ["...", "today"]
+
+ Research
+ Chrome natív dátumválasztó letiltva:
+ http://stackoverflow.com/questions/11320615/disable-native-datepicker-in-google-chrome
+
+ */
+
+(function ( $ ) {
+
+	$.fn.datePicker = function ( options ) {
+
+		var defaultOptions = {
+			firstDayOfWeek:		"monday",				// monday|sunday
+			dateFormat:			undefined,				// dátum formátum
+			outputFormat:		undefined,				// default js
+			dayNames:			undefined,				// [] – felsorolás
+			dayShortNames:		undefined,				// [] – felsorolás
+			monthNames:			undefined,				// [] – felsorolás
+			monthShortNames:	undefined,				// [] – felsorolás
+			dayPeriodName:		undefined,				// [] – felsorolás
+			hourType:			undefined,				// 12|24
+			dateTimeDivider:	undefined,				// dátum és óra elválasztó
+			timeFormat:			undefined,				// óra formátum – "hh:mm"
+			showDayPeriod:		undefined,				// true|false – show am/pm
+			launchDate:			undefined,				// Date() típusú kezdőérték, ami felülírja a mai napot
+			modalPosition:		"auto",					// auto|modal|none – ha nincs target – auto: maga számolja; modal: normal modalként viselkedik; none: csak css formázással jelenik meg
+			dayBreak:			7,						// hány elem kerülhet egy sorba
+			hiddenWeekDays:		[],						// rejtett napok listája angolul ["saturday", "sunday"] vagy (0–6) [5, 6]
+			modal:				true,					// true|false – engedélyezie-e modal felnyitását
+			manual:				false,					// true|false – engedélyezi-e manuális dátum beírását
+			preview:			false,					// true|false – ha engedélyezve van a manual, akkor mutasson-e segés dátumpanelt gépeléskor
+			yearSelector:		false,					// true|false – évválasztó selectként
+			monthSelector:		false,					// true|false – hóválasztó selectként
+			timeSelector:		false,					// true|false – szükség van-e idő beálításra? (óra:perc)
+			language:			false,					// false|hu|en – nyelvet alapból a legközelebbi lang=""-ból szedi hierarchiában felette. Ha nem talál megfelelőt, akkor "en" lesz
+			relativeDayNames:	false,					// true|false – tegnap, ma, holnap
+			weekBreak:			true,					// true|false - a rejtett napokat is figyelembevéve hét végén (vagy pénteken ha a hétvége rejtett) töri a hetet
+			disabled:			["22", "Monday", ["dátimtól", "dátumig"], "pontos dátum"],	// kivételek megadása, amiket ne lehessen választani
+			target:				false,					// false esetén ablak, ellenkező esetben selectort vár ahova a modalt generálhatja ÉS a target kap egy open classt is
+			monthDays:			[31, 28, 31, 30, 31, 30, 31, 30, 31, 30, 31, 30],
+			events:				[
+				{
+					class:		"dp-day-weekend",
+					dates:		[{dayday:"saturday"}, {dayday:"sunday"}] 	// dátum formátum ha csak hónapod adunk meg, akkor minden hónap, ha napot, akkor minden nap stb. {year:2014, month:8, day:20} vagy {dayday:"monday"}
+				},
+				{
+					class:		"dp-holiday",
+					dates:		[{month:8, day:20}]		// dátum formátum ha csak hónapod adunk meg, akkor minden hónap, ha napot, akkor minden nap stb.
+				}
+			],
+
+			selector: {
+				default:				"input[type='date']",
+//				modalClass:				".dp-modal",
+				modalBody:				".dp-modal-body",		// modal body
+				prev:					".dp-prev",				// prev month
+				next:					".dp-next",				// next month
+				monthClass:				"dp-month",
+				weekDayClass:			"dp-weekday",			// napok nevei a fejlécben
+				dayListClass:			"dp-day-list",			// a hét napjai listában
+				dayClass:				"dp-day",				// napok jelölőse
+				selectedClass:			"dp-day-selected",		// selected day
+				yearSelectorClass:		"dp-year-selector",
+				monthSelectorClass:		"dp-month-selector",
+				timeSelectorClass:		"dp-time-selector",
+				timeSelectorFieldClass:	"dp-time-selector-field",
+				modalOpenClass:			"dp-modal-open",
+				targetOpenClass:		"dp-target-open",
+				dayWeekendClass:		"dp-day-weekend",
+				dayEmptyClass:			"dp-day-empty"
+			},
+
+			attr: {
+				modal: {
+					name:				"data-modal-type",
+					value:				"datepicker"
+				}
+			},
+
+			html: {
+				default:				"<div class='dp-modal'><div class='dp-modal-dialog'><div class='dp-modal-content'><div class='dp-modal-header'><div class='dp-navigation'><a class='dp-prev' href='#'>←</a><a class='dp-next' href='#'>→</a><div class='dp-selectors'><div class='dp-year-selector'></div><div class='dp-month-selector'></div></div></div></div><div class='dp-modal-body'><div class='dp-month'></div><div class='dp-time-selector'><label></label><input class='dp-time-selector-field' type='time'/></div></div></div></div></div>",
+				defaultOld:				"<div class='dp-modal'><div class='dp-modal-dialog'><div class='dp-modal-content'><div class='dp-modal-body'></div></div></div></div>"
+			},
+
+			languageVersion: {
+				hu: {
+					dayNames:			["hétfő", "kedd", "szerda", "csütörtök", "péntek", "szombat", "vasárnap"],
+					dayShortNames:		["h", "k", "sz", "cs", "p", "sz", "v"],
+					monthNames:			["január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december"],
+					monthShortNames:	["jan", "feb", "már", "ápr", "máj", "jún", "júl", "aug", "szep", "okt", "nov", "dec"],
+					dayPeriodName:		["de", "du"],
+					firstDayOfWeek:		"monday",		// "monday"|"sunday"
+					dateFormat:			"yyyy-mm-dd",	// dátum formátum
+					timeFormat:			"hh:mm",		// óra formátum
+					dateTimeDivider:	" ",			// dátum és óra elválasztó
+					hourType:			24,				// 12|24
+					showDayPeriod:		false			// true|false – show am/pm
+				},
+				en: {
+					dayNames:			["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+					dayShortNames:		["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+					monthNames:			["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+					monthShortNames:	["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+					dayPeriodName:		["am", "pm"],
+					firstDayOfWeek:		"monday",		// "monday"|"sunday"
+					dateFormat:			"dd/mm/yyyy",	// dátum formátum
+					timeFormat:			"hh:mm",		// óra formátum
+					dateTimeDivider:	" ",			// dátum és óra elválasztó
+					hourType:			12,				// 12|24
+					showDayPeriod:		true			// true|false – show am/pm
+				},
+				"en-gb": {
+					dayNames:			["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+					dayShortNames:		["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+					monthNames:			["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+					monthShortNames:	["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+					dayPeriodName:		["am", "pm"],
+					firstDayOfWeek:		"monday",		// "monday"|"sunday"
+					dateFormat:			"dd/mm/yyyy",	// dátum formátum
+					timeFormat:			"hh:mm",		// óra formátum
+					dateTimeDivider:	" ",			// dátum és óra elválasztó
+					hourType:			12,				// 12|24
+					showDayPeriod:		true			// true|false – show am/pm
+				},
+				"en-us": {
+					dayNames:			["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+					dayShortNames:		["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+					monthNames:			["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+					monthShortNames:	["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+					dayPeriodName:		["am", "pm"],
+					firstDayOfWeek:		"sunday",		// "monday"|"sunday"
+					dateFormat:			"mm/dd/yyyy",	// dátum formátum
+					timeFormat:			"hh:mm",		// óra formátum
+					dateTimeDivider:	" ",			// dátum és óra elválasztó
+					hourType:			12,				// 12|24
+					showDayPeriod:		true			// true|false – show am/pm
+				}
+			}
+		};
+
+
+
+		var o = $.extend(true, defaultOptions, options),
+			wrap = $(this).length > 0 ? $(this) : $(o.selector.default),
+			calendar;									// alapnaptár
+//			selectorType = this.selector.substr(0,1),	// selector típusa, de szinte felesleges, mert csak id lehet
+//			selectID = this.selector.substr(1);			// selector neve; később ez belekerül az egyedi azonosítókba
+
+
+		return wrap.each(function() {
+
+			var datePicker = $(this).prop('type','text'),	// forrás input
+				datePickerModal,						// új modal konténer
+				modalBody,								// dinamikus modal body
+				modalMonth,								// dinamikus hónap
+				modalMonthDay,							// dinamikus hónap napjai [1...31]
+				modalWeekday,							// hét napjainak konténere
+				modalWeekdayDay,						// hét napjainak neve
+				modalDayList,							// a nap listájának konténere
+				modalYearSelector,						// évválasztó
+				modalMonthSelector,						// hónapválasztó
+				modalTimeSelectorField,					// óraválasztó
+				modalTarget,							// ha volt megadva más selector
+				today = dateToObject(new Date()),		// mai nap
+				isOver = false,							// modal fölött állunk-e
+				current,								// aktuális dátum Objektum (nem Date!, hanem saját)
+				lang;									// nyelv specifikus beállítások
+
+			// megpróbálja beállítani a datepicker nyelvét a következő sorrend szerint: paraméter > html lang paramétere > ha egyik sem, akkor "en"
+			lang = o.languageVersion[o.language] || o.languageVersion[datePicker.closest("[lang]").attr("lang")] || o.languageVersion["en"];
+
+//			Date tartalomtípust szétbontott objektumként adja vissza
+			function dateToObject(date) {
+				return {
+					year:	date.getFullYear(),
+					month:	date.getMonth(),
+					day:	date.getDate(),
+					dayday:	date.getDay(),
+					hour:	date.getHours(),
+					minute:	date.getMinutes()
+				}
+			}
+
+//			dátum objektumot Date formátumúvá alakítja figyelembevéve az indulóértékeket
+			function objectToDate(dateObj) {
+				return new Date([dateObj.year, dateObj.month + 1, dateObj.day + 1].join("/"));
+			}
+
+//			paraméterek alapján legenerálja a modalt és azonosítja a funcióelemeket
+			function setModal() {
+
+				datePickerModal = $(o.html.default);			// html struktúra DOM objektummá alakítva
+				modalTarget = $(o.target);
+				modalBody = datePickerModal.find(o.selector.modalBody);
+				modalYearSelector = datePickerModal.find("." + o.selector.yearSelectorClass);
+				modalMonthSelector = datePickerModal.find("." + o.selector.monthSelectorClass);
+				modalTimeSelectorField = datePickerModal.find("." + o.selector.timeSelectorFieldClass);
+
+				// többszörös függvényhívás esetén, elkerülendő a duplikátumokat, törli az előzményeket ha vannak
+				datePicker.next("[" + o.attr.modal.name + "='" + o.attr.modal.value + "']").remove();
+
+				// ha van target, akkor oda teszi a modalt és ellenőrzi, hogy egy másik pluginhívás már nem tett-e utána egy modal. Ha igen, törli
+				if (o.target) {
+					modalTarget.children().first("[" + o.attr.modal.name + "='" + o.attr.modal.value + "']").remove();	// többszörös függvényhívás esetén, elkerülendő a duplikátumokat, törli az előzményeket ha vannak
+					modalTarget.prepend( datePickerModal.attr(o.attr.modal.name, o.attr.modal.value) );					// ha van target, akkor annak az elejére kerül – az attr a lehetséges későbbi duplikátumok szűrése miatt kell
+				} else {
+					datePicker.after( datePickerModal.attr(o.attr.modal.name, o.attr.modal.value) );					// ha nincs target, akkor közvetlenül az input után
+				}
+
+				if (!o.timeSelector) {
+					datePickerModal.find("." + o.selector.timeSelectorClass).remove();
+				}
+
+				setModalPosition();
+			}
+
+//			Beállítja a modal pozícióját a megadott paramétereknek megfelelően
+			function setModalPosition() {
+
+				if (o.target) { return }						// ha van target, akkor nem csinál semmit
+
+				// todo ha auto, akkor kap egy auto-s class-t és kiszámolgatja a pozícióját ha akív az ablak
+				if (o.modalPosition == "auto") {
+
+
+				// todo ha modal, akkor kap egy modal-os class-t
+				} else if (o.modalPosition == "modal") {
+
+				// ha none, akkor nincs teendő, simán css-ből oldódik meg
+				} else if (o.modalPosition == "none") {
+					return;
+				}
+			}
+
+//			a hónap napjainak száma – vissza [1...31]
+			function getMonthLength(dateObj) {
+				var thisMonth = dateObj.month + 1,
+					monthLength = 1;
+
+				for (var i = 1; i <= 32; i++) {
+					if (thisMonth == new Date([dateObj.year, dateObj.month + 1, i + 1].join("/")).getMonth() + 1) {
+						monthLength++;
+					}
+				}
+
+				return monthLength;
+			}
+
+//			a tömb legutolsó elemét a végéről az első helyre mozgatja
+			function loopArray(array, shift) {
+
+				if (shift > 0) {
+					for (var i = 0; i < shift; i++) {
+						array.unshift(array[array.length - 1]);
+						array.pop();
+					}
+				}
+				return array;
+			}
+
+//			visszaadja a kezdőnapot figyelembevéve a nap nevét [0...6]
+			function getTrueDay(date) {
+
+				var defaultWeekDayOrder = [1,2,3,4,5,6,0],				// usa alapállapot
+					trueWeekDayOrder = defaultWeekDayOrder.slice(0),	// valós sorrendhez másolat
+					shift = 0;											// elsolás alapállapothoz képest
+
+				// eltolásnak megfelelő érték beállítása
+				if (lang.firstDayOfWeek.toUpperCase() == "monday".toUpperCase())	{ shift = 1; }
+				if (lang.firstDayOfWeek.toUpperCase() == "tuesday".toUpperCase())	{ shift = 2; }
+				if (lang.firstDayOfWeek.toUpperCase() == "wednesday".toUpperCase())	{ shift = 3; }
+				if (lang.firstDayOfWeek.toUpperCase() == "thursday".toUpperCase())	{ shift = 4; }
+				if (lang.firstDayOfWeek.toUpperCase() == "friday".toUpperCase())	{ shift = 5; }
+				if (lang.firstDayOfWeek.toUpperCase() == "saturday".toUpperCase())	{ shift = 6; }
+
+				loopArray(trueWeekDayOrder, shift);														// a shift értéknek megfelelően odább csúsztatja a kezdőnapot
+				return trueWeekDayOrder.indexOf(defaultWeekDayOrder.indexOf(date.getDay()));			// összeveti az újat az eredetivel és a módosított napkezdetnek megfelelően adja vissza az aktuális nap nevét
+			}
+
+//			legenerálja adott havi néteget
+			function setMonth (dateObj) {
+
+				var emptyDaysBefore = new Date([dateObj.year, dateObj.month + 1, 1].join("/")).getDay() - 1,
+					emptyDaysAfter = 6 - getTrueDay(new Date([dateObj.year, dateObj.month + 1, getMonthLength(dateObj)].join("/")));
+
+				console.log(emptyDaysAfter);
+
+				// hónap ürítése
+				modalMonth = modalBody.find("." + o.selector.monthClass);
+
+				// dinamikus elemek újragenerálása
+				modalMonth.empty();
+				modalDayList = $("<ul/>").addClass(o.selector.dayListClass);
+				modalMonthDay = $("<li/>").addClass(o.selector.dayClass);
+				modalWeekday = $("<ul/>").addClass(o.selector.weekDayClass);
+				modalWeekdayDay = $("<li/>").addClass(o.selector.dayClass);
+
+				// év és hónap megjelenítése ha nem select kerül a helyükre
+				modalYearSelector.text( dateObj.year );
+				modalMonthSelector.text( lang.monthNames[dateObj.month] );
+
+				// hét napneveinek feltöltése
+				for (var i = 0; i < o.dayBreak; i++) {
+					modalWeekday.append(
+						modalWeekdayDay.clone().text( lang.dayShortNames[i] )
+					);
+				}
+
+				// előző hónap üres napjainak feltöltése ha van
+				for (var i = 0; i < emptyDaysBefore; i++) {
+					modalDayList.append(
+						modalMonthDay.clone().append( $("<span/>")).addClass(o.selector.dayEmptyClass)
+					)
+				}
+
+				// hónap napjainak feltöltése
+				for (var i = 0; i < getMonthLength(dateObj); i++) {
+
+//					console.log( objectToDate({year: dateObj.year, month: dateObj.month, day: i}).getDay() );
+
+					modalDayList.append(
+						modalMonthDay.clone().append(
+							$("<span/>").append(
+								$("<a/>", {href:"#"}).text(i + 1).attr({
+									"data-year": dateObj.year,
+									"data-month": dateObj.month + 1,
+									"data-day": i + 1,
+									"data-dayname": lang.dayNames[ getTrueDay( objectToDate({year: dateObj.year, month: dateObj.month, day: i}) ) ],
+									"data-dayshortname": lang.dayShortNames[ getTrueDay( objectToDate({year: dateObj.year, month: dateObj.month, day: i}) ) ]
+								})
+							)
+						).addClass(function() {
+								if ([6,0].indexOf( objectToDate({year: dateObj.year, month: dateObj.month, day: i}).getDay() ) > -1) {
+									return o.selector.dayWeekendClass;
+								}
+							})
+					);
+				}
+
+				// todo következő hónap üres napjainak feltöltése ha van
+				for (var i = 0; i < emptyDaysAfter; i++) {
+					modalDayList.append(
+						modalMonthDay.clone().append( $("<span/>")).addClass(o.selector.dayEmptyClass)
+					)
+				}
+
+				// napok beágyazása
+				modalBody.prepend( modalMonth.prepend( modalDayList ).prepend( modalWeekday ) );
+
+				// napokhoz kötött események beállítása
+				setDayEventhandler();
+			}
+
+//			visszaírja az eredményt
+			function writeResult(item) {
+
+				var value = item.attr("data-year") + "-" + item.attr("data-month") + "-" + item.attr("data-day");
+
+				// ha az óraválasztó is be van kapcsolva
+				if (o.timeSelector) {
+					console.log(modalTimeSelectorField);
+					value += lang.dateTimeDivider + modalTimeSelectorField.val();
+				}
+
+				hideModal();				// panel elrejtése
+				datePicker.val(value);		// eredmény visszaírása az inputba
+			}
+
+//			beállítja az eseménykezelőket
+			function setDayEventhandler() {
+				var day = modalMonth.find("." + o.selector.dayClass + " a");
+
+				day.on("mousedown", function(e) {
+					var selectedDay = $(this);
+					e.preventDefault();
+					writeResult(selectedDay);
+				});
+			}
+
+//			date picker modal megjelenítése, megjelölése target esetén
+			function showModal () {
+				// ha van target megadva, hozzáadja az open classt
+				if (o.target) {
+					modalTarget.addClass(o.selector.targetOpenClass);
+
+					// ha nincs, akkor a modalhoz adja az open classt
+				} else {
+					datePickerModal.addClass(o.selector.modalOpenClass);
+				}
+			}
+
+//			date picker modal elrejtése, megjelölés megszüntetése target esetén
+			function hideModal () {
+				// ha van target megadva, hozzáadja az open classt
+				if (o.target) {
+					modalTarget.removeClass(o.selector.targetOpenClass);
+
+					// ha nincs, akkor a modalhoz adja az open classt
+				} else {
+					datePickerModal.removeClass(o.selector.modalOpenClass);
+				}
+			}
+
+//			eseménykezelők beállítása
+			function setEventhandler() {
+				$(document).on("click", function(e) {
+					hideModal()
+				});
+				datePickerModal.hover(
+					function () {
+//						isOver = true;
+					},function () {
+//						isOver = false;
+					}
+				).on({
+						"click": function (e) {
+							e.stopPropagation();
+						}
+					});
+				datePicker.on({
+					"focus click": function (e) {
+						e.stopPropagation();
+						showModal();
+					},
+					"blur": function () {
+						var st = setTimeout(function () {
+							hideModal();
+							st.clearTimeout;
+						}, 10);
+					},
+					"keydown": function (e) {
+						// tab 9, esc 27
+						if ([9, 27].indexOf(e.keyCode) > 0 ) {
+							hideModal();
+						}
+					}
+				});
+
+				datePickerModal.find(o.selector.prev).on("mousedown", function(e) {
+					e.preventDefault();
+					current.month--;
+					if (current.month < 0) {
+						current.year--;
+						current.month = 11;
+					}
+					setMonth(current);
+				});
+				datePickerModal.find(o.selector.next).on("mousedown", function(e) {
+					e.preventDefault();
+					current.month++;
+					if (current.month > 11) {
+						current.year++;
+						current.month = 0;
+					}
+					setMonth(current);
+				});
+			}
+
+			// alapbeállítások elvégzése
+			function init(dateObj) {
+				setModal();				// modal legenerálása
+				setMonth(dateObj);		// adott hónap szerinti tartalom legenerálása
+				setEventhandler();			// események beállítása
+			}
+
+			// kezdőnap beállítása
+			current = today;
+
+			// datePicket indítása
+			init(today);
+		});
+	};
+
+} (jQuery));
+
 ;
 //
 //	Makes an item linkable with the value of the attribute

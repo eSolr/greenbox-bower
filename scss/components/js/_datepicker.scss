@@ -1,0 +1,195 @@
+//
+//	datePicker
+//
+
+
+
+$enable-datepicker-module:true !default;
+
+
+//
+//	Launch autocomplete module
+//
+@if $enable-datepicker-module {
+
+	// hide arrow in chrome
+	input::-webkit-calendar-picker-indicator {
+		display: none;
+	}
+
+	// hide the prompt in chrome
+
+	input[type="date"]::-webkit-input-placeholder {
+		visibility: hidden !important;
+	}
+
+	// date picker modal
+	.dp-modal {
+		display: none;
+		width: 300px;
+		background-color: white;
+
+		.dp-modal-dialog {
+
+			.dp-modal-content {
+
+				// modal fejléc
+				.dp-modal-header {
+					padding-top: $baseline / 2;
+					padding-bottom: $baseline / 2;
+				}
+
+				// modal body
+				.dp-modal-body {
+//					padding-top: $baseline / 2;
+					padding-bottom: $baseline / 2;
+					text-align: center;
+
+					// hónap wrappere
+					.dp-month {
+						margin-bottom: $baseline / 2;
+						@include clearfix;
+					}
+
+					// nét napja általában
+					.dp-day {
+						width: (100 / 7) * 1%;
+						float: left;
+
+						// hétvége
+						&.dp-day-weekend {
+							background-color: transparentize($color-1, .9);
+						}
+					}
+
+					// lista fejléc
+					.dp-weekday {
+						.dp-day {
+							font-weight: bold;
+						}
+					}
+
+					// napok listája
+					.dp-day-list {
+						list-style-type: none;
+						margin: 0;
+						padding: 0;
+
+						// hónap napjai
+						.dp-day {
+
+							span {
+								display: block;
+								min-height: $baseline;	// to make visible empty days also
+							}
+
+							a {
+								display: block;
+
+								&:hover {
+									color: $bg-color;
+									background-color: $color-1;
+								}
+							}
+
+							// hét napjának neve
+							.dp-dayday {
+								font-size: smaller;
+							}
+
+							&.dp-day-empty {
+//								background-color: #eeeeee;
+							}
+
+							// kiválasztott nap megjelölése
+							&.dp-day-selected {
+								a {
+									color: $bg-color;
+									background-color: $color-1;
+								}
+							}
+						}
+					}
+				}
+				.dp-modal-footer {}
+
+				// navigációs eszközök
+				.dp-navigation {
+					margin-bottom: none !important;
+					@extend .media;
+					text-align: center;
+
+					.dp-prev, .dp-next {
+						width: 20%;
+					}
+
+					// előző hónap link
+					.dp-prev {
+						@extend .media-left;
+					}
+
+					// következő hónap link
+					.dp-next {
+						@extend .media-right;
+					}
+
+					// dátumválasztó eszközök
+					.dp-selectors {
+						@extend .media-body;
+						@extend .list-inline;
+
+						> * {
+							margin-right: 0;				// mert a generált semmi közt nem hagy, így a bug sem jön elő
+						}
+
+						// évválasztó, vagy megjelenító
+						.dp-year-selector {
+							margin-right: 5px;
+						}
+
+						// hónapválasztó, vagy megjelenítő
+						.dp-month-selector {}
+					}
+				}
+
+				// óraválasztó
+				.dp-time-selector {
+
+					label {
+						margin-right: 5px;
+					}
+
+					// óra:perc  input
+					input.dp-time-selector-field {
+						width: 80px;
+					}
+				}
+			}
+		}
+
+		// date picker modal nyitva
+		&.dp-modal-open {
+			display: block;
+			position: absolute;
+			z-index: 999;
+			@include box-shadow(0 0 10px transparentize(black, .8));
+		}
+
+		// automatikus pozícionálás
+		&.dp-modal-position-auto
+
+		// ha fölötte nyílik
+		&.dp-position-top {}
+
+		// ha alatta nyílik
+		&.dp-position-bottom {}
+	}
+
+	// date picker target nyitva
+	.dp-target-open {
+
+		.dp-modal {
+			display: block;
+		}
+	}
+}
