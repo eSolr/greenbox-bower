@@ -4999,3 +4999,154 @@ var esNameday = {
 	};
 
 } (jQuery));
+;
+//
+//	Scroller
+//
+
+/*
+	Általános működés
+
+	Feltételek:
+	• kellenek blokkok, amiket egymás mellé rendeznénk,
+	• kell egy row, aminek a szélessége követi a három egymás mellé rendezett blokkét és egyenesen tartja őket,
+	• kell egy wrapper, amin belül a row mozgatásra kerül
+	• a slider szélességét a wrapper határozza meg!
+*/
+
+(function ( $ ) {
+
+	$.fn.scroller = function ( options ) {
+
+		var o = $.extend(true, $.fn.scroller.defaultOptions, options),
+			wrap = $(this);
+
+		wrap.each(function () {
+			var wrapper = $(this),
+				row = wrapper.children(o.row).first(),
+				blocks = row.children(o.block),
+				blockLength = blocks.length,
+				firstBlock,
+				lastBlock,
+				wrapperWidth,
+				rowWidth,
+				blockWidth,
+				loop,
+				timer,
+				current = 0;
+
+
+			// elemek inicializálása, alapértékek beállítása
+			function init() {
+
+				// az első beállítása
+				firstBlock = blocks.first();
+				lastBlock = blocks.last();
+
+				// alap stílusok beállítása
+				wrapper.css(o.style.wrapper);
+				row.css(o.style.row);
+				blocks.css(o.style.blocks).css(o.style.anim);
+
+				// szélességek beállítása
+				row.css("width", (blockLength * 100) + "%");
+				row.children().css("width", (100 / blockLength) + "%");
+
+				if (blockLength > 1) {
+					var timer = setTimeout(function () {
+						startLoop();
+					}, o.delay);
+				}
+
+				setEventhandlers();
+			}
+
+			function setEventhandlers() {
+				row.children().hover(
+					function () {
+						stopLoop();
+					},
+					function () {
+						startLoop();
+					});
+			}
+
+			// loop indítása
+			function startLoop() {
+
+				blocks.css({
+					"transition-duration": o.animDuration,
+					"-o-transition-duration": o.animDuration,
+					"-moz-transition-duration": o.animDuration,
+					"-webkit-transition-duration": o.animDuration
+				});
+
+				loop = setInterval(function() {
+					setNext();
+				}, o.duration);
+			}
+
+			// stop loop
+			function stopLoop() {
+				clearInterval(loop);
+
+			}
+
+			// következő slide
+			function setNext() {
+				firstBlock.css(o.style.firstMinus);
+				var timer = setTimeout(function () {
+					firstBlock.insertAfter( lastBlock );
+					firstBlock = row.children().first();
+					lastBlock = row.children().last();
+					lastBlock.css(o.style.firstZero);
+				}, o.duration / 2)
+			}
+
+			init();
+		});
+	};
+
+
+//	--------------------------------------------------------------------------------------------------------------------
+//	Default values
+
+	$.fn.scroller.defaultOptions = {
+		delay: 0,
+		duration: 5000,
+		animDuration: "2s",
+		selector: {
+			row: "",
+			block: ""
+		},
+		style: {
+			wrapper: {
+//				"width": "500px",
+				"position": "relative",
+				"overflow": "hidden"
+			},
+			row: {},
+			blocks: {
+				"float": "left",
+				"margin-left": "0%",
+				"margin-right": 0
+			},
+			firstZero: {
+				"margin-left": "0%"
+			},
+			firstMinus: {
+				"margin-left": "-100%"
+			},
+			anim: {
+				"transition-property": "all",
+				"-o-transition-property": "all",
+				"-moz-transition-property": "all",
+				"-webkit-transition-property": "all",
+				"transition-timing-function": "ease-in-out",
+				"-o-transition-timing-function": "ease-in-out",
+				"-moz-transition-timing-function": "ease-in-out",
+				"-webkit-transition-timing-function": "ease-in-out"
+			}
+		}
+	};
+} (jQuery));
