@@ -593,7 +593,14 @@
 } (jQuery));/**
  * Created by arminpolecsak on 2014.08.25..
  */
-;/*
+;if (typeof console == 'undefined') {
+	var console = {};
+	console.log = function() {return;};
+	console.debug = function() {return;};
+	console.info = function() {return;};
+	console.warn = function() {return;};
+	console.exception = function() {return;};
+};;/*
  Makes an input datePicker
 
  Általános leírás
@@ -5047,6 +5054,7 @@ var esNameday = {
 				wrapper.css(o.style.wrapper);
 				row.css(o.style.row);
 				blocks.css(o.style.blocks).css(o.style.anim);
+				blocks.filter(":nth-child(n+2)").hide();			// a kezdeti border elcsúszásokat fixálja
 
 				// szélességek beállítása
 				row.css("width", (blockLength * 100) + "%");
@@ -5082,6 +5090,7 @@ var esNameday = {
 				});
 
 				loop = setInterval(function() {
+					blocks.show();
 					setNext();
 				}, o.duration);
 			}
