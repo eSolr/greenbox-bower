@@ -2356,7 +2356,7 @@ var esDate = {
 	@desc		Select to button group convert
 	@tested		Safari, Chrome, Fireforx, Opera, IE
 
-	todo		elsütni a change eseményt ha megváltozik a select
+	done		elsütni a change eseményt ha megváltozik a select
 	todo		lekezelni ha menet közben hízik a select
 	todo		kezelni: <option disabled>
 	todo		kezelni: <optgroup>, <optgroup disabled>
@@ -2405,7 +2405,7 @@ var esDate = {
 		return wrap.each( function () {
 
 			var select = $(this);
-			o.reset = select.is("[data-multiple-reset]");
+			o.reset = select.is("[data-multiple-reset]");		// ha szeretnénk reset (törlés) gombot is
 
 			select.hide().after(o.groupHTML).next().addClass(o.groupClass).end().children().each(function() {
 
@@ -2424,14 +2424,14 @@ var esDate = {
 						e.preventDefault();
 						if (select.prop("multiple")) {
 							$(this).toggleClass(o.selectedClass);
-							if ($(this).parent().prev().children().eq($(this).index()).attr("selected")) {
-								$(this).parent().prev().children().eq($(this).index()).removeAttr("selected");
+							if ($(this).parent().prev().children().eq($(this).index()).prop("selected")) {
+								$(this).parent().prev().children().eq($(this).index()).removeAttr("selected").change();
 							} else {
-								$(this).parent().prev().children().eq($(this).index()).attr("selected","");
+								$(this).parent().prev().children().eq($(this).index()).prop("selected", true).change();
 							}
 						} else {
 							$(this).siblings().removeClass(o.selectedClass).end().addClass(o.selectedClass)
-								.parent().prev().children().removeAttr("selected").eq($(this).index()).prop("selected", true);
+								.parent().prev().children().removeAttr("selected").eq($(this).index()).prop("selected", true).change();
 						}
 					});
 			});
@@ -2441,6 +2441,7 @@ var esDate = {
 					.on("click.esolr.selectbtn", function(e){
 						e.preventDefault();
 						$(this).siblings().removeClass(o.selectedClass).parent().prev().children().removeAttr("selected");
+						select.change();
 					});
 			}
 		});
