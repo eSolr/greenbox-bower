@@ -1324,11 +1324,11 @@ $("button").on("click", function(e){
 
 //	ajaxComplete.esolr.ajaxsource
 
-	//	to apply on ajax loaded content
+//	to apply on ajax loaded content
 //	$(document).on("ready.esolr.ajaxsource ajaxComplete.esolr.ajaxsource", function(){
-	$(document).on("ready.esolr.ajaxsource", function(){
-		$.fn.esAjaxSource();
-	});
+//	$(document).on("ready.esolr.ajaxsource", function(){
+//		$.fn.esAjaxSource();
+//	});
 
 })(jQuery);
 
@@ -1382,10 +1382,10 @@ $("button").on("click", function(e){
 		return wrap;
 	};
 
-	//	to apply on ajax loaded content
-	$(document).on("ready.esolr.ajaxtarget ajaxComplete.esolr.ajaxtarget", function(){
-		$.fn.esAjaxTarget();
-	});
+//	to apply on ajax loaded content
+//	$(document).on("ready.esolr.ajaxtarget ajaxComplete.esolr.ajaxtarget", function(){
+//		$.fn.esAjaxTarget();
+//	});
 
 })(jQuery);;/*
 	Character counter
@@ -2356,6 +2356,7 @@ var esDate = {
 	@desc		Select to button group convert
 	@tested		Safari, Chrome, Fireforx, Opera, IE
 
+	todo		elsütni a change eseményt ha megváltozik a select
 	todo		lekezelni ha menet közben hízik a select
 	todo		kezelni: <option disabled>
 	todo		kezelni: <optgroup>, <optgroup disabled>
@@ -2445,7 +2446,7 @@ var esDate = {
 		});
 	};
 
-	$.fn.esSelectBtn();
+//	$.fn.esSelectBtn();
 
 }) (jQuery);;/*
 	desc		Select Direction
@@ -2565,10 +2566,10 @@ var esDate = {
 		});
 	};
 
-	//	to apply on ajax loaded content
-	$(document).on("ready.esolr.selectdir ajaxComplete.esolr.selectdir", function(){
-		$.fn.esSelectDir();
-	});
+//	to apply on ajax loaded content
+//	$(document).on("ready.esolr.selectdir ajaxComplete.esolr.selectdir", function(){
+//		$.fn.esSelectDir();
+//	});
 
 }) (jQuery);;
 //
@@ -2639,10 +2640,10 @@ var es = {
 		});
 	};
 
-	//	to apply on ajax loaded content
-	$(document).on("ready.esolr.imgcrop ajaxComplete.esolr.imgcrop", function(){
-		$.fn.esImgCrop();
-	});
+//	to apply on ajax loaded content
+//	$(document).on("ready.esolr.imgcrop ajaxComplete.esolr.imgcrop", function(){
+//		$.fn.esImgCrop();
+//	});
 
 } (jQuery));;/*	Example
  */
@@ -3193,10 +3194,10 @@ var esNameday = {
 		});
 	};
 
-	//	to apply on ajax loaded content
-	$(document).on("ready.esolr.responsive-img ajaxComplete.esolr.responsive-img", function(){
-		$.fn.esResponsiveImg();
-	});
+//	to apply on ajax loaded content
+//	$(document).on("ready.esolr.responsive-img ajaxComplete.esolr.responsive-img", function(){
+//		$.fn.esResponsiveImg();
+//	});
 
 } (jQuery));;/*
 	 Sets the height of an item to the same as the window.
@@ -3294,9 +3295,9 @@ var esNameday = {
 		});
 	};
 
-	$(document).ready(function(){
-		$.fn.esSetWindowsHeight();
-	});
+//	$(document).ready(function(){
+//		$.fn.esSetWindowsHeight();
+//	});
 }) (jQuery);;/*
 	Show Items on scroll
 
@@ -4541,10 +4542,10 @@ var esNameday = {
 		});
 	};
 
-	//	to apply on ajax loaded content
-	$(document).on("ajaxComplete.esolr.tab", function(){
-		$.fn.esTab();
-	});
+//	to apply on ajax loaded content
+//	$(document).on("ajaxComplete.esolr.tab", function(){
+//		$.fn.esTab();
+//	});
 //	$(document).on("ready.esolr.tab ajaxComplete.esolr.tab", function(){
 //		$.fn.esTab();
 //	});
@@ -4880,8 +4881,8 @@ var esNameday = {
 		return wrap.each(function(){
 
 			var panelGroup = $(this),
-				panels = panelGroup.find(".panel"),
-				hashPanel = panels.find(windowHash).closest(".panel");
+				panels = panelGroup.find(o.selectors.panel),
+				hashPanel = panels.find(windowHash).closest(o.selectors.panel);
 
 			init();
 
@@ -4899,7 +4900,7 @@ var esNameday = {
 				if (o.set.expanded.length > 0) {
 					for (var i in o.set.expanded) {
 						if (i >= 0 && i < panels.length) {
-							panels.eq(i).addClass("expanded");
+							panels.eq(i).addClass(o.selectors.expandedClass);
 						}
 					}
 				}
@@ -4914,7 +4915,7 @@ var esNameday = {
 				// Toggle
 				panelGroup.find(o.selectors.toggle).on("click", function(e) {
 					e.preventDefault();
-					var parentPanel = $(this).closest(".panel");
+					var parentPanel = $(this).closest(o.selectors.panel);
 
 					// Ha autoCollapse be van kapcsolva
 					if (o.set.autoCollapse) {
@@ -4934,7 +4935,7 @@ var esNameday = {
 				// Expand
 				panelGroup.find(o.selectors.expand).on("click", function(e) {
 					e.preventDefault();
-					var parentPanel = $(this).closest(".panel");
+					var parentPanel = $(this).closest(o.selectors.panel);
 					expandPanel(parentPanel.index());
 
 					if (o.set.autoCollapse) {
@@ -4945,7 +4946,7 @@ var esNameday = {
 				// Collapse
 				panelGroup.find(o.selectors.collapse).on("click", function(e) {
 					e.preventDefault();
-					collapsePanel($(this).closest(".panel").index());
+					collapsePanel($(this).closest(o.selectors.panel).index());
 				});
 
 				// Expand all
@@ -4963,27 +4964,27 @@ var esNameday = {
 
 //			Kinyit vagy bezár egy panelt állapotától függően
 			function togglePanel(panelCounter) {
-				panels.eq(panelCounter).toggleClass("expanded");
+				panels.eq(panelCounter).toggleClass(o.selectors.expandedClass);
 			}
 
 //			Kinyit egy panelt
 			function expandPanel(panelCounter) {
-				panels.eq(panelCounter).addClass("expanded");
+				panels.eq(panelCounter).addClass(o.selectors.expandedClass);
 			}
 
 //			Bezár egy panelt
 			function collapsePanel(panelCounter) {
-				panels.eq(panelCounter).removeClass("expanded");
+				panels.eq(panelCounter).removeClass(o.selectors.expandedClass);
 			}
 
 //			Kinyitja mindegyiket, kivéve a paraméterben megadottat ha van
 			function expandAllPanel(except) {
-				panels.not( panels.eq(except) ).addClass("expanded");
+				panels.not( panels.eq(except) ).addClass(o.selectors.expandedClass);
 			}
 
 //			Bezárja mindegyiket, kivéve a paraméterben megadottat ha van
 			function collapseAllPanel(except) {
-				panels.not( panels.eq(except) ).removeClass("expanded");
+				panels.not( panels.eq(except) ).removeClass(o.selectors.expandedClass);
 			}
 		});
 	};
@@ -4997,11 +4998,14 @@ var esNameday = {
 			autoCollapse: false					//	when a panel opens, all others closes automatically
 		},
 		selectors: {
-			toggle:		"[data-panel-toggle]",
-			expand:		"[data-panel-expand]",
-			collapse:	"[data-panel-collapse]",
-			expandAll:	"[data-panel-expandAll]",
-			collapseAll:"[data-panel-collapseAll]"
+			panel:			".panel",
+			expandedClass: 	"expanded",
+			collapsedClass:	"collapsed",
+			toggle:			"[data-panel-toggle]",
+			expand:			"[data-panel-expand]",
+			collapse:		"[data-panel-collapse]",
+			expandAll:		"[data-panel-expandAll]",
+			collapseAll:	"[data-panel-collapseAll]"
 		}
 	};
 
@@ -5035,12 +5039,8 @@ var esNameday = {
 				blockLength = blocks.length,
 				firstBlock,
 				lastBlock,
-				wrapperWidth,
-				rowWidth,
-				blockWidth,
 				loop,
-				timer,
-				current = 0;
+				timer;
 
 
 			// elemek inicializálása, alapértékek beállítása
