@@ -4873,7 +4873,27 @@ var esNameday = {
 
 	$.fn.panelAccordion = function ( options ) {
 
-		var o = $.extend(true, $.fn.panelAccordion.defaultOptions, options),
+		defaultOptions = {
+			selector: ".panel-group.accordion",		//	default selector
+			set: {
+				status: "default",					//	default|expanded|collapsed – first or selected is expanded|all expanded|all collapsed
+				hashAutoExpand: false,				//	opens for mydomain.com#hash if available in page-title
+				expanded: [0],						//	expands these items on launch
+				autoCollapse: false					//	when a panel opens, all others closes automatically
+			},
+			selectors: {
+				panel:			".panel",
+				expandedClass: 	"expanded",
+				collapsedClass:	"collapsed",
+				toggle:			"[data-panel-toggle]",
+				expand:			"[data-panel-expand]",
+				collapse:		"[data-panel-collapse]",
+				expandAll:		"[data-panel-expandAll]",
+				collapseAll:	"[data-panel-collapseAll]"
+			}
+		};
+
+		var o = $.extend(true, defaultOptions, options),
 			wrap = this[0] ? $(this) : $(o.selector),
 			linkSelector = this.selector,
 			windowHash = window.location.hash;
@@ -4907,7 +4927,7 @@ var esNameday = {
 
 				// Set URL Hashed panel expanded if exists. This overwrites everything else before
 				if (o.set.hashAutoExpand && windowHash !== "" && hashPanel.length > 0) {
-					expandPanel(panels.index(hashPanel))
+					expandPanel(panels.index(hashPanel));
 					document.location.href = windowHash;
 				}
 
@@ -4920,15 +4940,15 @@ var esNameday = {
 					// Ha autoCollapse be van kapcsolva
 					if (o.set.autoCollapse) {
 						if (parentPanel.is(".expanded")) {
-							collapsePanel(parentPanel.index());
+							collapsePanel(panels.index(parentPanel));
 						} else {
-							expandPanel(parentPanel.index());
-							collapseAllPanel(parentPanel.index());
+							expandPanel(panels.index(parentPanel));
+							collapseAllPanel(panels.index(parentPanel));
 						}
 
 					// Ha autoCollapse nincs bekapcsolva
 					} else {
-						togglePanel(parentPanel.index());
+						togglePanel(panels.index(parentPanel));
 					}
 				});
 
@@ -4936,10 +4956,10 @@ var esNameday = {
 				panelGroup.find(o.selectors.expand).on("click", function(e) {
 					e.preventDefault();
 					var parentPanel = $(this).closest(o.selectors.panel);
-					expandPanel(parentPanel.index());
+					expandPanel(panels.index(parentPanel));
 
 					if (o.set.autoCollapse) {
-						collapseAllPanel(parentPanel.index())
+						collapseAllPanel(panels.index(parentPanel))
 					}
 				});
 
@@ -4987,26 +5007,6 @@ var esNameday = {
 				panels.not( panels.eq(except) ).removeClass(o.selectors.expandedClass);
 			}
 		});
-	};
-
-	$.fn.panelAccordion.defaultOptions = {
-		selector: ".panel-group.accordion",		//	default selector
-		set: {
-			status: "default",					//	default|expanded|collapsed – first or selected is expanded|all expanded|all collapsed
-			hashAutoExpand: false,				//	opens for mydomain.com#hash if available in page-title
-			expanded: [0],						//	expands these items on launch
-			autoCollapse: false					//	when a panel opens, all others closes automatically
-		},
-		selectors: {
-			panel:			".panel",
-			expandedClass: 	"expanded",
-			collapsedClass:	"collapsed",
-			toggle:			"[data-panel-toggle]",
-			expand:			"[data-panel-expand]",
-			collapse:		"[data-panel-collapse]",
-			expandAll:		"[data-panel-expandAll]",
-			collapseAll:	"[data-panel-collapseAll]"
-		}
 	};
 
 } (jQuery));
