@@ -31,6 +31,8 @@
  Research:
  http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 
+ done copy class
+ todo ha az első elem üres, akkor a form is üres, ha az első elemnek van értéke, akkor legyen az az első > vagy ezt paraméterezni
  todo sima selectre is működjön, hogy módosítoom az id-t, mert pl nem a value-ba teszem a cuccokar
  todo showFirstAsDefault kellene, hogy a legelsőt is mint opciót mutassa
  todo showFirstEmpty, amikor manuálisan betenne egy üres elemet a tetejére
@@ -84,6 +86,7 @@
 			firstLetterMatch:	false,					// true|false – szó eleji egyezés
 			preSelected:		[],						// ha az inputban van egyezés, akkor ezeket megjelöli. Ha több adat van és a select nem multiple, akkor csak az elsőt
 			filterEmptyValues:	true,					// kiszedi az value nélküli vagy üres value-val rendelkező elemeket elemeket
+			copyClass:			false,					// átveszi a selector class-ait
 			data: {
 				src:			undefined,
 				dataType:		"object"				// object|array
@@ -214,8 +217,8 @@
 
 				if (selectItem.find("option").length > 0) {
 					selectItem.find("option").each(function() {
-//							data.push({"id": this.value, "text": this.text })								// select alapján készít egy jsont
-						dataList.push("<li data-value='" + this.value + "'>" + this.text + "</li>")		// select alapján leképez egy html listát
+//							data.push({"id": this.value, "text": this.text })											// select alapján készít egy jsont
+						dataList.push("<li data-value='" + this.value + "'>" + this.text + "</li>")						// select alapján leképez egy html listát
 					});
 				}
 			}
@@ -224,12 +227,15 @@
 			// legenerálja a html string (tömb) alapján a listát
 			function initACSelect() {
 
-				o.selectors.wrapID = selectorType + o.selectors.wrapID + selectID;						// egyedi ac_select-esített id, amibe belefűzi az eredeti id-t is
+				o.selectors.wrapID = selectorType + o.selectors.wrapID + selectID;										// egyedi ac_select-esített id, amibe belefűzi az eredeti id-t is
 
 				// ac_select_multiple
 				selectWrap = $("<div/>").attr("id", o.selectors.wrapID).addClass(function() {
 					var classes = o.selectors.wrapClass;
-					if (o.multiple == true) { classes += " " + o.selectors.multipleClass}				// ha multiple, akkor az ac_select kap egy plusz class-t is
+					if (o.multiple == true) { classes += " " + o.selectors.multipleClass}								// ha multiple, akkor az ac_select kap egy plusz class-t is
+					if (o.copyClass) {
+						classes += " " + selectItem.attr("class").toString().replace(o.selectors.hiddenSelectClass, "");// ha engedélyezve van, akkor a select classait átemeli a generált selectre
+					}
 					return classes;
 				});
 
@@ -243,7 +249,6 @@
 				selectList = $("<ul/>").addClass(o.selectors.listClass);
 
 				if (o.multiple) {
-//					selectItem.after( selectWrap.append( selectMultiWrap.append( selectTagWrap).append( selectInputWrap.append( selectInputField ) ) ).append( selectList ) );				// az új listaelemek beágyazása
 					selectItem.after( selectWrap.append( selectInput.append( selectTagWrap).append( selectInputWrap.append( selectInputField ) ) ).append( selectList ) );				// az új listaelemek beágyazása
 				} else {
 					selectItem.after( selectWrap.append( selectInput.append( selectInputField ) ).append( selectList ) );				// az új listaelemek beágyazása
