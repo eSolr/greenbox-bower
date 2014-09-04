@@ -35,3 +35,21 @@
 .preline {
 	white-space: pre-line;
 }
+
+//	------------
+
+.break-word {
+	word-break: break-word;
+}
+
+.break-word-normal {
+	word-break: normal;
+}
+
+.break-word-all {
+	word-break: break-all;
+}
+
+.break-word-keepall {
+	word-break: keep-all;
+}
