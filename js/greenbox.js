@@ -31,6 +31,7 @@
  Research:
  http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 
+ todo disabled attribútumot lekezelni!
  done copy class
  todo ha az első elem üres, akkor a form is üres, ha az első elemnek van értéke, akkor legyen az az első > vagy ezt paraméterezni
  todo sima selectre is működjön, hogy módosítoom az id-t, mert pl nem a value-ba teszem a cuccokar
@@ -86,7 +87,7 @@
 			firstLetterMatch:	false,					// true|false – szó eleji egyezés
 			preSelected:		[],						// ha az inputban van egyezés, akkor ezeket megjelöli. Ha több adat van és a select nem multiple, akkor csak az elsőt
 			filterEmptyValues:	true,					// kiszedi az value nélküli vagy üres value-val rendelkező elemeket elemeket
-			copyClass:			false,					// átveszi a selector class-ait
+			copyClass:			true,					// átveszi a selector class-ait
 			data: {
 				src:			undefined,
 				dataType:		"object"				// object|array
