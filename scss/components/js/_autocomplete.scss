@@ -25,7 +25,16 @@ $enable-autocomplete-module:true !default;
 		display: inline-block;
 		line-height: 1.5em;
 		background-color: #eeeeee;
+		background-image: url(#{$ec-select-bg});
+		background-repeat: no-repeat;
+		background-position: top 16px right 10px;
 		vertical-align: top;
+
+		&.ac-select-loading {
+			background-image: none;
+			color: transparent;
+			background-color: $color-1;
+		}
 
 		// szimulálja a focus eseményt
 		&.ac-select--focus {
@@ -79,14 +88,14 @@ $enable-autocomplete-module:true !default;
 					.ac-select-tag {
 						display: inline-block;
 						color: white;
-						background-color: skyblue;
+						background-color: $color-1;
 						font-size: smaller;
 						margin-right: 1px;
-						padding: 0 7px;
+						padding: 4px 7px 5px;
 						vertical-align: top;
-						border-radius: 3px;
-						-moz-border-radius: 3px;
-						-webkit-border-radius: 3px;
+//						border-radius: 3px;
+//						-moz-border-radius: 3px;
+//						-webkit-border-radius: 3px;
 
 						// tag szövege
 						.ac-select-tag-text {

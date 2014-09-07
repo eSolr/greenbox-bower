@@ -26,6 +26,9 @@ $enable-datepicker-module:true !default;
 	// date picker modal
 	.dp-modal {
 		display: none;
+//		position: absolute;
+//		top: 0;
+//		left: 0;
 		width: 300px;
 		background-color: white;
 
@@ -64,6 +67,9 @@ $enable-datepicker-module:true !default;
 
 					// lista fejléc
 					.dp-weekday {
+						list-style-type: none;
+						padding-left: 0;
+
 						.dp-day {
 							font-weight: bold;
 						}

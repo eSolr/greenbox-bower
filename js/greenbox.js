@@ -32,6 +32,7 @@
  http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 
  todo disabled attribútumot lekezelni!
+ done copy style
  done copy class
  todo ha az első elem üres, akkor a form is üres, ha az első elemnek van értéke, akkor legyen az az első > vagy ezt paraméterezni
  todo sima selectre is működjön, hogy módosítoom az id-t, mert pl nem a value-ba teszem a cuccokar
@@ -40,7 +41,7 @@
  todo törlés gombot normál select viselkedéshez
  done a focus-szal egyszerre az ac-select is kapjon egy focus class-t
  done ha multiple ÉS saját a forrás, akkor a selectbe való visszaírást le kell kezelni!
- todo betöltéshez class rendelés, hogy látványosabb lehessen az állapot
+ done betöltéshez class rendelés, hogy látványosabb lehessen az állapot
  todo ha van value nélküli első elem, azt ne is emelje át!
  todo sima selectnél lehessen beállítani olyat is, hogy „egyik sem”, ami legelsőként épül be!
  todo lekezelni az értékkel rendelkező, de megjelenítés nélkli elemeket
@@ -54,19 +55,19 @@
  done select visszaíráskor triggelni rajta egy onChange-et
  todo összekötés több mezőn keresztüli szűréshez (egyik eredménye alapján módosul a következő)
  todo már betöltött ac_select tartalmának frissítése|resetelése
- todo tag törlése x-szel
+ done tag törlése x-szel
  todo megadni mi legyen a target (input és akkor hogy szerparálja az eredményeket) vagy select
  done szippantsa fel a selected elemeket a selectből
- todo kezdőérték megadás
+ done kezdőérték megadás
  todo valós idejű beleírás lehetősége
- todo csak szókező egyezés|bárhol egyezés
+ todo csak szókezdő egyezés|bárhol egyezés
  todo késleltetés
  todo lista fel/lenyílás pozíciótól függően
  todo mobil megjelenés
  todo opt groupos/kétszintű feldolgozás > kétszintű json feldolgozás
  todo átvenni a select szélesség beállításait
  todo maximális magasságot megadni listaelemszámban
- todo a select feletti klikkelést – inputWrap
+ done a select feletti klikkelést – inputWrap
  todo alternatív outputot megadni és abba milyen módon generálja a listát
  */
 
@@ -80,14 +81,16 @@
 			placeholderLoading:	"loading...",
 			placeholder: 		"",						// input placeholder szöveg
 			minimumCaracter:	0,						// minimum karakterszám, ami után elkezd szűrni
-			typeDelay: 			0,						// billentyűleütés utáni késleltetés
+			typeDelay: 			300,					// billentyűleütés utáni késleltetés ms-ban
+			typeRepeat: 		300,					// hány mp-enként ellenőrizze a begépelt stringet a szűrő algoritmus
 			multiple:			false,					// true|false – az alap select alapján állítja be
 //			caseSensitive:		false,					// ture|false – egyezésnél számítson-e a kis és nagybetű
 			preload:			true,					// true|false – ha true, akkor a dokival együtt töltődik be, false esetén kattintásra
 			firstLetterMatch:	false,					// true|false – szó eleji egyezés
 			preSelected:		[],						// ha az inputban van egyezés, akkor ezeket megjelöli. Ha több adat van és a select nem multiple, akkor csak az elsőt
-			filterEmptyValues:	true,					// kiszedi az value nélküli vagy üres value-val rendelkező elemeket elemeket
-			copyClass:			true,					// átveszi a selector class-ait
+			filterEmptyValues:	true,					// true|false – kiszedi az value nélküli vagy üres value-val rendelkező elemeket elemeket
+			copyClass:			true,					// true|false – átveszi a selector class tartalmát
+			copyStyle:			true,					// true|false – átveszi a selector style tartalmát
 			data: {
 				src:			undefined,
 				dataType:		"object"				// object|array
@@ -115,19 +118,19 @@
 				multipleClass: 			"ac-select-multiple",
 				multipleSelectedHide: 	"ac-multi-hide",		// ez az a hide, amikor multiple selectben a listából el akarom tüntetni
 				listHighlight: 			"ac-select-hl",
-				selectFocus: 			"ac-select--focus"
+				selectFocus: 			"ac-select--focus",
+				loadingClass:			"ac-select-loading"
 			}
 		};
 
-		var o = $.extend(true, defaultOptions, options),
-			wrap = $(this),
+		var wrap = $(this),
 			selectorType = this.selector.substr(0,1),	// selector típusa, de szinte felesleges, mert csak id lehet
 			selectID = this.selector.substr(1);			// selector neve; később ez belekerül az egyedi azonosítókba
 
-
 		return wrap.each(function() {
 
-			var selectItem = $(this),					// kiválasztott select
+			var o = $.extend(true, {}, defaultOptions, options),
+				selectItem = $(this),					// kiválasztott select
 				selectWrap,								// létrehozott virtuális automplete-es select wrappere
 				selectMultiWrap,
 				selectTagWrap,
@@ -141,7 +144,9 @@
 				dataList = [],							// html lista tömbje
 				selectedData = [],						// ebbe gyűlnek a kiválasztott értékpárok
 				filteredList,							// a billentyűzetről való lépdeléshez kell egy aktuális szűrt lista
-				isOver = false,							// jelzi ha a select felett állunk; a precízebb kinyílás-becsuks miatt kell
+				keyPressTimer,							// a billentyű leütése után mennyivel indítson keresést. Ha ennél gyorsabban gépelünk, a timert lenullázza
+				inputValPrevious,
+				inputValCurrent,
 				charCounter;							// filternél char counter
 
 
@@ -151,11 +156,7 @@
 			selectItem.addClass(o.selectors.hiddenSelectClass);
 
 			// multiselect beállításe az eredeti select alapján
-			if (selectItem.attr("multiple") == undefined) {
-				o.multiple = false;
-			} else {
-				o.multiple = true;
-			}
+			o.multiple = selectItem.prop("multiple");
 
 			// ha nem külső forrásból töli be a json-t, akkor nem jelenik meg a betöltő szöveg
 			if (!o.json.src && !o.data.src) {
@@ -181,7 +182,7 @@
 					}
 
 					for (var i = 0; i < o.preSelected.length; i++) {
-						selectListItems.filter("[data-value='" + o.preSelected[i] + "']").first().trigger("click");
+						selectListItems.filter("[data-value='" + o.preSelected[i] + "']").first().trigger("mousedown");		// mousemove amiatt, mert az elemeken is ezt az eseményt kapja el
 					}
 				}
 			}
@@ -198,7 +199,7 @@
 					setEvents();						// általános eseménykezelők beállításe
 					setSelectEvents();					// lista elmeinek eseménykezelője
 					setPreselected();					// ha vannak indítóelemek kiválasztva, akkor azokat beteszi
-				})
+				});
 			}
 
 
@@ -238,11 +239,16 @@
 						classes += " " + selectItem.attr("class").toString().replace(o.selectors.hiddenSelectClass, "");// ha engedélyezve van, akkor a select classait átemeli a generált selectre
 					}
 					return classes;
+				}).attr("style", function() {
+					if (o.copyStyle) {
+						return selectItem.attr("style");
+					}
 				});
 
 				// kijön
 //				selectMultiWrap = $("<div/>").addClass(o.selectors.multiWrapClass);
 
+				selectWrap.addClass(o.selectors.loadingClass);															// loading class hozzárendelve
 				selectInput = $("<div/>").addClass(o.selectors.inputClass);
 				selectTagWrap = $("<ul/>").addClass(o.selectors.tagWrapClass);
 				selectInputWrap = $("<div/>").addClass(o.selectors.inputWrapClass);
@@ -261,6 +267,7 @@
 			function generateList() {
 				selectList.html( dataList.join("") );
 				selectListItems = selectList.children();
+				selectWrap.removeClass(o.selectors.loadingClass);
 				selectInputField.attr("placeholder", o.placeholder);
 			}
 
@@ -276,30 +283,14 @@
 						if (e.keyCode == 27) {
 							selectList.removeClass(o.selectors.showClass);
 							selectInputField.blur();
-						}
-					},
-					click: function () {
-						if (!isOver) {
-							selectList.removeClass(o.selectors.showClass);
-							selectInputField.blur();
+							inputWatcherStop();
 						}
 					}
 				});
 
-				$(document).on({
-//					click: function (e) {
-//						selectList.removeClass(o.selectors.showClass);
-//					}
-				});
-
-				selectWrap.hover(
-					function (e) {
-						isOver = true;
-					},
-					function (e) {
-						isOver = false;
-					}
-				);
+				selectWrap.on("click", function() {
+						selectInputField.focus();
+					});
 
 				selectList.on({
 					mousemove: function(e) {
@@ -310,7 +301,7 @@
 				selectInputField.on({
 					click: function (e) {
 						e.stopPropagation();
-//						selectList.addClass(o.selectors.showClass);
+						selectList.addClass(o.selectors.showClass);
 					},
 					keydown: function (e) {
 
@@ -329,11 +320,24 @@
 							removeTag( selectTagWrap.children().last() );
 						}
 
+						// tab esetén
+						// todo ha már volt kiválasztva és úgy ugrunk, akkor dupla kiemelés lesz, meg kell szüntetni
+						if (e.keyCode == 9 || e.shiftKey && e.keyCode == 9) {
+
+							// sima select esetén tabra kiválasztja az aktuális állapotot, multiple estén csak ugrik a következőre
+							if (!o.multiple) {
+								listItemSelected( filteredList.filter("." + o.selectors.listHighlight).first() );			// a highlighttal rendelkezőt hozzáadja
+							}
+							inputWatcherStop();
+							return;
+						}
+
 						// enter – a listában legelsőt hozzáadja a tagekhez
 						if (e.keyCode == 13) {
 							e.preventDefault();
 							listItemSelected( filteredList.filter("." + o.selectors.listHighlight).first() );			// a highlighttal rendelkezőt hozzáadja
 							selectList.removeClass(o.selectors.showClass);												// lista bezására
+							return;
 						}
 
 						// page up
@@ -364,8 +368,6 @@
 						// arrow down
 						if (e.keyCode == 40) {
 
-							var current;
-
 							// ha több mint egy szűrt elem van
 							if (filteredList.length > 1) {
 
@@ -379,44 +381,84 @@
 							}
 						}
 
+						clearTimeout(keyPressTimer);
+
+						if ([33,38,40].indexOf(e.keyCode) < 0) {
+
+							keyPressTimer = setTimeout(function () {
+//								selectFilter(selectInputField.val());				// szűri a listát az input tartalma alapján
+//								inputWatcherStart();								// elindítja a billentyűzetfigyelést (és változás esetén szűr)
+								clearTimeout(keyPressTimer);
+							}, o.typeDelay);
+						}
+
 						return;
 					},
 					focus: function () {
 						// megjeleníti a listákat
 						selectWrap.addClass(o.selectors.selectFocus);
 						selectList.addClass(o.selectors.showClass);
+						inputWatcherStart();										// elindítja a billentyűzetfigyelést (és változás esetén szűr)
 					},
 					keyup: function (e) {
 
+						/*clearTimeout(keyPressTimer);
+
 						if ([33,38,40].indexOf(e.keyCode) < 0) {
-							selectFilter(selectInputField.val());					// szűri a listát az input tartalma alapján
-						}
+
+							keyPressTimer = setTimeout(function () {
+								selectFilter(selectInputField.val());				// szűri a listát az input tartalma alapján
+
+								// elindítja a tartalomfigyelőt
+								o.filterRepeatTimer = setInterval(function () {
+									console.log("csekk", o.filterRepeatTimer);
+								}, o.typeRepeat);
+
+								clearTimeout(keyPressTimer);
+							}, o.typeDelay);
+						}*/
 					},
 					blur: function () {
-						if (!isOver) {
+						inputWatcherStop();
+						var timer = setTimeout(function () {					// a késleltetés a listában való kattintás miatt szükséges!
 							selectList.removeClass(o.selectors.showClass);
-						}
-						selectWrap.removeClass(o.selectors.selectFocus);
-//						$(this).off("keyup");
+							selectWrap.removeClass(o.selectors.selectFocus);
+						}, 10);
 					}
 				});
-
-//				selectListItems.on({
-//					click: function(e) {
-//						e.preventDefault();
-//						listItemSelected( $(this) );
-//						selectList.removeClass(o.selectors.showClass);			// lista elrejtése
-//					},
-//					mouseout: function () {
-//						$(this).removeClass(o.selectors.listHighlight);			// eltünteti az esetlegsen megjelenő highlightot
-//					}
-//				});
 			}
 
+			// elindítja a tartalomfigyelőt – csak akkor ha még nem futott – és szűri a listát ha változás van
+			function inputWatcherStart() {
+//				console.log("start", o.filterRepeatTimer);
+				if (!o.filterRepeatTimer) {
+					o.filterRepeatTimer = setInterval(function () {
+						inputValCurrent = selectInputField.val();
+						// Ha változozz az input értéke, akkor szűri a listát
+						if (inputValCurrent !== inputValPrevious) {
+							selectFilter(selectInputField.val());				// szűri a listát az input tartalma alapján
+						}
+						inputValPrevious = inputValCurrent;
+						console.log("start & running", o.filterRepeatTimer);
+					}, o.typeRepeat);
+				}
+			}
+
+			// leállítja a leütésfigyelőt – csak akkor ha volt egyáltalán
+			function inputWatcherStop() {
+				if (o.filterRepeatTimer) {
+					clearInterval(o.filterRepeatTimer);
+					o.filterRepeatTimer = undefined;							// biztos ami biztos
+//					console.log("input watcher stop", o.filterRepeatTimer);
+				}
+			}
+
+			// események egy dinamikusan generált listaelemen
 			function setSelectEvents() {
 				selectListItems.on({
-					click: function(e) {
+					mousedown: function(e) {
 						e.preventDefault();
+						e.stopPropagation();
 						listItemSelected( $(this) );
 						selectWrap.removeClass(o.selectors.selectFocus);		// leveszi a fókuszt jelző class-t
 						selectList.removeClass(o.selectors.showClass);			// lista elrejtése
@@ -433,8 +475,10 @@
 			}
 
 
-			// kattintás egy listaelemen
+			// listaelem kiválasztása
 			function listItemSelected(item) {
+
+				inputWatcherStop();
 
 				// ha van egyáltalán megjeleníthető elem
 				if (item.length > 0) {
@@ -443,24 +487,25 @@
 					if (o.multiple) {
 						addTag(item);																// tag hozzáadása
 
-						// ha csak egy elemet lehet kiválasztani
+					// ha csak egy elemet lehet kiválasztani
 					} else {
 						selectedData = [];															// selected reset
 						selectedData.push({"id": item.attr("data-value"), "text": item.text()});	// az új elem pusholása
-						selectInputField.val(item.text());												// inputba visszaírni
+						selectInputField.val(item.text());											// inputba visszaírni
 						selectList.removeClass(o.selectors.showClass);								// panel elrejtve
 
 						// attól függően hogy betöltött vagy forrásban lévő selectről van szó csak megjelöl és change elsüt vagy létrehoz/töröl/change elsüt
 						if (!o.json.src && !o.data.src) {
 							selectItem.children().prop('selected', false).end().find("[value='" + item.attr("data-value") + "']").prop('selected', true).end().change();	// select jelölés mindenről töröl, kiválasztott megjelölés select-ként, select change elsüt
 						} else {
-							emptySelect();															// select ürítése
+//							emptySelect();															// select ürítése
 							var option = $("<option/>").attr("value", item.attr("data-value")).text(item.text()).prop('selected', true);	// selectedre állított option létrehozása
 							selectItem.append( option ).change();									// option beállítása, change elsütése
 						}
 					}
 				}
 			}
+
 
 			// tag hozzáadása a taglistához
 			function addTag(item) {
@@ -493,6 +538,7 @@
 				}
 			}
 
+
 			// törli az átadott tag-et és visszaállítja a listaelemet;
 			function removeTag(item) {
 				selectedData.splice(searchObjectInArray(selectedData, item.attr("data-value")), 1);	// kiveszi a selectData tömbből a törölt elemet
@@ -516,6 +562,7 @@
 				}
 				return result;
 			}
+
 
 			// a billentyűleütéseknek megfelelően leszűri a listát beállítva a láthatóságot
 			function selectFilter(filter) {
@@ -549,6 +596,7 @@
 				filteredList = selectListItems.not(":hidden").not("." + o.selectors.multipleSelectedHide);
 			}
 
+
 			// autocomplete inicializálása
 			function init() {
 
@@ -557,10 +605,10 @@
 
 					// ha a json előtöltött, azaz nem kattintásra tölti be az adott json-t
 					if (o.preload) {
-						emptySelect();		// kipucolja a select tartalmát
-						loadData();			// indítja a betöltést és feldolgozást
+						emptySelect();			// kipucolja a select tartalmát
+						loadData();				// indítja a betöltést és feldolgozást
 
-						// ha a json-t az inputba történő első kattintáskor töltjük be
+					// ha a json-t az inputba történő első kattintáskor töltjük be
 					} else {
 						emptySelect();
 						initACSelect();
@@ -572,15 +620,15 @@
 
 				// ha json formátumú sima tömb a forrás
 				} else if (o.data.src) {
-					emptySelect();			// kipucolja a select tartalmát
-					dataToHTML(o.data.src);	// json formátumból html „stringet” generál
-					initACSelect();			// legenerálja a select általános elemeit
-					generateList();			// legenerálja a html listát a html „string” alapján
-					setEvents();			// általános eseménykezelők beállítás
-					setSelectEvents();		// legenerált lista eseménykezelőinek beállítása
-					setPreselected();		// ha vannak indítóelemek kiválasztva, akkor azokat beteszi
+					emptySelect();				// kipucolja a select tartalmát
+					dataToHTML(o.data.src);		// json formátumból html „stringet” generál
+					initACSelect();				// legenerálja a select általános elemeit
+					generateList();				// legenerálja a html listát a html „string” alapján
+					setEvents();				// általános eseménykezelők beállítás
+					setSelectEvents();			// legenerált lista eseménykezelőinek beállítása
+					setPreselected();			// ha vannak indítóelemek kiválasztva, akkor azokat beteszi
 
-					// ha a select tartalma maga a forrás
+				// ha a select tartalma maga a forrás
 				} else {
 					selectToHTML();
 					initACSelect();
@@ -596,9 +644,7 @@
 		});
 	};
 
-} (jQuery));/**
- * Created by arminpolecsak on 2014.08.25..
- */
+} (jQuery));
 ;if (typeof console == 'undefined') {
 	var console = {};
 	console.log = function() {return;};
@@ -720,6 +766,8 @@
 				defaultOld:				"<div class='dp-modal'><div class='dp-modal-dialog'><div class='dp-modal-content'><div class='dp-modal-body'></div></div></div></div>"
 			},
 
+			css: {},
+
 			languageVersion: {
 				hu: {
 					dayNames:			["hétfő", "kedd", "szerda", "csütörtök", "péntek", "szombat", "vasárnap"],
@@ -778,31 +826,29 @@
 
 
 
-		var o = $.extend(true, defaultOptions, options),
+		var o = $.extend(true, {}, defaultOptions, options),
 			wrap = $(this).length > 0 ? $(this) : $(o.selector.default),
 			calendar;									// alapnaptár
-//			selectorType = this.selector.substr(0,1),	// selector típusa, de szinte felesleges, mert csak id lehet
-//			selectID = this.selector.substr(1);			// selector neve; később ez belekerül az egyedi azonosítókba
 
 
 		return wrap.each(function() {
 
 			var datePicker = $(this).prop('type','text'),	// forrás input
-				datePickerModal,						// új modal konténer
-				modalBody,								// dinamikus modal body
-				modalMonth,								// dinamikus hónap
-				modalMonthDay,							// dinamikus hónap napjai [1...31]
-				modalWeekday,							// hét napjainak konténere
-				modalWeekdayDay,						// hét napjainak neve
-				modalDayList,							// a nap listájának konténere
-				modalYearSelector,						// évválasztó
-				modalMonthSelector,						// hónapválasztó
-				modalTimeSelectorField,					// óraválasztó
-				modalTarget,							// ha volt megadva más selector
-				today = dateToObject(new Date()),		// mai nap
-				isOver = false,							// modal fölött állunk-e
-				current,								// aktuális dátum Objektum (nem Date!, hanem saját)
-				lang;									// nyelv specifikus beállítások
+				datePickerModal,							// új modal konténer
+				modalBody,									// dinamikus modal body
+				modalMonth,									// dinamikus hónap
+				modalMonthDay,								// dinamikus hónap napjai [1...31]
+				modalWeekday,								// hét napjainak konténere
+				modalWeekdayDay,							// hét napjainak neve
+				modalDayList,								// a nap listájának konténere
+				modalYearSelector,							// évválasztó
+				modalMonthSelector,							// hónapválasztó
+				modalTimeSelectorField,						// óraválasztó
+				modalTarget,								// ha volt megadva más selector
+				today = dateToObject(new Date()),			// mai nap
+				isOver = false,								// modal fölött állunk-e
+				current,									// aktuális dátum Objektum (nem Date!, hanem saját)
+				lang;										// nyelv specifikus beállítások
 
 			// megpróbálja beállítani a datepicker nyelvét a következő sorrend szerint: paraméter > html lang paramétere > ha egyik sem, akkor "en"
 			lang = o.languageVersion[o.language] || o.languageVersion[datePicker.closest("[lang]").attr("lang")] || o.languageVersion["en"];
@@ -1016,6 +1062,7 @@
 				day.on("mousedown", function(e) {
 					var selectedDay = $(this);
 					e.preventDefault();
+					e.stopPropagation();
 					writeResult(selectedDay);
 				});
 			}
@@ -1046,32 +1093,26 @@
 
 //			eseménykezelők beállítása
 			function setEventhandler() {
-				$(document).on("click", function(e) {
-					hideModal()
-				});
-				datePickerModal.hover(
-					function () {
-//						isOver = true;
-					},function () {
-//						isOver = false;
-					}
-				).on({
-						"click": function (e) {
-							e.stopPropagation();
-						}
-					});
+
+//				datePickerModal.on({
+//						"click, mousedown": function (e) {
+//							e.stopPropagation();
+//						}
+//					});
+
+				// események az input mezőn
 				datePicker.on({
 					"focus click": function (e) {
-						e.stopPropagation();
+//						e.stopPropagation();
 						showModal();
 					},
-					"blur": function () {
+					blur: function () {
 						var st = setTimeout(function () {
 							hideModal();
 							st.clearTimeout;
 						}, 10);
 					},
-					"keydown": function (e) {
+					keydown: function (e) {
 						// tab 9, esc 27
 						if ([9, 27].indexOf(e.keyCode) > 0 ) {
 							hideModal();
@@ -1079,25 +1120,38 @@
 					}
 				});
 
-				datePickerModal.find(o.selector.prev).on("mousedown", function(e) {
-					e.stopPropagation();
-					e.preventDefault();
-					current.month--;
-					if (current.month < 0) {
-						current.year--;
-						current.month = 11;
+				datePickerModal.find(o.selector.prev).on({
+					mousedown: function(e) {
+						e.preventDefault();
+						e.stopPropagation();
+						current.month--;
+						if (current.month < 0) {
+							current.year--;
+							current.month = 11;
+						}
+						setMonth(current);
+					},
+					click: function (e) {					// miután release-re ugrik href-re, emiatt ezt blokkolni kell
+						e.preventDefault();
+						e.stopPropagation();
 					}
-					setMonth(current);
 				});
-				datePickerModal.find(o.selector.next).on("mousedown", function(e) {
-					e.stopPropagation();
-					e.preventDefault();
-					current.month++;
-					if (current.month > 11) {
-						current.year++;
-						current.month = 0;
+
+				datePickerModal.find(o.selector.next).on({
+					mousedown: function(e) {
+						e.preventDefault();
+						e.stopPropagation();
+						current.month++;
+						if (current.month > 11) {
+							current.year++;
+							current.month = 0;
+						}
+						setMonth(current);
+					},
+					click: function (e) {					// miután release-re ugrik href-re, emiatt ezt blokkolni kell
+						e.preventDefault();
+						e.stopPropagation();
 					}
-					setMonth(current);
 				});
 			}
 
@@ -1132,7 +1186,7 @@
 
 	$.fn.esLink = function ( options ) {
 
-		var o = $.extend(true, $.fn.esLink.defaultOptions, options),
+		var o = $.extend(true, {}, $.fn.esLink.defaultOptions, options),
 			wrap = this[0] ? $(this) : $(o.selector),
 			linkSelector = this.selector;
 
@@ -1163,107 +1217,6 @@
 	@desc		Ajax source loader
 	@tested
 
-	todo		több elemmel is kipróbálni
-	todo		megoldani rekurzív függvényhívás problémáját
-	todo		onloadra event triggert csinálni
-	todo		kipróbálni, hogy mi van ha ajahívós diven belül alapból is ajaxhívós div van
-*/
-
-/*
-	Research	http://stackoverflow.com/questions/16542595/jquery-plugin-to-apply-also-on-dynamically-created-elements
-				http://hacks.mozilla.org/2012/05/dom-mutationobserver-reacting-to-dom-changes-without-killing-browser-performance/
-				https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver?redirectlocale=en-US&redirectslug=DOM/MutationObserver
-				http://jsfiddle.net/7cqXC/9/
-
-	Custom event
-				http://www.sitepoint.com/jquery-custom-events/
-*/
-
-
-/*
-	Adott html elembe tölti a data-ajax-source-ban megadott url-t
-
-	Example
-	<div data-ajax-source="http://source-of-the-content"></div>
-*/
-
-(function(){
-
-	$.fn.esAjaxSource = function( options ) {
-
-		var defaults = {
-			dom_wrap: "[data-ajax-source]"
-		};
-
-		var o = $.fn.extend(true, defaults, options);
-
-		var wrap = this;
-		if (this.length === 0) { wrap = $(o.dom_wrap); }
-
-		//	remove attribute square brackets
-		function ra( selector ) {
-			var replaced = selector.replace(/\[/g, "").replace(/\]/, "");
-			return replaced;
-		}
-
-		//	load ajax source
-		return wrap.each(function() {
-
-			var container = $(this);
-
-			if (container.attr(ra(o.dom_wrap)) !== "") {
-				container.load(container.attr(ra(o.dom_wrap)), function(response, status, xhr) {
-					$(this).find(o.dom_wrap).esAjaxSource();
-					container.removeAttr(ra(o.dom_wrap));
-				});
-			}
-		});
-	};
-
-	//	to apply on ajax loaded content
-//	$(document).on("ready.esolr.ajaxsource ajaxComplete.esolr.ajaxsource", function(){
-	$(document).on("ready.esolr.ajaxsource", function(){
-		$.fn.esAjaxSource();
-	});
-
-	/*$(document).on("ajaxComplete.esolr.ajaxsource", function(){
-		$.fn.esAjaxSource();
-	});*/
-
-	/*$(document).on("ooo", "[data-ajax-source]", function(e){
-		console.log("Betöltve");
-	});*/
-})(jQuery);
-
-
-$("button").on("click", function(e){
-	e.preventDefault
-	$(this).after( $("<div></div>").attr("data-ajax-source", "esolr.responsiveimg.ajax.html").esAjaxSource());
-});;/*
-	@desc		Ajax source loader
-	@tested
-
-	todo		több elemmel is kipróbálni
-	todo		megoldani rekurzív függvényhívás problémáját
-	todo		onloadra event triggert csinálni
-	todo		kipróbálni, hogy mi van ha ajahívós diven belül alapból is ajaxhívós div van
-*//*
-	Research	http://stackoverflow.com/questions/16542595/jquery-plugin-to-apply-also-on-dynamically-created-elements
-				http://hacks.mozilla.org/2012/05/dom-mutationobserver-reacting-to-dom-changes-without-killing-browser-performance/
-				https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver?redirectlocale=en-US&redirectslug=DOM/MutationObserver
-				http://jsfiddle.net/7cqXC/9/
-
-	Custom event
-				http://www.sitepoint.com/jquery-custom-events/
-*//*
-	Adott html elembe tölti a data-ajax-source-ban megadott url-t
-
-	Example
-	<div data-ajax-source="http://source-of-the-content"></div>
-*/(function(){$.fn.esAjaxSource=function(e){function i(e){var t=e.replace(/\[/g,"").replace(/\]/,"");return t}var t={dom_wrap:"[data-ajax-source]"},n=$.fn.extend(!0,t,e),r=this;this.length===0&&(r=$(n.dom_wrap));return r.each(function(){var e=$(this);e.attr(i(n.dom_wrap))!==""&&e.load(e.attr(i(n.dom_wrap)),function(t,r,s){$(this).find(n.dom_wrap).esAjaxSource();e.removeAttr(i(n.dom_wrap))})})};$(document).on("ready.esolr.ajaxsource",function(){$.fn.esAjaxSource()})})(jQuery);$("button").on("click",function(e){e.preventDefault;$(this).after($("<div></div>").attr("data-ajax-source","esolr.responsiveimg.ajax.html").esAjaxSource())});;/*
-	@desc		Ajax source loader
-	@tested
-
 	todo		megoldani rekurzív függvényhívás problémáját
 	todo		onloadra event triggert csinálni
 	todo		kipróbálni, hogy mi van ha ajahívós diven belül alapból is ajaxhívós div van
@@ -1292,7 +1245,7 @@ $("button").on("click", function(e){
 			dom_wrap: "[data-ajax-source]"
 		};
 
-		var o = $.fn.extend(true, defaults, options);
+		var o = $.fn.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		if (this.length === 0) {
@@ -1363,7 +1316,7 @@ $("button").on("click", function(e){
 			dom_wrap: "[data-ajax-target]"
 		};
 
-		var o = $.fn.extend(true, defaults, options);
+		var o = $.fn.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		if (this.length === 0) {
@@ -1412,7 +1365,7 @@ $("button").on("click", function(e){
 			dom_wrap:	""
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		//	if there is no wrap added at fn call use default
@@ -1511,7 +1464,7 @@ var esDate = {
 			}
 		};
 
-		var o = $.fn.extend(true, defaults, options);
+		var o = $.fn.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		if (this.length === 0) {
@@ -1644,7 +1597,7 @@ var esDate = {
 
 	$.fn.esDnDPortlet = function ( options ) {
 
-		var o = $.extend({}, $.fn.esDnDPortlet.defaultOptions, options),
+		var o = $.extend(true, {}, $.fn.esDnDPortlet.defaultOptions, options),
 			portlet,								// normal portlet
 			fn,										// fn portlet
 			area,									// normal area
@@ -2321,7 +2274,7 @@ var esDate = {
 			triggerEvent: "blur"
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 
 		return this.each(function() {
 
@@ -2342,7 +2295,7 @@ var esDate = {
 			max: undefined
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 
 		return $(this).each( function () {
 
@@ -2362,12 +2315,17 @@ var esDate = {
 	@desc		Select to button group convert
 	@tested		Safari, Chrome, Fireforx, Opera, IE
 
+	todo		meg kellene jelölni a legenerált scelectet is, hogy multiple-e vagy sem
+	todo		select change() változást azonnal kezelje le!
+	todo		az üres text értékű option-t hagyja ki > van helyette reset
+	todo		az üres value értékű option-t hagyja ki > van helyette reset
 	done		elsütni a change eseményt ha megváltozik a select
+	todo		megoldani, hogy a class-nál megadott formázásokat vegye át a generált, vagy egy data-class… be lehessen betenni a classokat
+	todo		ajax postolást beletenni – Roodieval beszélni
 	todo		lekezelni ha menet közben hízik a select
 	todo		kezelni: <option disabled>
 	todo		kezelni: <optgroup>, <optgroup disabled>
 	todo		a reset az alapállapotot állítsa vissza, ne pedig töröljön mindent
-	todo		megoldani, hogy a class-nál megadott formázásokat vegye át a generált, vagy egy data-class… be lehessen betenni a classokat
 */
 
 /*
@@ -2389,18 +2347,26 @@ var esDate = {
 	$.fn.esSelectBtn = function ( options ) {
 
 		var defaults = {
-			dom_wrap:		".select-btn",
-			groupClass:		"select-btn-group",
+			dom_wrap:		".select-btn",		//
+			groupClass:		"select-btn-group",	//
 			groupHTML:		"<div></div>",
-			buttonClass:	"btn btn-select",
+			buttonClass:	"btn btn-select",	//
 			buttonHTML:		"<a href='#'></a>",
 			resetHTML:		"✕",
-			resetClass:		"reset",
-			selectedClass:	"selected",
-			reset:			undefined
+			resetClass:		"reset",			//
+			selectedClass:	"selected",			//
+			reset:			undefined,
+			copyClass:		true,
+			selector: {
+				default:		".select-btn",
+				groupClass:		"select-btn-group",
+				buttonClass:	"btn btn-select",
+				resetClass:		"reset",
+				selectedClass:	"selected"
+			}
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		//	if there is no wrap added at fn call use default
@@ -2503,7 +2469,7 @@ var esDate = {
 			]
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		//	if there is no wrap added at fn call use default
@@ -2586,13 +2552,7 @@ var esDate = {
 
 var es = {
 
-	function: {
-
-		encodeURL: function(url) {
-
-			return true;
-		}
-	}
+	function: {}
 };;/*
 	desc		Image crop
 	ajaxload	tested
@@ -2619,7 +2579,7 @@ var es = {
 			alignClass:		"bg-align"
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = $(o.dom_wrap);
 
 		//	remove attribute square brackets
@@ -2754,7 +2714,7 @@ var esNameday = {
 			}
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 //		console.log(o.p.first.html)
@@ -2933,7 +2893,7 @@ var esNameday = {
 			defaultTab:				0
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		//	if there is no wrap added at fn call use default
@@ -3066,7 +3026,7 @@ var esNameday = {
 			]
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		//	if there is no wrap added at fn call use default
@@ -3242,7 +3202,7 @@ var esNameday = {
 			minus: undefined
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		if (this.length === 0) {
@@ -3324,7 +3284,7 @@ var esNameday = {
 			dom_wrap:	"data-es-videoload"
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		//	if there is no wrap added at fn call use default
@@ -3372,7 +3332,7 @@ var esNameday = {
 			currentDefault:		0
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		//	if there is no wrap added at fn call use default
@@ -3517,7 +3477,7 @@ var esNameday = {
 		*/
 
 
-		var o = $.extend(true, $.fn.esSliderPro.defaultOptions, options);
+		var o = $.extend(true, {}, $.fn.esSliderPro.defaultOptions, options);
 		var wrap = this;
 //			wrap = this[0] ? $(this) : $(o.dom_wrap);						// letiltva, mert különben olyan slidert is elindít, amit nem kellene neki
 
@@ -4383,7 +4343,7 @@ var esNameday = {
 			start: 0					// ennél az y scrolltop koordinátánál aktiválódik, addig simán görget
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 
 		return this.each(function() {
 
@@ -4437,7 +4397,7 @@ var esNameday = {
 			targetAttr:	"data-switch-target"
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		//	if there is no wrap added at fn call use default
@@ -4514,7 +4474,7 @@ var esNameday = {
 			}
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		//	if there is no wrap added at fn call use default
@@ -4649,7 +4609,7 @@ var esNameday = {
 			overflow: "[data-valign-overflow]"
 		};
 
-		var o = $.fn.extend(true, defaults, options);
+		var o = $.fn.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		if (this.length === 0) {
@@ -4704,7 +4664,7 @@ var esNameday = {
 			dom_wrap:	"data-es-videoload"
 		};
 
-		var o = $.extend(true, defaults, options);
+		var o = $.extend(true, {}, defaults, options);
 		var wrap = this;
 
 		//	if there is no wrap added at fn call use default
@@ -4755,7 +4715,7 @@ var esNameday = {
 
 	$.fn.esFluidHeight = function ( options ) {
 
-		var o = $.extend(true, $.fn.esFluidHeight.defaultOptions, options),
+		var o = $.extend(true, {}, $.fn.esFluidHeight.defaultOptions, options),
 			wrap = this[0] ? $(this) : $(o.dom.selector);
 
 		wrap.each(function () {
@@ -4823,7 +4783,7 @@ var esNameday = {
 
 	$.fn.esStickyFooter = function ( options ) {
 
-		var o = $.extend(true, $.fn.esStickyFooter.defaultOptions, options),
+		var o = $.extend(true, {}, $.fn.esStickyFooter.defaultOptions, options),
 			wrap = this[0] ? $(this) : $(o.selector);
 
 		return wrap.each(function(){
@@ -4869,7 +4829,13 @@ var esNameday = {
 	};
 
 } (jQuery));
-;
+;/*
+
+	todo minieditot elkészíteni
+	Olyasmi kelle legyen, hogy megjelölök egy szöveget span-nal, vagy bármivel és klikkre át tudjam írni akár hízlalva,
+	selectből kiválasztva stb., majd ajaxon elpostolva akárhova a változást.
+
+*/;
 //
 //	Makes a panel-group accordion
 //
@@ -4900,7 +4866,7 @@ var esNameday = {
 			}
 		};
 
-		var o = $.extend(true, defaultOptions, options),
+		var o = $.extend(true, {}, defaultOptions, options),
 			wrap = this[0] ? $(this) : $(o.selector),
 			linkSelector = this.selector,
 			windowHash = window.location.hash;
@@ -5036,7 +5002,7 @@ var esNameday = {
 
 	$.fn.scroller = function ( options ) {
 
-		var o = $.extend(true, $.fn.scroller.defaultOptions, options),
+		var o = $.extend(true, {}, $.fn.scroller.defaultOptions, options),
 			wrap = $(this);
 
 		wrap.each(function () {
