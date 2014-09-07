@@ -439,7 +439,7 @@
 							selectFilter(selectInputField.val());				// szűri a listát az input tartalma alapján
 						}
 						inputValPrevious = inputValCurrent;
-						console.log("start & running", o.filterRepeatTimer);
+//						console.log("start & running", o.filterRepeatTimer);
 					}, o.typeRepeat);
 				}
 			}
@@ -515,11 +515,11 @@
 
 					// tag létrehozása az item property-k alapján törlő gombbal és eseménykezelővel
 					var tag = $("<li/>").addClass(o.selectors.multiTagClass).attr("data-value", item.attr("data-value"))
-						.append( $("<div/>").addClass(o.selectors.multiTagTextClass).text(item.text()) )
 						.append( $("<div/>").addClass(o.selectors.multiTagRemoveClass).html(o.selectors.multiTagRemoveHTML).on("click", function(e) {
 							e.preventDefault();
 							removeTag( $(this).closest("." + o.selectors.multiTagClass) );
-						}) );
+						}))
+						.append( $("<div/>").addClass(o.selectors.multiTagTextClass).text(item.text()) );
 
 					selectedData.push({"id": item.attr("data-value"), "text": item.text()});	// selected pusholva
 					selectTagWrap.append( tag );												// tab beszúrása
