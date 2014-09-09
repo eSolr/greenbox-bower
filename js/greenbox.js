@@ -5131,4 +5131,31 @@ var esNameday = {
 			}
 		}
 	};
+} (jQuery));;//
+//	Select Go To based on its value if value attribute exists
+//	todo target
+//
+
+
+(function ( $ ) {
+
+	$.fn.selectGoTo = function ( options ) {
+
+		var defaultOptions = {
+			selector: ".select--goto"
+		};
+
+		var o = $.extend({}, defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector);
+
+		return wrap.each(function(){
+			var selectItem = $(this);
+			selectItem.change(function () {
+				if (selectItem.children("[value='" + selectItem.val() + "']").length > 0 ) {
+					location.href = selectItem.val();
+				}
+			});
+		});
+	};
+
 } (jQuery));
