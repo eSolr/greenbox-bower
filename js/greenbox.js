@@ -2612,38 +2612,7 @@ var es = {
 //		$.fn.esImgCrop();
 //	});
 
-} (jQuery));;/*	Example
- */
-
-//	todo lekezelni a szökőéveket
-//	todo URL-t konfigolhatóvá tenni
-
-
-var esNameday = {
-
-	url:	"../js/js-data/esolr.nameday.hu.min.json",
-
-	getName: function(url) {
-
-		esNameday.url = typeof urlClass === "undefined" ? esNameday.url : url;
-
-		var firstDay = "01/01/" + new Date().getFullYear();
-		var json = null;
-		var diff = parseInt( ( new Date() - new Date( firstDay ) ) / 1000 / 60 / 60 / 24 );
-
-		$.ajax({
-			'async': false,
-			'global': false,
-			'url': esNameday.url,
-			'dataType': "json",
-			'success': function(data) {
-				json = data;
-			}
-		});
-
-		return json.namedays[ diff ][ 2 ];
-	}
-};;/*
+} (jQuery));;/*
 	todo	a paraméterezés nem működik… ellenőrizni, miért
 */
 
@@ -4835,7 +4804,93 @@ var esNameday = {
 	Olyasmi kelle legyen, hogy megjelölök egy szöveget span-nal, vagy bármivel és klikkre át tudjam írni akár hízlalva,
 	selectből kiválasztva stb., majd ajaxon elpostolva akárhova a változást.
 
-*/;
+*/;//
+//	Névnap lekérdezés
+//
+//	A selector szövegét lecserélve a json adott sorának tartalmát kiírja.
+//
+//	json formátuma:
+//
+//	"namedays": [
+//		["01", "01", "Fruzsina"],
+//		["01", "02", "Ábel"],
+//		["01", "03", "Benjámin, Genovéva"],
+//		["01", "04", "Leóna, Titusz"],
+//		["01", "05", "Simon"],
+//		...
+//	]}
+//
+//
+//	done URL-t konfigolhatóvá tenni
+
+
+(function ( $ ) {
+
+	$.fn.setNameDay = function ( options ) {
+
+		var defaults = {
+				path: "../lib/greenbox/js/js-data/nameday.hu.json",
+				date: new Date(),
+				language: "hu",
+				separator: ", "
+			},
+			o = $.extend(true, {}, defaults, options),
+			wrap = $(this);
+
+		return wrap.each( function () {
+			var nameDay = $(this);
+
+			$.getJSON(o.path, function(data) {
+				nameDay.text( data[o.date.getMonth()][o.date.getDate() - 1].join(o.separator) );
+			});
+		});
+	};
+
+	$.fn.getNameDay = function ( options ) {
+
+		var defaults = {
+				path: "../lib/greenbox/js/js-data/nameday.hu.json",
+				date: new Date(),
+				language: "hu",
+				separator: ", "
+			},
+			o = $.extend(true, {}, defaults, options);
+
+		$.getJSON(o.path, function(data) {
+			return data[o.date.getMonth()][o.date.getDate() - 1].join(o.separator);
+		});
+	};
+
+} (jQuery));
+
+
+/*
+var esNameday = {
+
+	url:	"../js/js-data/esolr.nameday.hu.min.json",
+
+	getName: function(url) {
+
+		esNameday.url = typeof urlClass === "undefined" ? esNameday.url : url;
+
+		var firstDay = "01/01/" + new Date().getFullYear();
+		var json = null;
+		var diff = parseInt( ( new Date() - new Date( firstDay ) ) / 1000 / 60 / 60 / 24 );
+
+		$.ajax({
+			'async': false,
+			'global': false,
+			'url': esNameday.url,
+			'dataType': "json",
+			'success': function(data) {
+				json = data;
+			}
+		});
+
+		return json.namedays[ diff ][ 2 ];
+	}
+};*/
+;
 //
 //	Makes a panel-group accordion
 //
