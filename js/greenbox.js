@@ -31,6 +31,7 @@
  Research:
  http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 
+ todo kapcsolhatóvá tenni, hogy a nem létező elemeket újként adja hozzá a listához (tageknél kifejezetten kell)
  todo disabled attribútumot lekezelni!
  done copy style
  done copy class
@@ -4906,7 +4907,7 @@ var esNameday = {
 			set: {
 				status: "default",					//	default|expanded|collapsed – first or selected is expanded|all expanded|all collapsed
 				hashAutoExpand: false,				//	opens for mydomain.com#hash if available in page-title
-				expanded: [0],						//	expands these items on launch
+				expanded: [],						//	undefined|[]|[0,1,2,…] expands these items on launch – undefined, empty array or array listed with expandable items
 				autoCollapse: false					//	when a panel opens, all others closes automatically
 			},
 			selectors: {
@@ -4925,6 +4926,7 @@ var esNameday = {
 			wrap = this[0] ? $(this) : $(o.selector),
 			linkSelector = this.selector,
 			windowHash = window.location.hash;
+
 
 		return wrap.each(function(){
 
@@ -4945,10 +4947,10 @@ var esNameday = {
 				}
 
 				// Set expanded panels by option. This has higher priority than expand/collapse all
-				if (o.set.expanded.length > 0) {
-					for (var i in o.set.expanded) {
-						if (i >= 0 && i < panels.length) {
-							panels.eq(i).addClass(o.selectors.expandedClass);
+				if (o.set.expanded.length > 0 && o.set.expanded !== undefined) {
+					for (var i = 0; i < o.set.expanded.length; i++) {
+						if (o.set.expanded[i] >= 0 && o.set.expanded[i] < panels.length) {						// ha panelen darabszámon belüli értéket adunk meg
+							panels.eq(o.set.expanded[i]).addClass(o.selectors.expandedClass);	// rendelje hozzá a kinyitás classt
 						}
 					}
 				}
