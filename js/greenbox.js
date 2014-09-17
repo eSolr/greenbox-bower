@@ -4654,26 +4654,104 @@ var es = {
 //	});
 
 } (jQuery));;/*
-	DOM item visibility setting
+	DOM item visibility
+	Ha a megadott DOM elem rszben vagy egészben látható, akkor hozzá rendel egy class-t
+
+	Két pluginból áll a csomag:
+	$.fn.isItemVisible(), ami tulajdonképpen csak egy függvény
+	$.fn.isVisible(), ami egy vagy több class-t rendel egy elemhez ha az a paramétereknek megfelelően láthatóvá válik
+
+	todo	top és bottom értékeket megadhatóvá tenni, hátha van egy fejléc, lábléc…
+	done	lekezelni,hogy egy vagy több elemre fonatkozik-e
+	done	innerHeight – paddinggel – vagy sima height > inn
+	todo	horizontális scrollal is kiegészíteni
+	todo	megjelenés %-os megjelenéséhez beállítani az effektet
+	done	kapcsolhatóvá tenni, hogy a visible állapottal járó classokat scrollOut-ra levegye-e, azaz ne csak egy, hanem kétirányú legyen a folyamat
 */
 
 (function($){
 
-	$.fn.esVisible = function(partial,hidden){
+	$.fn.isVisible = function ( options ) {
 
-		var $t				= $(this).eq(0),
-			t				= $t.get(0),
-			$w				= $(window),
-			viewTop			= $w.scrollTop(),
-			viewBottom		= viewTop + $w.height(),
-			_top			= $t.offset().top,
-			_bottom			= _top + $t.height(),
-			compareTop		= partial === true ? _bottom : _top,
-			compareBottom	= partial === true ? _top : _bottom,
-			clientSize		= hidden === true ? t.offsetWidth * t.offsetHeight : true;
+		var o = $.extend(true, {}, $.fn.isVisible.defaultOptions, options),
+			wrap = this.length == 0 ? $(o.selector.default) : $(this),
+			assigned = this.length == 0 ? true : false;									// true|false – ha wrapper nélkül (true) hívtuk meg, akkor elemenként a data-visible éréke lesz a hozzárendelt class
+
+
+		function visible( item, partial, hidden ) {
+
+			var t				= item.get(0),												// önmagát adja vissza
+				$window			= $(window),												// window
+				viewTop			= $window.scrollTop(),										// mennyit scrolloztam az oldal vége felé (def=0)
+				viewBottom		= viewTop + $window.height(),								// mennyit scrolloztam az oldal eleje felé (def=window.height())
+				top				= item.offset().top,										// elem top koordinátája
+//				bottom			= top + item.height(),										// elem alsó koordinátája
+				bottom			= top + item.innerHeight(),										// elem alsó koordinátája
+				compareTop		= partial === true ? bottom : top,							// felfelé scrollnál a tetejét vagy az alját nézze (teljes vagy részleges megjelenés)
+				compareBottom	= partial === true ? top : bottom,							// lefelé scrollnál a tetejét vagy az alját nézze (teljes vagy részleges megjelenés)
+				clientSize		= hidden === true ? t.offsetWidth * t.offsetHeight : true;	// ellenőrzi, hogy az adott elemnek van-e kiterjedése, azaz rejtette
+
+			return !!clientSize && ((compareBottom <= viewBottom) && (compareTop >= viewTop));
+		}
+
+		return wrap.each(function () {
+
+			var item = $(this),
+				assignedClasses,			// ebbe kerülnek a látható elemhez hozzárendelt classok
+				$w = $(window);
+
+			if (assigned) {
+				assignedClasses = item.attr(o.selector.default.replace("[","").replace("]","")).replace(",", " ").replace(".", "").replace("  ", " ");	// kiveszi a vesszőt és a dupla szóközt
+			} else {
+				assignedClasses = o.class.replace(",", " ").replace(".", "").replace("  ", " ");			// kiveszi a vesszőt és a dupla szóközt
+			}
+
+			// átméretezésre és scrollra figyel az elemek megjelenését
+			$w.on("resize scroll", function () {
+
+				// ha látható, hozzárendeli a classokat
+				if ( visible( item, o.partial, o.hidden ) ) {
+					item.addClass( assignedClasses );
+				}
+
+				// ha nem látharó és reverse az állapota, akkor törli a classokat
+				if ( !visible( item, o.partial, o.hidden ) && o.reverse ) {
+					item.removeClass( assignedClasses );
+				}
+			});
+
+			if ( visible( item, o.partial, o.hidden ) ) {
+				item.addClass( assignedClasses );
+			}
+		});
+	};
+
+	$.fn.isVisible.defaultOptions = {
+		partial: true,					// true|false – részben (true) vagy egészen (false) látszódjon-e adott elem, hogy lefusson a plugin
+		hidden: false,					// true|false - ha true, akkor a kiterjedés nélküli elemek láthatóságára false lesz az eredmény akkor is ha képernyőn vannak
+		reverse: false,					// true|false - visszafelés is működjön a plugon, azaz ka kikerül az elem a képernyőről, akkor törölje a classokat
+		class: "",						// hozzárendelt classok vesszővel elválasztva – abban az esetben rendeli hozzá ezeket ha plugin hívásakor megadott selectorral hívtuk
+		selector: {
+			default: "[data-visible]"	// default selector – ha nem adunk meg plugin hívásakor, akkor ez lesz az alapértelmezett, illetve a tartalma hozzárendelt class
+		}
+	};
+
+	/*$.fn.isItemVisible = function( partial, hidden ){
+
+		var item		= $(this).eq(0),											// hogy tuti csak egy elemre vonatkogzzon
+		t				= item.get(0),												// önmagát adja vissza
+		$window			= $(window),												// window
+		viewTop			= $window.scrollTop(),										// mennyit scrolloztam az oldal vége felé (def=0)
+		viewBottom		= viewTop + $window.height(),								// mennyit scrolloztam az oldal eleje felé (def=window.height())
+		top				= item.offset().top,										// elem top koordinátája
+		bottom			= top + item.height(),										// elem alsó koordinátája
+		bottom			= top + item.innerHeight(),									// elem alsó koordinátája
+		compareTop		= partial === true ? bottom : top,							// felfelé scrollnál a tetejét vagy az alját nézze (teljes vagy részleges megjelenés)
+		compareBottom	= partial === true ? top : bottom,							// lefelé scrollnál a tetejét vagy az alját nézze (teljes vagy részleges megjelenés)
+		clientSize		= hidden === true ? t.offsetWidth * t.offsetHeight : true;	// ellenőrzi, hogy az adott elemnek van-e kiterjedése, azaz rejtette
 
 		return !!clientSize && ((compareBottom <= viewBottom) && (compareTop >= viewTop));
-	};
+	};*/
 
 })(jQuery);;
 //
