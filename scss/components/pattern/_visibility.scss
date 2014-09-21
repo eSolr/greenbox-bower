@@ -224,6 +224,10 @@ html.touch {
 //	Blind specific visibility
 //
 
+.show-blind-block,
+.show-blind-inline,
+.show-blind-inline-block { display: none; }
+
 .blind {
 	//Show
 	.show-blind-block { display: block; }
