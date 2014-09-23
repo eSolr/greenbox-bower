@@ -5171,10 +5171,10 @@ var esNameday = {
 				if (blockLength > 1) {
 					var timer = setTimeout(function () {
 						startLoop();
+						setEventhandlers();							// a hover eseményt is csak akkor kezeli le ha egynél több elem van
 					}, o.delay);
 				}
 
-				setEventhandlers();
 			}
 
 			function setEventhandlers() {
