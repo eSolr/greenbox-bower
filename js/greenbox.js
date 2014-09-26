@@ -5174,7 +5174,6 @@ var esNameday = {
 						setEventhandlers();							// a hover eseményt is csak akkor kezeli le ha egynél több elem van
 					}, o.delay);
 				}
-
 			}
 
 			function setEventhandlers() {
