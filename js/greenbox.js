@@ -3599,7 +3599,8 @@ var es = {
 				//	forrás portlet elrejtése
 				if (!o.set.source.show) {
 //					sourcePortlet.remove();
-					sceneSource.hide();
+//					sceneSource.hide();
+					sourcePortlet.hide();
 				}
 
 //				console.log(o.set.current);
