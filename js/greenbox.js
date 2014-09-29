@@ -2239,29 +2239,7 @@ var esDate = {
 		return js;
 	};
 
-} (jQuery));;//
-//	Set a "manual" resizeend event which is triggered after window resize event ends with 250ms default delay.
-//	As a parameter the delay value can me modified.
-//
-//	$.fn.esEventResizeend(); or
-//
-
-(function( $ ){
-
-	$.fn.esEventResizeend = function(delay) {
-
-		var	timer = window.setTimeout(function(){}, 0),
-			defaultEventName = "resizeend",
-			defaultDelay = 250;
-
-		$(window).on('resize', function() {
-			window.clearTimeout(timer);
-			timer = window.setTimeout(function() {
-				$(window).trigger(defaultEventName);
-			}, delay || defaultDelay);
-		});
-	}
-}(jQuery));;/*
+} (jQuery));;/*
 	@desc		Reset input field on parameter event (default is blure)
 	@version	1.0
 */
@@ -4654,7 +4632,51 @@ var es = {
 //		$.fn.esVideoLoader();
 //	});
 
-} (jQuery));;
+} (jQuery));;//
+//	Set a "manual" resizeend event which is triggered after window resize event ends with 250ms default delay.
+//	As a parameter the delay value can me modified.
+//
+//	$.fn.esEventResizeend(); or
+//
+
+(function( $ ){
+
+	$.fn.esEventResizeend = function(delay) {
+
+		var	timer = window.setTimeout(function(){}, 0),
+			defaultEventName = "resizeend",
+			defaultDelay = 250;
+
+		$(window).on('resize', function() {
+			window.clearTimeout(timer);
+			timer = window.setTimeout(function() {
+				$(window).trigger(defaultEventName);
+			}, delay || defaultDelay);
+		});
+	}
+}(jQuery));;//
+//	Set a "manual" scrollend event which is triggered after window scroll event ends with 250ms default delay.
+//	As a parameter the delay value can me modified.
+//
+//	$.fn.esEventScrollend();
+//
+
+(function( $ ){
+
+	$.fn.esEventScrollend = function(delay) {
+
+		var	timer = window.setTimeout(function(){}, 0),
+			defaultEventName = "scrollend",
+			defaultDelay = 250;
+
+		$(window).on('scroll', function() {
+			window.clearTimeout(timer);
+			timer = window.setTimeout(function() {
+				$(window).trigger(defaultEventName);
+			}, delay || defaultDelay);
+		});
+	}
+}(jQuery));;
 //
 //	todo megadni, hogy mihez képes állítsa be magát
 //
