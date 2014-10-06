@@ -12,6 +12,8 @@
 //	http://css-tricks.com/snippets/css/retina-display-media-query/
 
 
+$enable-grid-for-print:		false !default;
+
 
 //	Breakingpoints
 $mq-small:					480px !default;
@@ -20,15 +22,21 @@ $mq-large:					960px !default;
 $mq-xlarge:					1280px !default;
 $mq-retina:					1920px !default;
 
+//	Print specific grid
+$display-type:				"only screen";
+@if $enable-grid-for-print {
+	$display-type: "screen and print";
+}
+
 //	Mobile first sizing
 //	Closed for smaller, opened for larger screens
-$screen:					"only screen" !global;
-$xsmall:					"only screen" !global;
-$small:						"only screen and (min-width:"#{$mq-small}")" !global;
-$medium:					"only screen and (min-width:"#{$mq-medium}")" !global;
-$large:						"only screen and (min-width:"#{$mq-large}")" !global;
-$xlarge:					"only screen and (min-width:"#{$mq-xlarge}")" !global;
-$retina:					"only screen and (min-width:"#{$mq-retina}")" !global;
+$screen:					quote($display-type) !global;
+$xsmall:					quote($display-type) !global;
+$small:						quote($display-type) + " and (min-width:"#{$mq-small}")" !global;
+$medium:					quote($display-type) + " and (min-width:"#{$mq-medium}")" !global;
+$large:						quote($display-type) + " and (min-width:"#{$mq-large}")" !global;
+$xlarge:					quote($display-type) + " and (min-width:"#{$mq-xlarge}")" !global;
+$retina:					quote($display-type) + " and (min-width:"#{$mq-retina}")" !global;
 
 //	Reversed sizing from desktop to mobile
 //	This is only for handling exceptions
