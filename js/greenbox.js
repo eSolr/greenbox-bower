@@ -4959,6 +4959,7 @@ var es = {
 				modal_width = modal_dialog.outerWidth(),				// kezdeti szélesség a responsove szélességállításhoz
 				modal_align = o.align,									// modal igazítása
 				dismiss = modal.find("[data-dismiss='modal']"),
+				remove = modal.find("[data-remove='modal']"),
 				$w = $(window),											// ablak wrap
 				isFluid = modal.is(".modal-fluid");						// a modal szélessége fluid-e
 
@@ -5020,6 +5021,13 @@ var es = {
 				modal.fadeOut(100);
 			});
 
+			// a modalban lévő remove gombokat aktiválja ha vannak
+			remove.off().on("click", function (e) {
+				e.preventDefault();
+				modal.fadeOut(100);
+				modal.remove();
+			});
+
 			modal.on("modallaunch", function () {
 				setModalAlign();
 				setModalPosition(modal_align);
@@ -5070,6 +5078,33 @@ var es = {
 				modal.trigger("modalbeforeclose");
 				modal.fadeOut(100);
 				modal.trigger("modalclose");
+			});
+		});
+	};
+
+	// modal törlés gombok definiálása
+	$.fn.modal.remove = function ( options ) {
+
+		defaultOptions = {
+			selector: {
+				default: "[data-remove='modal']"
+			},
+			keyboard: false
+		};
+
+		var o = $.extend(true, {}, defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector.default);
+
+		return wrap.each(function() {
+			var dismiss = $(this),
+				modal = dismiss.parents(".modal");
+
+			dismiss.on("click", function (e) {
+				e.preventDefault();
+				modal.trigger("modalbeforeremove");
+				modal.fadeOut(100);
+				modal.remove();
+				modal.trigger("modalremove");
 			});
 		});
 	};
