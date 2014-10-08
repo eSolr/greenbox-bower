@@ -4906,7 +4906,202 @@ var es = {
 	Olyasmi kelle legyen, hogy megjelölök egy szöveget span-nal, vagy bármivel és klikkre át tudjam írni akár hízlalva,
 	selectből kiválasztva stb., majd ajaxon elpostolva akárhova a változást.
 
-*/;//
+*/;
+//
+//	Makes a panel-group accordion
+//
+//	todo	modal nyitásakor minden más modalt csukjon be (legyen kivétel?)
+//	todo	….modal("show|hide") opciót beépíteni
+
+
+(function ( $ ) {
+
+	$.fn.modal = function ( options ) {
+
+		defaultOptions = {
+			selector: {
+				default: ".modal",
+				modal_dialog: ".modal-dialog",
+
+				// modal position
+				modal_top:		".modal-top",
+				modal_right:	".modal-right",
+				modal_bottom:	".modal-bottom",
+				modal_left:		".modal-left",
+				modal_center:	".modal-center"
+			},
+			align: "center",											// top|right|bottom|left|center
+			width: "500px",
+			keyboard: false,											// true|false - esc-re becsukódik
+			id: false,
+			class: false
+		};
+
+		var o, fnToggle, wrap;
+
+		// a sima kapcsolók szortírozása
+		if (typeof options == "string") {
+			fnToggle = options;
+			o = $.extend(true, {}, defaultOptions);
+		} else {
+			o = $.extend(true, {}, defaultOptions, options);
+		}
+
+		wrap = this[0] ? $(this) : $(o.selector.default);
+
+
+		// modal kapcsolók definiálása
+		$.fn.modal.toggle();
+
+		return wrap.each(function(){
+			var modal = $(this),										// a modal maga (full ablakméret)
+				modal_dialog = modal.find(o.selector.modal_dialog),		// a modal box része
+				modal_width = modal_dialog.outerWidth(),				// kezdeti szélesség a responsove szélességállításhoz
+				modal_align = o.align,									// modal igazítása
+				dismiss = modal.find("[data-dismiss='modal']"),
+				$w = $(window),											// ablak wrap
+				isFluid = modal.is(".modal-fluid");						// a modal szélessége fluid-e
+
+			// ha a .modal class mellett van megadva pozíció klassz, annak megfelelően állítja be a pozíció változó értékét a függőleges korrekció kiszámításához
+			function setModalAlign() {
+
+				// pozíció beállítása paraméter alapján
+				if (modal_align == "top")		{ modal.addClass("modal-top"); }
+				if (modal_align == "right")		{ modal.addClass("modal-right"); }
+				if (modal_align == "bottom")	{ modal.addClass("modal-bottom"); }
+				if (modal_align == "left")		{ modal.addClass("modal-left"); }
+
+				// pozíció lekérdezése és eltárolása class alapján
+				if (modal.is(o.selector.modal_top))		{ modal_align = "top"; }
+				if (modal.is(o.selector.modal_right))	{ modal_align = "right"; }
+				if (modal.is(o.selector.modal_bottom))	{ modal_align = "bottom"; }
+				if (modal.is(o.selector.modal_left))	{ modal_align = "left"; }
+				if (modal.is(o.selector.modal_center))	{ modal_align = "center"; }
+			}
+
+			// függőleges korrekció az align függvényében (leginkább a középre igazítottnál fontos)
+			function setModalPosition(position) {
+				if (position == undefined || ["center", "right", "left"].indexOf(position) >= 0) { modal_dialog.css({ "margin-top": Math.ceil(modal_dialog.outerHeight() * -0.5) }); }
+			}
+
+			// responsive szélesség kezelése – ha a beállított minimum alá csökken az ablakméret
+			function setModalWidth() {
+				if ($w.innerWidth() < modal_width && !isFluid) {
+					modal.addClass("modal-fluid");
+				} else if (!isFluid) {
+					modal.removeClass("modal-fluid");
+				}
+			}
+
+			// modal megjelenítése
+			function showModal() {
+				$(".modal").hide();						// modalok elrejtése
+				modal.trigger("modalbeforelaunch");		// modal megnyitás előtti esemény triggelése
+				modal.fadeIn(100);						// modal megjelenítése
+				modal.trigger("modallaunch");			// modal megnyitás esemény triggelése a méretezéshez és igazításhoz
+			}
+
+			// modal elrejtése
+			function hideModal() {
+				modal.trigger("modalbeforeclose");
+				modal.fadeOut(100);
+				modal.trigger("modalclose");
+			}
+
+			// átméretezésnél újraszámolja a függőleges igazítást és a szélességet
+			$w.on("resize", function () {
+				setModalPosition(modal_align);
+				setModalWidth()
+			});
+
+			// a modalban lévő dismiss gombokat aktiválja ha vannak
+			dismiss.off().on("click", function (e) {
+				e.preventDefault();
+				modal.fadeOut(100);
+			});
+
+			modal.on("modallaunch", function () {
+				setModalAlign();
+				setModalPosition(modal_align);
+				setModalWidth();
+				modal.trigger("modalopen");
+			});
+
+			if (fnToggle == "show") {
+				showModal();
+			}
+
+			setModalAlign();
+			setModalPosition(modal_align);
+			setModalWidth();
+
+			if (fnToggle == "hide") {
+				console.log("hájd");
+				hideModal();
+			}
+
+			// dismiss gomb definiálása
+//			$.fn.modal.dismiss();
+
+			// toggle gomb definiálása
+//			$.fn.modal.toggle();
+		});
+	};
+
+	// modal bezására gombok definiálása
+	$.fn.modal.dismiss = function ( options ) {
+
+		defaultOptions = {
+			selector: {
+				default: "[data-dismiss='modal']"
+			},
+			keyboard: false
+		};
+
+		var o = $.extend(true, {}, defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector.default);
+
+		return wrap.each(function() {
+			var dismiss = $(this),
+				modal = dismiss.parents(".modal");
+
+			dismiss.on("click", function (e) {
+				e.preventDefault();
+				modal.trigger("modalbeforeclose");
+				modal.fadeOut(100);
+				modal.trigger("modalclose");
+			});
+		});
+	};
+
+	// modal megnyitása gomdok definiálása
+	$.fn.modal.toggle = function ( options ) {
+
+		defaultOptions = {
+			selector: {
+				default: "[data-toggle='modal']"
+			}
+		};
+
+		var o = $.extend(true, {}, defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector.default);
+
+		return wrap.each(function() {
+			var modalToggle = $(this);
+			if (modalToggle.attr("data-target") !== "") {
+				modalToggle.off().on("click", function (e) {
+					e.preventDefault();
+					$(".modal").hide();													// modalok elrejtése
+					$(modalToggle.attr("data-target")).trigger("modalbeforelaunch");	// modal megnyitás előtti esemény triggelése
+					$(modalToggle.attr("data-target")).fadeIn(100);						// modal megjelenítése
+					$(modalToggle.attr("data-target")).trigger("modallaunch");			// modal megnyitás esemény triggelése a méretezéshez és igazításhoz
+				});
+			}
+		});
+	};
+
+} (jQuery));
+;//
 //	Névnap lekérdezés
 //
 //	A selector szövegét lecserélve a json adott sorának tartalmát kiírja.
