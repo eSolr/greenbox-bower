@@ -4435,7 +4435,7 @@ var es = {
 
 			var tabs = $(this);
 
-			//	Ha nincs default érték, az első fület állítja br
+			//	Ha nincs default érték, az első fület állítja be
 			if (tabs.children("." + o.selectedClass).length == 0) {
 				tabs.children().eq(0).addClass(o.selectedClass);
 			}
@@ -4457,14 +4457,6 @@ var es = {
 			});
 		});
 	};
-
-//	to apply on ajax loaded content
-//	$(document).on("ajaxComplete.esolr.tab", function(){
-//		$.fn.esTab();
-//	});
-//	$(document).on("ready.esolr.tab ajaxComplete.esolr.tab", function(){
-//		$.fn.esTab();
-//	});
 
 } (jQuery));;/*
 	@name:		Class toggle with multiple classes
@@ -4797,6 +4789,349 @@ var es = {
 		selector: ".footer-sticky",									//	default selector
 		class: undefined,											//	attached at sticky state
 		style: "position: fixed; width: 100%; bottom: 0; left: 0;"	//	if class added this css is ignored
+	};
+
+} (jQuery));
+;
+//
+//	Gallery module
+//
+//	todo legyen responsive képméretek betöltésében is
+/*
+
+1. azonosítani a képlinkeket
+2. rel alapján meghatározni, hogy egy kép vagy galériákba sorolható
+3. megjelenítés paramétereit lekérdezni
+4. megjelenítés
+
+*/
+
+
+(function ( $ ) {
+
+	$.fn.gallery = function ( options ) {
+
+		var o = $.extend(true, {}, $.fn.gallery.defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector.default),
+			galleries = [];		// képcsoportok nevének gyűjtője [rel="csoportnév"]
+
+		$.fn.gallery.single(wrap.not("[rel]"), o);			// csoportazonosító nélküli képek
+		$.fn.gallery.single(wrap.filter("[rel='']"), o);	// üres csoportazonosítóval rendelkező képek
+
+		wrap.filter("[rel]").each(function () {
+			var image = $(this);
+			// ha a csoport még nem létezett a gyűjtőben, létrejön neki
+			if (image.attr("rel") !== "" && galleries.indexOf(image.attr("rel")) < 0) {
+				galleries.push(image.attr("rel"));
+				$.fn.gallery.group(wrap.filter("[rel='" + galleries.slice(-1)[0] + "']"), o);
+			}
+		});
+
+		return wrap;
+	};
+
+	// egy kép megjelenítése
+	$.fn.gallery.single = function ( singles, o ) {
+		return;
+	};
+
+	// képcsoport megjelenítése
+	$.fn.gallery.group = function ( group, o ) {
+
+		var modal = $(o.html.modal),
+			modalHeader = modal.find("." + o.css.modalHeader),
+			modalBody = modal.find("." + o.css.modalBody),
+			modalFooter = modal.find("." + o.css.modalFooter),
+			imgGroup = $(o.html.imgGroup),
+			thumbGroup = $(o.html.thumbGroup),
+			prev = $(o.html.prev),
+			next = $(o.html.next),
+			close = $(o.html.close),
+			galleryTitle = $(o.html.galleryTitle),
+			stacks,										// ebbe kerülnek a legenerált stackek a lapozás követéséhez
+			thumbStacks,								// ebbe kerülnek a legenerált thumbStackek a lapozás követéséhez
+			current = 0,
+			direction = false,							// false|back|forward – lapozás itánya (false cssak indulásnál)
+			$w = $(window),
+			body = $("body");
+
+		// Function for checking whether a file exits
+		function URLExists(url) {
+			var http = new XMLHttpRequest();
+			http.open('HEAD', url, false);
+			http.send();
+//			return http.status != 404;		// true|false – 404-et vizsgál
+			return http.status == 200;		// true|false - sikeres betöltést vizsgál
+		}
+
+		//
+		function generateModal() {
+			var stackCounter = 0,	// stack számláló
+				stack = [],			// stack gyűjtő, ami számláló nullázása előtt tárolásra kerül
+				thumbStack = [];	// stack gyűjtő thumbnaileknek
+
+			// végigmegy a csoport elemein és szétszortírozza őket coverbe és stack-ekbe
+			for (var i = 0; i < group.length; i++) {
+
+				// ha létezik a képfájl
+				if (URLExists(group.eq(i).attr("href"))) {
+
+//					todo ellenőrizni a stack és cover viselkedést ha csak 1–2 elem van
+
+					/*var imm = new Image(), imgWidth, imgHeight;
+					imm.onload = function() {
+						imgWidth = this.width;
+						imgHeight = this.height;
+					};
+					imm.src = group.eq(i).attr("href");*/
+
+					var img = $("<img />", { src: group.eq(i).attr("href") }).addClass(o.css.img),									// img létrehozása href alapján
+						imgFrame = $(o.html.imgFrame).append(img),																	// img behelyezése egy keretbe
+						thumb = o.thumbnail.show ? $("<img />", { src: group.eq(i).attr("href") }).addClass(o.css.thumb) : false,	// thumb létrehozása href alapján
+						thumbFrame = o.thumbnail.show ? $(o.html.thumbFrame).append(thumb) : false;									// thumb behelyezése egy keretbe
+
+					// ha a stack megtelt hozzáadja a csoporthoz és nullázza a számlálót és a gyűjtőt
+					if (stackCounter >= o.stack) {
+						imgGroup.append(stack.attr("data-items", stack.children().length));
+						stack = [];
+						if (o.thumbnail.show) {
+							thumbGroup.append(thumbStack);
+							thumbStack = [];
+						}
+						stackCounter = 0;
+					}
+
+					// ha a számláló nulla, azaz vagy az elején vagyunk vagy előző stack zárása után, akkor nyitunk egy új stacket
+					if (stackCounter == 0) {
+						stack = $(o.html.imgStack);
+						if (o.thumbnail.show) {
+							thumbStack = $(o.html.thumbStack);
+						}
+					}
+
+					// ha még nem telt meg a stack
+					if (stackCounter++ < o.stack) {
+						stack.append(imgFrame.attr("data-width", function () {
+							// hozzárendeli, hogy a stack hanyad részét foglalja el. Ha cover, akkor 1of1
+							if (i == 0 && o.cover) {
+								return "1of1";
+							}
+							// ha kevesebb elem van hátra mint az o.stack
+							if (group.length - i < o.stack) {
+								return "1of" + (stackCounter + group.length - i - 1);
+							}
+							return "1of" + o.stack;
+						}));
+						if (o.thumbnail.show) {
+							thumbStack.append(thumbFrame);
+						}
+					}
+
+					// ha nem telt meg a stack, de már elértünk az utolsó képhez, akkor zárjuk a stack-et
+					if (stackCounter < o.stack && i == group.length - 1) {
+						imgGroup.append(stack.attr("data-items", stack.children().length));
+						stack = [];
+						if (o.thumbnail.show) {
+							thumbGroup.append(thumbStack);
+							thumbStack = [];
+						}
+						stackCounter = 0;
+					}
+
+					// ha az első elemen állok és van cover, akkor zárjuk a stack-et és eltároljuk
+					if (i == 0 && o.cover) {
+						imgGroup.append(stack.attr("data-items", stack.children().length).addClass(o.css.cover));	// eltárolja hozzáadva a cover classt
+						stack = [];
+						if (o.thumbnail.show) {
+							thumbGroup.append(thumbStack);	// eltárolja hozzáadva a cover classt
+							thumbStack = [];
+						}
+						stackCounter = 0;
+					}
+				}
+			}
+
+			stacks = imgGroup.children();			// shorthand későbbi feldolgozáshoz
+			thumbStacks = thumbGroup.children();	// shorthand későbbi feldolgozáshoz
+
+			// a thumbnailre kattintva adott stackre ugrik
+			thumbStacks.on("click", function (e) {
+				e.preventDefault();
+				showCurrent($(this).index());
+			});
+
+			// modal megkapja a képeket
+			modalBody.append(imgGroup);
+
+			// ha van thumbnail, akkor az is a helyére kerül
+			if (o.thumbnail.show) {
+				modalBody.append(thumbGroup);
+				stacks.css("padding-bottom", (parseInt(o.thumbnail.paddingTop) + parseInt(o.thumbnail.height)));		// padding bottom
+				thumbStacks.find("img").css("height", o.thumbnail.height);
+			}
+
+			// navigációs elemek elhelyezése
+			modalFooter.append(prev, next, close);
+
+			// modal felhelyezése a DOM-ra
+			body.append(modal);
+		}
+
+		// modal törlése a DOM-ból
+		function removeModal() { modal.remove(); }
+
+		// modal megjelenítése
+		function showModal() {
+
+			// billentyűzet figyelés ha engedélyezve van
+			if (o.keyboard) {
+				$w.off("keydown.gallery").on("keydown.gallery", function (e) {
+//					console.log(e.keyCode);
+					// esc
+					if (e.keyCode == 27) { hideModal(); }
+					if ([37, 38, 33].indexOf(e.keyCode) >= 0) { showPrev(); }	// bal, fel, pgup
+					if ([39, 40, 34].indexOf(e.keyCode) >= 0) { showNext(); }	// jobb, le, pgdown
+					if ([36].indexOf(e.keyCode) >= 0) { showFirst(); }			// home
+					if ([35].indexOf(e.keyCode) >= 0) { showLast(); }			// end
+				});
+			}
+
+			// aktuális stack képeinek méretezése
+			$w.off("resize.gallery").on("resize.gallery", function () {
+				setImgSize(stacks.eq(current), thumbStacks.eq(current));
+			});
+
+			// navigációs elemek
+			prev.off().on("click", function (e) {
+				e.preventDefault();
+				showPrev();
+			});
+			next.off().on("click", function (e) {
+				e.preventDefault();
+				showNext();
+			});
+			close.off().on("click", function (e) {
+				e.preventDefault();
+				hideModal();
+			});
+
+			// modal megjelenítése
+			modal.fadeIn(200);
+		}
+
+		// modal elrejtése
+		function hideModal() { modal.fadeOut(200); }
+
+		// galéria elemen való kattintásra megjeleníti a galériát
+		group.on("click", function (e) {
+			e.preventDefault();
+			showModal();
+			showCurrent(o.start);
+		});
+
+
+		function showPrev() {
+			direction = "back";
+			showCurrent(--current);
+		}
+
+		function showNext() {
+			direction = "forward";
+			showCurrent(++current);
+		}
+
+		function showFirst() {
+			direction = "back";
+			showCurrent(0);
+		}
+
+		function showLast() {
+			direction = "forward";
+			showCurrent(stacks.length - 1);
+		}
+
+		function setImgSize(stck, thmb) {
+			var stckImg = stck.find("." + o.css.img),
+				thmbImg = thmb.find("." + o.css.thumb),
+				ln = stckImg.length;
+			for (var i = 0; i < ln; i++) {
+				var imgRatio = stckImg.eq(i).width() / stckImg.eq(i).height(),						// képarány
+					frameRatio = stckImg.eq(i).parent().width() / stckImg.eq(i).parent().height(),	// keret arány
+					thumbImgRatio = thmbImg.eq(i).width() / thmbImg.eq(i).height();					// thumbnail képarány referenciaként
+				if (frameRatio > thumbImgRatio) {
+					stckImg.eq(i).addClass(o.css.reverseRatio);
+				} else {
+					stckImg.eq(i).removeClass(o.css.reverseRatio);
+				}
+
+				// függőleges igazítás
+				if (stckImg.eq(i).height() < stckImg.eq(i).parent().height()) {
+					stckImg.eq(i).css("margin-top", Math.round( (stckImg.eq(i).parent().height() - stckImg.eq(i).height()) / 2 ));
+				}
+
+				console.log(stckImg.eq(i).height(), stckImg.eq(i).parent().height());
+			}
+		}
+
+		function showCurrent(c) {
+			if (c < 0) { current = stacks.length - 1; }		// ha túl alacsony, a végére „csordul”
+			else if (c >= stacks.length) { current = 0; }	// ha túl maga, az elejére „csordul”
+			else { current = c; }
+			stacks.fadeOut(200).removeClass(o.css.current).eq(current).addClass(o.css.current).fadeIn(200);		// megjeleníti az aktuális stacket és hozzárendeli a .current classt
+			thumbStacks.removeClass(o.css.current).eq(current).addClass(o.css.current);							// az aktuális thumb stackhez hozzárendeli a .current classt
+			setImgSize(stacks.eq(current), thumbStacks.eq(current));
+		}
+
+		generateModal();
+		return;
+	};
+
+	// default options
+	$.fn.gallery.defaultOptions = {
+		selector: {
+			default:		".gbgallery"
+		},
+		stack:				1,			// [1..] – a megadott számú fotót egyszerre mutatja
+		cover:				false,		// true|false – ha a fenti érték nem false, akkor az első képet borítónak veszi
+		start:				0,			// auto|[0..] - a megadott sorszámú elemmel indít. Ha auto, akkor mindig az aktuális elemnél nyílik fel
+		autoplay:			false,		// true|false
+		loop:				true,		// true|false
+		stretch:			true,		// true|false – ha a kép kisebb, akkor stretch-elje vagy hagyja változatlanul
+		fullsize:			false,		// true|false
+		fullscreen:			false,		// true|false
+		stackMatch:			false,		// true|false - ha true, akkor az egy stack-en belül lévő képek magasságát kompenzálja a szélesség terhére
+		keyboard:			true,		// true|false - kezelje a lapozó billentyűket és az esc-et
+		toc:				false,		// true|false
+		onShowReset:		false,		// true|false - ha true, akkor többszöri nézegetés indításánál mindig az elejétől kezdi, míg false esetén megjegyzi a pozíciót
+		thumbnail: {
+			show:			true,		// true|false
+			position:		"bottom",	// top|bottom
+			height:			100,
+			paddingTop:		70
+		},
+		html: {
+			modal:			"<div class='modal-gallery' tabindex='-1' role='dialog' aria-hidden='true' aria-labelledby=''><div class='modal-dialog'><div class='modal-content'><div class='modal-header'></div><div class='modal-body'></div><div class='modal-footer'></div></div></div></div>",
+			imgGroup:		"<ul class='modal-img-group'></ul>",
+			imgStack:		"<li class='modal-img-stack'></li>",
+			imgFrame:		"<div class='modal-img-frame'></div>",
+			thumbGroup:		"<ul class='modal-thumb-group'></ul>",
+			thumbStack:		"<li class='modal-thumb-stack'></li>",
+			thumbFrame:		"<div class='modal-thumb-frame'></div>",
+			galleryTitle:	"<p class='modal-title'></p>",
+			prev:			"<a class='modal-prev' href='#'><span class='icon icon-left'></span></a>",
+			next:			"<a class='modal-next' href='#'><span class='icon icon-right'></span></a>",
+			close:			"<a class='modal-close' href='#'><span class='icon icon-x'></span></a>"
+		},
+		css: {
+			img:			"modal-img",
+			cover:			"modal-img-cover",
+			thumb:			"modal-thumb",
+			modalHeader:	"modal-footer",
+			modalBody:		"modal-body",
+			modalFooter:	"modal-footer",
+			current:		"current",
+			reverseRatio:	"modal-img-swapratio"
+		}
 	};
 
 } (jQuery));
