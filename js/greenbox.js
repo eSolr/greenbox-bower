@@ -4855,6 +4855,7 @@ var es = {
 			$w = $(window),
 			body = $("body");
 
+
 		// Function for checking whether a file exits
 		function URLExists(url) {
 			var http = new XMLHttpRequest();
@@ -4974,11 +4975,21 @@ var es = {
 			modalFooter.append(prev, next, close);
 
 			// modal felhelyezése a DOM-ra
-			body.append(modal);
+			if (o.id !== false) {
+				body.append(modal.attr("id", o.id));
+			} else {
+				body.append(modal);
+			}
+
+			modal.trigger("gallerygenerated");
 		}
 
 		// modal törlése a DOM-ból
-		function removeModal() { modal.remove(); }
+		function removeModal() {
+			modal.trigger("gallerybeforedismiss");
+			modal.remove();
+			modal.trigger("gallerydismiss");
+		}
 
 		// modal megjelenítése
 		function showModal() {
@@ -5015,12 +5026,19 @@ var es = {
 				hideModal();
 			});
 
+			modal.trigger("gallerybeforeopen");
+
 			// modal megjelenítése
 			modal.fadeIn(200);
+			modal.trigger("galleryopen");
 		}
 
 		// modal elrejtése
-		function hideModal() { modal.fadeOut(200); }
+		function hideModal() {
+			modal.trigger("gallerybeforeclose");
+			modal.fadeOut(200);
+			modal.trigger("galleryclose");
+		}
 
 		// galéria elemen való kattintásra megjeleníti a galériát
 		group.on("click", function (e) {
@@ -5068,8 +5086,6 @@ var es = {
 				if (stckImg.eq(i).height() < stckImg.eq(i).parent().height()) {
 					stckImg.eq(i).css("margin-top", Math.round( (stckImg.eq(i).parent().height() - stckImg.eq(i).height()) / 2 ));
 				}
-
-				console.log(stckImg.eq(i).height(), stckImg.eq(i).parent().height());
 			}
 		}
 
@@ -5091,6 +5107,7 @@ var es = {
 		selector: {
 			default:		".gbgallery"
 		},
+		id:					false,		// true|false - lehet megadni a galériának
 		stack:				1,			// [1..] – a megadott számú fotót egyszerre mutatja
 		cover:				false,		// true|false – ha a fenti érték nem false, akkor az első képet borítónak veszi
 		start:				0,			// auto|[0..] - a megadott sorszámú elemmel indít. Ha auto, akkor mindig az aktuális elemnél nyílik fel
