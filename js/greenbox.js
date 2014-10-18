@@ -4830,12 +4830,14 @@ var es = {
 		return wrap;
 	};
 
-	// egy kép megjelenítése
+
+//	egy kép megjelenítése ----------------------------------------------------------------------------------------------
 	$.fn.gallery.single = function ( singles, o ) {
 		return;
 	};
 
-	// képcsoport megjelenítése
+
+//	képcsoport megjelenítése -------------------------------------------------------------------------------------------
 	$.fn.gallery.group = function ( group, o ) {
 
 		var modal = $(o.html.modal),
@@ -4847,25 +4849,28 @@ var es = {
 			prev = $(o.html.prev),
 			next = $(o.html.next),
 			close = $(o.html.close),
+			download = $(o.html.download),
+			dl = [],									// ebben tárolódnak el a letöltések linkjei
 			galleryTitle = $(o.html.galleryTitle),
 			stacks,										// ebbe kerülnek a legenerált stackek a lapozás követéséhez
 			thumbStacks,								// ebbe kerülnek a legenerált thumbStackek a lapozás követéséhez
 			current = 0,
-			direction = false,							// false|back|forward – lapozás itánya (false cssak indulásnál)
+			previous = 0,
+			direction = true,							// false|back|forward – lapozás itánya (false cssak indulásnál)
 			$w = $(window),
 			body = $("body");
 
 
-		// Function for checking whether a file exits
+//		Function for checking whether a file exits
 		function URLExists(url) {
 			var http = new XMLHttpRequest();
 			http.open('HEAD', url, false);
 			http.send();
-//			return http.status != 404;		// true|false – 404-et vizsgál
+			// return http.status != 404;		// true|false – 404-et vizsgál
 			return http.status == 200;		// true|false - sikeres betöltést vizsgál
 		}
 
-		//
+//		Modal legenerálása
 		function generateModal() {
 			var stackCounter = 0,	// stack számláló
 				stack = [],			// stack gyűjtő, ami számláló nullázása előtt tárolásra kerül
@@ -4877,7 +4882,7 @@ var es = {
 				// ha létezik a képfájl
 				if (URLExists(group.eq(i).attr("href"))) {
 
-//					todo ellenőrizni a stack és cover viselkedést ha csak 1–2 elem van
+					// todo ellenőrizni a stack és cover viselkedést ha csak 1–2 elem van
 
 					/*var imm = new Image(), imgWidth, imgHeight;
 					imm.onload = function() {
@@ -4949,6 +4954,11 @@ var es = {
 						}
 						stackCounter = 0;
 					}
+
+					// letötés linkek eltárolása
+					if (o.download) {
+						dl.push( group.eq(i).is(o.selector.download) ? group.eq(i).attr(o.selector.download.replace("[","").replace("]","")) : "" )
+					}
 				}
 			}
 
@@ -4958,6 +4968,12 @@ var es = {
 			// a thumbnailre kattintva adott stackre ugrik
 			thumbStacks.on("click", function (e) {
 				e.preventDefault();
+				if (previous < current) {
+					direction = false
+				} else {
+					direction = true
+				}
+				previous = current;
 				showCurrent($(this).index());
 			});
 
@@ -4972,7 +4988,7 @@ var es = {
 			}
 
 			// navigációs elemek elhelyezése
-			modalFooter.append(prev, next, close);
+			modalFooter.append(prev, next, close, download);
 
 			// modal felhelyezése a DOM-ra
 			if (o.id !== false) {
@@ -4984,22 +5000,23 @@ var es = {
 			modal.trigger("gallerygenerated");
 		}
 
-		// modal törlése a DOM-ból
+//		modal törlése a DOM-ból
 		function removeModal() {
 			modal.trigger("gallerybeforedismiss");
-			modal.remove();
+			modal.fadeOut(200, function () {
+				modal.remove();
+			});
 			modal.trigger("gallerydismiss");
 		}
 
-		// modal megjelenítése
+//		modal megjelenítése
 		function showModal() {
 
 			// billentyűzet figyelés ha engedélyezve van
 			if (o.keyboard) {
 				$w.off("keydown.gallery").on("keydown.gallery", function (e) {
-//					console.log(e.keyCode);
 					// esc
-					if (e.keyCode == 27) { hideModal(); }
+					if (e.keyCode == 27) { removeModal(); }
 					if ([37, 38, 33].indexOf(e.keyCode) >= 0) { showPrev(); }	// bal, fel, pgup
 					if ([39, 40, 34].indexOf(e.keyCode) >= 0) { showNext(); }	// jobb, le, pgdown
 					if ([36].indexOf(e.keyCode) >= 0) { showFirst(); }			// home
@@ -5023,7 +5040,7 @@ var es = {
 			});
 			close.off().on("click", function (e) {
 				e.preventDefault();
-				hideModal();
+				removeModal();
 			});
 
 			modal.trigger("gallerybeforeopen");
@@ -5033,41 +5050,50 @@ var es = {
 			modal.trigger("galleryopen");
 		}
 
-		// modal elrejtése
+//		modal elrejtése
 		function hideModal() {
 			modal.trigger("gallerybeforeclose");
 			modal.fadeOut(200);
 			modal.trigger("galleryclose");
 		}
 
-		// galéria elemen való kattintásra megjeleníti a galériát
+//		galéria elemen való kattintásra megjeleníti a galériát
 		group.on("click", function (e) {
 			e.preventDefault();
+			generateModal();
 			showModal();
 			showCurrent(o.start);
 		});
 
-
+//		Előző stack
 		function showPrev() {
-			direction = "back";
+			direction = false;
+			previous = current;
 			showCurrent(--current);
 		}
 
+//		Következő stack
 		function showNext() {
-			direction = "forward";
+			direction = true;
+			previous = current;
 			showCurrent(++current);
 		}
 
+//		Első stackre ugrás
 		function showFirst() {
-			direction = "back";
+			direction = false;
+			previous = current;
 			showCurrent(0);
 		}
 
+//		Utolsó stackre ugrás
 		function showLast() {
-			direction = "forward";
+			direction = true;
+			previous = current;
 			showCurrent(stacks.length - 1);
 		}
 
+//		Képméret beállítása
 		function setImgSize(stck, thmb) {
 			var stckImg = stck.find("." + o.css.img),
 				thmbImg = thmb.find("." + o.css.thumb),
@@ -5089,23 +5115,71 @@ var es = {
 			}
 		}
 
+		function positionCurrentThumb(n) {
+			console.log(thumbStacks.eq(n).offset().left, thumbStacks.eq(n).offset().left + thumbStacks.eq(n).innerWidth(), $w.width());
+
+			if ($w.width() < thumbStacks.eq(n).offset().left + thumbStacks.eq(n).innerWidth()) {
+				var overflow = thumbStacks.eq(n).offset().left + thumbStacks.eq(n).innerWidth() - $w.width();
+				thumbStacks.eq(0).animate({
+					marginLeft: "-=" + (overflow + 15)
+				}, 500, "linear");
+			}
+			if (thumbStacks.eq(n).offset().left < 0) {
+				var overflow = 0 - thumbStacks.eq(n).offset().left;
+				thumbStacks.eq(0).animate({
+					marginLeft: "+=" + (overflow + 15)
+				}, 500, "linear");
+			}
+		}
+
+//		Aktuális elem beállításe effecttel, thumbnail kiválasztűssal és letöltés linkkel
 		function showCurrent(c) {
+
 			if (c < 0) { current = stacks.length - 1; }		// ha túl alacsony, a végére „csordul”
 			else if (c >= stacks.length) { current = 0; }	// ha túl maga, az elejére „csordul”
 			else { current = c; }
-			stacks.fadeOut(200).removeClass(o.css.current).eq(current).addClass(o.css.current).fadeIn(200);		// megjeleníti az aktuális stacket és hozzárendeli a .current classt
-			thumbStacks.removeClass(o.css.current).eq(current).addClass(o.css.current);							// az aktuális thumb stackhez hozzárendeli a .current classt
+
+			// ha engedélyezett a letöltés, akkor a gomhoz hozzárendeli az aktuális elem linkjét
+			if (o.download && dl[current] !== "") {
+				download.attr("href", dl[current]).fadeIn(200);
+			} else {
+				download.fadeOut(200);
+			}
+
+			// transition
+			if (previous == current) {
+				stacks.fadeOut(200).removeClass(o.css.current).eq(current).addClass(o.css.current).fadeIn(200);
+			} else {
+				if (o.transition == "dissolve") {
+					stacks.fadeOut(200).removeClass(o.css.current).eq(current).addClass(o.css.current).fadeIn(200);		// megjeleníti az aktuális stacket és hozzárendeli a .current classt
+				} else if (o.transition == "push") {
+					stacks.eq(previous).animate({
+						marginLeft: direction ? "-100%" : "100%"
+					});
+					stacks.eq(current).css({
+						"margin-left": direction ? "100%" : "-100%",
+						"display": "block"
+					}).animate({
+						marginLeft: "0%"
+					});
+				} else {
+					stacks.fadeOut(200).removeClass(o.css.current).eq(current).addClass(o.css.current).fadeIn(200);
+				}
+			}
+
+			thumbStacks.removeClass(o.css.current).eq(current).addClass(o.css.current);								// az aktuális thumb stackhez hozzárendeli a .current classt
+			positionCurrentThumb(current);
 			setImgSize(stacks.eq(current), thumbStacks.eq(current));
 		}
 
-		generateModal();
 		return;
 	};
 
 	// default options
 	$.fn.gallery.defaultOptions = {
 		selector: {
-			default:		".gbgallery"
+			default:		".gbgallery",
+			download:		"[data-download]"
 		},
 		id:					false,		// true|false - lehet megadni a galériának
 		stack:				1,			// [1..] – a megadott számú fotót egyszerre mutatja
@@ -5120,6 +5194,8 @@ var es = {
 		keyboard:			true,		// true|false - kezelje a lapozó billentyűket és az esc-et
 		toc:				false,		// true|false
 		onShowReset:		false,		// true|false - ha true, akkor többszöri nézegetés indításánál mindig az elejétől kezdi, míg false esetén megjegyzi a pozíciót
+		transition:			"push",		// dissolve|push - képváltás effekt
+		download:			false,		// true|false
 		thumbnail: {
 			show:			true,		// true|false
 			position:		"bottom",	// top|bottom
@@ -5137,7 +5213,8 @@ var es = {
 			galleryTitle:	"<p class='modal-title'></p>",
 			prev:			"<a class='modal-prev' href='#'><span class='icon icon-left'></span></a>",
 			next:			"<a class='modal-next' href='#'><span class='icon icon-right'></span></a>",
-			close:			"<a class='modal-close' href='#'><span class='icon icon-x'></span></a>"
+			close:			"<a class='modal-close' href='#'><span class='icon icon-x'></span></a>",
+			download:		"<a class='modal-download' href='#' target='_blank'><span class='icon icon-download'></span></a>"
 		},
 		css: {
 			img:			"modal-img",

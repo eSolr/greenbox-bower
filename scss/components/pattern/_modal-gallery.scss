@@ -170,7 +170,7 @@ $enable-modal-gallery:		true !default;
 		}
 
 		// navigation
-		.modal-prev, .modal-next, .modal-close {
+		.modal-prev, .modal-next, .modal-close, .modal-download {
 			position: fixed;
 			background-color: transparentize(black, .5);
 			border: 1px solid transparentize(white, .3);
@@ -203,10 +203,10 @@ $enable-modal-gallery:		true !default;
 		.modal-close {
 			top: 25px;
 			right: 25px;
-//			width: 30pt;
-//			height: 30pt;
-//			font-size: 25pt;
-//			line-height: 30pt;
+		}
+		.modal-download {
+			top: 25px;
+			right: 105px;
 		}
 	}
 }
