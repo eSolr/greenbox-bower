@@ -1173,47 +1173,6 @@
 
 } (jQuery));
 
-;
-//
-//	Makes an item linkable with the value of the attribute
-//
-//	<div data-es-link="link-to-a-webpage"></div>
-//
-//	$("[data-es-link]").esLink({preventdefault:true})
-//
-
-
-(function ( $ ) {
-
-	$.fn.esLink = function ( options ) {
-
-		var o = $.extend(true, {}, $.fn.esLink.defaultOptions, options),
-			wrap = this[0] ? $(this) : $(o.selector),
-			linkSelector = this.selector;
-
-		return wrap.each(function(){
-
-			var linkedItem = $(this).css(o.css);
-			linkHref = linkedItem.attr(linkSelector.replace("[", "").replace("]", ""));
-
-			linkedItem.on("click", function(e) {
-				if (o.preventDefault) {e.preventDefault();}
-				if (linkHref !== "" && linkHref !== undefined) {
-					document.location.href = linkHref;
-				}
-			});
-		});
-	};
-
-	$.fn.esLink.defaultOptions = {
-		selector: "[data-es-link]",		//	default selector
-		preventDefault: false,
-		css: {
-			"cursor": "pointer"
-		}
-	};
-
-} (jQuery));
 ;/*
 	@desc		Ajax source loader
 	@tested
@@ -4969,6 +4928,11 @@ var es = {
 			stacks = imgGroup.children();			// shorthand későbbi feldolgozáshoz
 			thumbStacks = thumbGroup.children();	// shorthand későbbi feldolgozáshoz
 
+			// zoom kezelése
+			stacks.on("click", function () {
+				zooming($(this).index());
+			});
+
 			// a thumbnailre kattintva adott stackre ugrik
 			thumbStacks.on("click", function (e) {
 				e.preventDefault();
@@ -5002,6 +4966,32 @@ var es = {
 			}
 
 			modal.trigger("gallerygenerated");
+		}
+
+//		Zoom kezelése
+		function zooming(n) {
+			console.log(n);
+			/*if (o.zoom) {
+				var s = $(this),
+					zoomStatus = false;
+				s.css("cursor", "move").on("click", function () {
+					if (zoomStatus) { // zoom kikapcsol
+						thumbGroup.fadeIn();
+						$(this).find("img").css({
+							width: "auto",
+							height: "100%"
+						});
+						zoomStatus = false;
+					} else { // zoom bekapcsol
+						thumbGroup.fadeOut();
+						$(this).find("img").css({
+							width: "100%",
+							height: "auto"
+						});
+						zoomStatus = true;
+					}
+				});
+			}*/
 		}
 
 //		modal törlése a DOM-ból
@@ -5336,7 +5326,79 @@ var es = {
 		return !!clientSize && ((compareBottom <= viewBottom) && (compareTop >= viewTop));
 	};*/
 
-})(jQuery);;/*
+})(jQuery);;
+//
+//	Makes an item linkable with the value of the attribute
+//
+//	<div data-linkto="link-to-a-webpage"></div>
+//
+//	$("[data-linkto-href]").linkTo({preventdefault:true})
+//
+
+
+(function ( $ ) {
+
+	$.fn.linkTo = function ( options ) {
+
+		var o = $.extend(true, {}, $.fn.linkTo.defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector),
+			selector = this.selector;
+
+		wrap.css(o.css).on("click", function (e) {
+			var href = $(this).attr(selector.replace("[", "").replace("]", ""));
+			if (o.preventDefault) { e.preventDefault(); }
+			if (href !== "") { document.location.href = href; }
+		});
+
+		return wrap;
+	};
+
+	$.fn.linkTo.defaultOptions = {
+		selector: "[data-linkto]",		//	default selector
+		preventDefault: false,
+		css: {
+			"cursor": "pointer"
+		}
+	};
+
+} (jQuery));
+
+
+
+//	OBSOLITE
+
+(function ( $ ) {
+
+	$.fn.esLink = function ( options ) {
+
+		var o = $.extend(true, {}, $.fn.esLink.defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector),
+			linkSelector = this.selector;
+
+		return wrap.each(function(){
+
+			var linkedItem = $(this).css(o.css);
+			linkHref = linkedItem.attr(linkSelector.replace("[", "").replace("]", ""));
+
+			linkedItem.on("click", function(e) {
+				if (o.preventDefault) {e.preventDefault();}
+				if (linkHref !== "" && linkHref !== undefined) {
+					document.location.href = linkHref;
+				}
+			});
+		});
+	};
+
+	$.fn.esLink.defaultOptions = {
+		selector: "[data-es-link]",		//	default selector
+		preventDefault: false,
+		css: {
+			"cursor": "pointer"
+		}
+	};
+
+} (jQuery));
+;/*
 
 	todo minieditot elkészíteni
 	Olyasmi kelle legyen, hogy megjelölök egy szöveget span-nal, vagy bármivel és klikkre át tudjam írni akár hízlalva,
