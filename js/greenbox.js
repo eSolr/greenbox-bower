@@ -4876,6 +4876,10 @@ var es = {
 				stack = [],			// stack gyűjtő, ami számláló nullázása előtt tárolásra kerül
 				thumbStack = [];	// stack gyűjtő thumbnaileknek
 
+			// ha újra indítjuk a galériát, akkor az elejétől induljon
+			previous = 0;
+			current = 0;
+
 			// végigmegy a csoport elemein és szétszortírozza őket coverbe és stack-ekbe
 			for (var i = 0; i < group.length; i++) {
 
@@ -5004,9 +5008,9 @@ var es = {
 		function removeModal() {
 			modal.trigger("gallerybeforedismiss");
 			modal.fadeOut(200, function () {
-				modal.remove();
+				modal.trigger("gallerydismiss");
+				modal.off().remove();
 			});
-			modal.trigger("gallerydismiss");
 		}
 
 //		modal megjelenítése
@@ -5115,20 +5119,19 @@ var es = {
 			}
 		}
 
+//		Képernyőn túllógó current thumbnail képernyőre húzása
 		function positionCurrentThumb(n) {
-			console.log(thumbStacks.eq(n).offset().left, thumbStacks.eq(n).offset().left + thumbStacks.eq(n).innerWidth(), $w.width());
-
 			if ($w.width() < thumbStacks.eq(n).offset().left + thumbStacks.eq(n).innerWidth()) {
 				var overflow = thumbStacks.eq(n).offset().left + thumbStacks.eq(n).innerWidth() - $w.width();
 				thumbStacks.eq(0).animate({
 					marginLeft: "-=" + (overflow + 15)
-				}, 500, "linear");
+				}, o.transition.duration, "linear");
 			}
 			if (thumbStacks.eq(n).offset().left < 0) {
 				var overflow = 0 - thumbStacks.eq(n).offset().left;
 				thumbStacks.eq(0).animate({
 					marginLeft: "+=" + (overflow + 15)
-				}, 500, "linear");
+				}, o.transition.duration, "linear");
 			}
 		}
 
@@ -5148,22 +5151,22 @@ var es = {
 
 			// transition
 			if (previous == current) {
-				stacks.fadeOut(200).removeClass(o.css.current).eq(current).addClass(o.css.current).fadeIn(200);
+				stacks.fadeOut(o.transition.duration).removeClass(o.css.current).eq(current).css("margin-left", 0).addClass(o.css.current).fadeIn(o.transition.duration);	// alaphelyzetbe állítja a galériát > perpill az első elem látszódik
 			} else {
-				if (o.transition == "dissolve") {
-					stacks.fadeOut(200).removeClass(o.css.current).eq(current).addClass(o.css.current).fadeIn(200);		// megjeleníti az aktuális stacket és hozzárendeli a .current classt
-				} else if (o.transition == "push") {
-					stacks.eq(previous).animate({
+				if (o.transition.effect == "dissolve") {
+					stacks.fadeOut(o.transition.duration).removeClass(o.css.current).eq(current).addClass(o.css.current).fadeIn(o.transition.duration);		// megjeleníti az aktuális stacket és hozzárendeli a .current classt
+				} else if (o.transition.effect == "push") {
+					stacks.eq(previous).removeClass(o.css.current).animate({
 						marginLeft: direction ? "-100%" : "100%"
-					});
-					stacks.eq(current).css({
+					}, o.transition.duration);
+					stacks.eq(current).addClass(o.css.current).css({
 						"margin-left": direction ? "100%" : "-100%",
 						"display": "block"
 					}).animate({
 						marginLeft: "0%"
-					});
+					}, o.transition.duration);
 				} else {
-					stacks.fadeOut(200).removeClass(o.css.current).eq(current).addClass(o.css.current).fadeIn(200);
+					stacks.fadeOut(o.transition.duration).removeClass(o.css.current).eq(current).addClass(o.css.current).fadeIn(o.transition.duration);
 				}
 			}
 
@@ -5194,8 +5197,12 @@ var es = {
 		keyboard:			true,		// true|false - kezelje a lapozó billentyűket és az esc-et
 		toc:				false,		// true|false
 		onShowReset:		false,		// true|false - ha true, akkor többszöri nézegetés indításánál mindig az elejétől kezdi, míg false esetén megjegyzi a pozíciót
-		transition:			"push",		// dissolve|push - képváltás effekt
+		transition: {
+			effect:			"push",		// dissolve|push - képváltás effekt
+			duration:		500			// amináció hossza
+		},
 		download:			false,		// true|false
+		zoom:				false,		// true|false
 		thumbnail: {
 			show:			true,		// true|false
 			position:		"bottom",	// top|bottom
