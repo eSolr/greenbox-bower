@@ -3480,7 +3480,7 @@ var es = {
 					}))
 				);
 
-//
+
 				//	a létrehozott scene konténer azonosítása
 				scenes = slider.find("." + o.slider.scene.wrap.class);
 
@@ -3538,6 +3538,31 @@ var es = {
 //					sourcePortlet.remove();
 //					sceneSource.hide();
 					sourcePortlet.hide();
+				} else {
+
+					// ha megjelenik a forrásportlet és aktív az autopause
+					if (o.set.autopause) {
+						sourcePortlet.on({
+							mouseenter: function () {
+								loopStop();
+							},
+							mouseleave: function () {
+								loopStart();
+							}
+						});
+
+						// ha a cél a targetben van
+						if (o.slider.target !== undefined) {
+							target.on({
+								mouseenter: function () {
+									loopStop();
+								},
+								mouseleave: function () {
+									loopStart();
+								}
+							});
+						}
+					}
 				}
 
 //				console.log(o.set.current);
@@ -3709,6 +3734,7 @@ var es = {
 				label:		"Navigation elements",
 				show:		true
 			},
+			autopause:		false,			// true|false – rolloverre megállítja a loopot
 			pause: {
 				label:		"Play/Pause button",
 				show:		false			// még inaktív
