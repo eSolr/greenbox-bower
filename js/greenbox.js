@@ -3538,11 +3538,22 @@ var es = {
 //					sourcePortlet.remove();
 //					sceneSource.hide();
 					sourcePortlet.hide();
-				} else {
+				}
 
-					// ha megjelenik a forrásportlet és aktív az autopause
-					if (o.set.autopause) {
-						sourcePortlet.on({
+				// autopause aktív
+				if (o.set.autopause) {
+					sourcePortlet.on({
+						mouseenter: function () {
+							loopStop();
+						},
+						mouseleave: function () {
+							loopStart();
+						}
+					});
+
+					// ha a cél a targetben van
+					if (o.slider.target !== undefined) {
+						target.on({
 							mouseenter: function () {
 								loopStop();
 							},
@@ -3550,18 +3561,6 @@ var es = {
 								loopStart();
 							}
 						});
-
-						// ha a cél a targetben van
-						if (o.slider.target !== undefined) {
-							target.on({
-								mouseenter: function () {
-									loopStop();
-								},
-								mouseleave: function () {
-									loopStart();
-								}
-							});
-						}
 					}
 				}
 
@@ -4393,7 +4392,7 @@ var es = {
 		var defaults = {
 			dom_wrap:			".tabs",
 			selectedClass:		"selected",
-			containerClass:		"tab-panels",
+			container:			".tab-panels",
 			disabledClass:		".disabled",
 			animating:			false,
 			looping:			false,
@@ -4418,16 +4417,27 @@ var es = {
 
 		return wrap.each( function () {
 
-			var tabs = $(this);
+			var tabs = $(this),
+				tabPanels = $(tabs.attr("data-tab-panels")),
+				containerHasId = String(tabs.attr("data-tab-panels"))[0] == "#" ? true : false;
 
 			//	Ha nincs default érték, az első fület állítja be
 			if (tabs.children("." + o.selectedClass).length == 0) {
 				tabs.children().eq(0).addClass(o.selectedClass);
 			}
 
-			tabs.parent()
-				.find( "." + o.containerClass + "," + "#" + o.containerClass ).children().hide()
-				.eq( tabs.children( "." + o.selectedClass ).index() ).show();
+			// ha separated, akkor nem relatív, hanem abszolút módon keresi meg a containert
+			if (containerHasId) {
+				// abszolút
+				tabPanels.children().hide()
+					.eq( tabs.children( "." + o.selectedClass ).index() ).show();
+			}
+			else {
+				// relatív
+				tabs.parent()
+					.find(o.container).children().hide()
+					.eq( tabs.children( "." + o.selectedClass ).index() ).show();
+			}
 
 			//	if button not disabled click event will be binded
 			$(this).children().not(o.disabledClass).on("click.esolr.tab", function (e) {
@@ -4435,14 +4445,22 @@ var es = {
 				e.preventDefault();
 				var tab = $(this);
 
-				tab.siblings().removeClass( o.selectedClass )
-					.end().addClass( o.selectedClass )
-					.parent().parent().find( "." + o.containerClass ).children().hide()
-					.siblings().eq( tab.index() ).show();
+				if (containerHasId) {
+					// abszolút
+					tab.siblings().removeClass( o.selectedClass )
+						.end().addClass( o.selectedClass );
+					tabPanels.children().hide()
+						.siblings().eq( tab.index() ).show();
+				} else {
+					// relatív
+					tab.siblings().removeClass( o.selectedClass )
+						.end().addClass( o.selectedClass )
+						.parent().parent().find(o.container).children().hide()
+						.siblings().eq( tab.index() ).show();
+				}
 			});
 		});
 	};
-
 } (jQuery));;/*
 	@name:		Class toggle with multiple classes
 	@version:	1.0
