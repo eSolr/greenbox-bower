@@ -4655,9 +4655,11 @@ var es = {
 //
 //	$.fn.esEventScrollend();
 //
+//	todo	lekezelni a mac túlcsodrulását is
 
 (function( $ ){
 
+	// obsolite
 	$.fn.esEventScrollend = function(delay) {
 
 		var	timer = window.setTimeout(function(){}, 0),
@@ -4669,6 +4671,52 @@ var es = {
 			timer = window.setTimeout(function() {
 				$(window).trigger(defaultEventName);
 			}, delay || defaultDelay);
+		});
+	};
+
+	// new event handler
+	$.fn.esEventScroll = function( options ) {
+
+		defaultOptions = {
+			selector:	"window",
+			scrollEnd:	"scrollend",
+			scrollDown:	"scrolldown",
+			scrollUp:	"scrollup",
+			delay: 		250,
+			overscroll:	false					// bekötni
+		};
+
+		var o = $.extend(true, {}, defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector);
+
+		return wrap.each(function () {
+
+			var	item = $(this),
+				current = item.scrollTop(),		// aktuális scroll állapot
+				prev = current,
+				timer = window.setTimeout(function(){}, 0);					// előző scroll állapot
+
+			// lekérdezi az aktuálsi scrollpozíciót és ennek megfelelően elsüti az eseményeket
+			function setScroll() {
+				current = item.scrollTop();
+				if (current > prev) {
+					item.trigger(o.scrollDown);
+				} else {
+					item.trigger(o.scrollUp)
+				}
+				prev = current;
+			}
+
+			item.on('scroll', function() {
+				setScroll();					// beállítja a scrollozás irányát
+				// scrollend esemény figyelése
+				window.clearTimeout(timer);
+				timer = window.setTimeout(function() {
+					item.trigger(o.scrollEnd);
+				}, o.delay);
+			});
+
+			setScroll();
 		});
 	}
 }(jQuery));;
