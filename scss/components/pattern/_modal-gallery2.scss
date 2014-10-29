@@ -77,6 +77,15 @@ $enable-modal-gallery:		true !default;
 
 			&.current {}
 			&.modal-img-cover {}
+
+			&.current[data-stack="2"] img {
+				margin-right: 0;
+			}
+
+			&.current[data-stack="2"] + .current[data-stack="2"] img {
+				margin-left: 0;
+				margin-right: auto;
+			}
 		}
 
 		.modal-img-frame {

@@ -5399,6 +5399,9 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 								"data-download": galleryItems.eq(c).attr("data-download")
 							}).addClass(o.css.img)
 						))
+						.attr("data-stack", function () {
+							return o.cover && c == 0 ? 1 : o.stack;
+						})
 						//.css("padding-bottom", (parseInt(o.thumbnail.paddingTop) + parseInt(o.thumbnail.height)) )
 						.addClass(function () {
 						return o.cover && c == 0 ? " " + o.css.cover : "";
