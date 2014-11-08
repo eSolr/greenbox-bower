@@ -5325,6 +5325,7 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 //	Gallery module
 //
 //	todo legyen responsive képméretek betöltésében is
+//	todo vertkálissal indítson
 /*
 
 1. azonosítani a képlinkeket
@@ -5345,8 +5346,10 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 		// galéria inicializálása
 		function initGallery(galleryItems) {
 			var modal = $(o.html.modal),
+				modalV = $(o.html.modalVertical),
 				modalHeader = modal.find("." + o.css.modalHeader),
 				modalBody = modal.find("." + o.css.modalBody),
+				modalBodyV = modal.find("." + o.css.modalBodyV),
 				modalFooter = modal.find("." + o.css.modalFooter),
 				preloader = $(o.html.preloader),
 				imgGroup = $(o.html.imgGroup),
@@ -5355,6 +5358,7 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 				next = $(o.html.next),
 				close = $(o.html.close),
 				download = $(o.html.download),
+				zoom = $(o.html.zoom),
 				loadedImages = 0,							// betöltött képeket számolja. Ha eléri a 10-et, megjeleníti az elsőt és kirakja a thumbnaileket
 				gallery = [],
 				dl = [],									// ebben tárolódnak el a letöltések linkjei
@@ -5383,13 +5387,72 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 				xhr.send(null);
 			}*/
 
+			function eventEndScroll(item) {
+
+				if (item == undefined) { item = $(window); }
+
+				var	timer = window.setTimeout(function(){}, 0);
+
+				item.off('scroll.gallery').on('scroll.gallery', function() {
+					window.clearTimeout(timer);
+					timer = window.setTimeout(function() {
+						item.trigger("scrollend.gallery");
+					}, 200);
+				});
+			};
+
+			// visszaadja, hogy adott elem hamyadik stackbe tartozik [0..n]
+			function getStack(n) {
+				if (n == 0 && o.cover) { return 0; }
+				return Math.floor((galleryItems.length - cover) / o.stack);
+			}
+
+			// visszaadja, hogy adott sorszámú elem hány elemű stackbe tartozik
+			function getStackSize(n) {
+				// ha nulladik elemen állunk és van cover
+				if (n == 0 && o.cover) { return 1; }
+				// ha az utolsó stackben vagyunk és van maradványérték
+				if (galleryItems.length - ((galleryItems.length - cover) % o.stack) <= n && 0 < (galleryItems.length - cover) % o.stack) {
+					return (galleryItems.length - cover) % o.stack;
+				}
+				// minden más esetben a stack méretét kapja paraméterül
+				return o.stack;
+			}
+
+			// visszaadja, hogy adott sorszámú elem a stack-en belül hol helyezkedik el: single|first|inline|last
+			function getStackPosition(n) {
+				// ha az érték negatív, akkor ez single, vagy ha a stackben csak egy elem van, de elértük a végét
+				if ((n - cover) % o.stack < 0 || ((n - cover) % o.stack == 0 && n == galleryItems.length - 1 )) { return "single"; }
+				// ha az érték 0, akkor ez a stack első eleme
+				if ((n - cover) % o.stack == 0) { return "first"; }
+				// ha az érték eléri a stack méretét, akkor ez a stack utolsó eleme, vagy ha elértük a végét
+				if ((n - cover) % o.stack == o.stack - 1 || n == galleryItems.length - 1) { return "last"; }
+				// ellenkező esetben ez egy sorban lévő elem, azaz se nem egyedül álló, de nem első vagy utolsó
+				return  "inline";
+			}
+
+			// beállítja a töltöttség és az aktuális stack függvényében, mely navigációs elemek érhetők el
+			// ha minden kép betöltve, akkor bekapcsoljuk az előző/következő elemet annak megfelelően, hogy melyik elemen állunk
+			function setNavigation(c) {
+
+				// feltételezve, hogy az első nyílik meg, míg be nem töltődik mindegyik, nem lehet a végére ugrani
+				if (current == 0 && galleryItems.length !== loadedImages) {
+					prev.hide()
+				} else {
+					prev.fadeIn();								// Minden kép betöltve!
+				}
+			}
+
 			//képek betöltése
 			function loadImages(c) {
 				if (c == undefined) { c = 0 }					// ha nem volt megadva kezdőérték, akkor nullával indít
 				var img = new Image(), imgWidth, imgHeight;
 				img.onload = function() {
-					//console.log(this.src, imgWidth, imgHeight, c);
-					//felparaméterezett kép hozzáadása a DOM-hoz (pl. etöltés linket is!)
+					loadedImages++;
+					setNavigation();
+
+					// console.log(this.src, imgWidth, imgHeight, c);
+					// felparaméterezett kép hozzáadása a DOM-hoz (pl. letöltés linket is!)
 					imgGroup.append( $(o.html.imgStack).append(
 						$(o.html.imgFrame).append(
 							$("<img/>").attr({
@@ -5399,16 +5462,38 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 								"data-download": galleryItems.eq(c).attr("data-download")
 							}).addClass(o.css.img)
 						))
-						.attr("data-stack", function () {
-							return o.cover && c == 0 ? 1 : o.stack;
+						.attr({
+							"data-stack": getStackPosition(c),
+							"data-stack-size": getStackSize(c)
 						})
 						//.css("padding-bottom", (parseInt(o.thumbnail.paddingTop) + parseInt(o.thumbnail.height)) )
 						.addClass(function () {
-						return o.cover && c == 0 ? " " + o.css.cover : "";
-					})).
-					css({
+							return o.cover && c == 0 ? " " + o.css.cover : "";
+						}))
+						.css({
 							"bottom": parseInt(o.thumbnail.height) + 40
 						});
+
+					if (o.zoom) {
+						modalBodyV.find("." + o.css.imgGroup).append( $(o.html.imgStack).append(
+							$(o.html.imgFrame).append(
+								$("<img/>").attr({
+									"src": this.src,
+									"width": this.width,
+									"height": this.height
+								}).addClass(o.css.img)
+							))
+							.attr({
+								"data-stack": getStackPosition(c),
+								"data-stack-size": getStackSize(c)
+							})
+							.addClass(function () {
+								return o.cover && c == 0 ? " " + o.css.cover : "";
+							}))
+							.css({
+								"bottom": parseInt(o.thumbnail.height) + 40
+							});
+					}
 
 					//ha az indítókép + a vele látható stack-ek betöltődtek, akkor megjelenítjük és eltüntetjük a preloadert
 					if (current + o.stack == c) {
@@ -5434,10 +5519,14 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 						.append( $(o.html.thumbStack)
 							.append( $(o.html.thumbFrame)
 								.append($("<img/>").attr({"src": this.src, width: this.width, height: this.height}).addClass(o.css.thumb))
-								.addClass(function () {
-									return o.cover && c == 0 ? " " + o.css.cover : "";
-								})
 								.css("opacity",0).animate({opacity:1}, o.fade))
+							.attr({
+								"data-stack": getStackPosition(c),
+								"data-stack-size": getStackSize(c)
+							})
+							.addClass(function () {
+								return o.cover && c == 0 ? " " + o.css.cover : "";		// ha cover, akkor a stack külön megjelölésre kerül
+							})
 							.on("click", function (e) {
 								e.preventDefault();
 								var thumb = $(this);
@@ -5451,15 +5540,14 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 
 								//console.log(thumbGroup.children().eq(thumb.index() - ((thumb.index() - cover) % o.stack) ));
 								//console.log(thumb.index(), (thumb.index() % o.stack) );
-
 							})
 					);
 
+					// beállítja a thumbnail magasságát a megadott paraméter alapján
 					thumbGroup.find("img").css("height", o.thumbnail.height);
-					if (c < galleryItems.length - 1) {
-						c++;
-						loadThumbnails(c);
-					}
+
+					// ha még nem töltődött be az összes kép, akkor a következő betöltését is elindítja
+					if (c < galleryItems.length - 1) { loadThumbnails(++c); }
 				};
 				// ha van data-thumb paraméter, akkor nem a nagy képet húzza be, hanem a kicsit
 				if (galleryItems.eq(c).attr("data-thumb") !== undefined) {
@@ -5472,19 +5560,40 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 			// modal törlése a DOM-ból
 			function removeModal() {
 				modal.trigger("gallerybeforedismiss");
-				o.fn.beforedismiss();
+				o.event.beforedismiss();
 				modal.fadeOut(o.fade, function () {
 					modal.trigger("gallerydismiss");
-					o.fn.dismiss();
+					o.event.dismiss();
 					modal.off().remove();
 				});
 			}
 
 			// galéria alapelemeinek legenerálása
 			function generateGallery() {
+				eventEndScroll(modalBodyV);
 				modal.prepend(preloader);									// preloader elhelyezése
 				body.append(modal.attr("id", galleryItems.attr("rel")));	// modal elhelyezése, rel id-ként
-				modalFooter.append(prev, next, close, download);			// navigációs elemek elhelyezése
+				modalFooter.append(prev, next, close);						// navigációs elemek elhelyezése
+				if (o.download) { modalFooter.append(download); }			// download gomb elhelyezése
+				if (o.zoom) {
+					modalFooter.append(zoom);								// zoom gomb elhelyezése
+					modalBodyV.on("scrollend.gallery", function () {
+						var bodyVImages = modalBodyV.find("." + o.css.imgStack);
+						for (var i = 0; i < galleryItems.length; i++) {
+							// ha adott kép a képernyőn van, akkor beállítja currentnek
+							if (0 < bodyVImages.eq(i).offset().top && bodyVImages.eq(i).offset().top < $w.height() / 2) {
+								//console.log(i, bodyVImages.eq(i).offset().top, bodyVImages.eq(i));
+								//current = getStackNumber(i);
+								//	todo korrigálni a stack értéket vagy levizsgálni a showCurrentben
+							}
+						}
+					});
+				}
+
+				// effect class hozzáadása a modalhoz
+				if (o.transition.effect == "fold") {
+					modal.addClass(o.css.effectFold);
+				}
 
 				// navigációs elemek
 				prev.off().on("click", function (e) {
@@ -5499,19 +5608,25 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 					e.preventDefault();
 					removeModal();
 				});
+				zoom.off().on("click", function (e) {
+					e.preventDefault();
+					modal.toggleClass("modal-gallery-vertical");
+					showCurrent(current);
+				});
 
 				modal.trigger("gallerybeforeopen");
-				o.fn.beforeopen();
+				o.event.beforeopen();
 
 				modal.fadeIn(o.fade, function () {
 					modalBody.append(imgGroup);				// kép konténer hozzáadása a DOM-hoz
+					if (o.zoom) { modalBodyV.append(imgGroup.clone()); }				// kép konténer hozzáadása a DOM-hoz
 					if (o.thumbnail.show) {					// ha van thumbnail, akkor a thumb konténer hozzáadása a DOM-hoz és betöltés indítása
 						modalBody.append(thumbGroup);		// thumb konténer hozzáadása a DOM-hoz
 						loadThumbnails();					// thumbnailek asszinkron betöltése elindítva
 					}
 					loadImages();							// képek asszinkron betötése elindítva
 					modal.trigger("galleryopen");			// esemény elsütése
-					o.fn.open();
+					o.event.open();
 				});
 
 				// billentyűzet figyelés ha engedélyezve van
@@ -5571,6 +5686,15 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 				showCurrent( (galleryItems.length - cover) % o.stack == 0 ? galleryItems.length - o.stack : galleryItems.length - 1 - (((galleryItems.length - cover) % o.stack) - 1));
 			}
 
+			function getProportionalWidth(img) {
+
+				//rw * ph pw
+				//rh
+
+			}
+
+
+
 			function setPosition(imgStack) {
 				var img = imgStack.find("img"),
 					imgHeight,
@@ -5578,21 +5702,39 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 					stackHeight =  imgStack.height(),
 					stackRatio = imgStack.width() / stackHeight;
 
+				if (o.transition.effect == "fold" && o.stack == 2) {
 
-				// képaránynak megfelelő súlyozás
-				if (imgRatio > stackRatio) {	// ha a kép fekvőbb a kerethez képest
-					img.css({
-						width: "100%",
-						height: "auto"
-					});
-				} else {						// ha a kép állóbb a kerethez képest
-					img.css({
-						width: "auto",
-						height: "100%"
-					});
+					// képaránynak megfelelő súlyozás
+					//if (imgRatio > stackRatio) {	// ha a kép fekvőbb a kerethez képest
+					if (imgRatio > (imgGroup.width() / 2) / imgGroup.height()) {	// ha a kép fekvőbb a kerethez képest
+						//img.css(o.style.landscapeStretch);
+						img.css({
+							"width": "inherit",
+							"max-width": "none",
+							"height": (imgGroup.width() / 2) * img.attr("height") / img.attr("width")
+						});
+					} else {						// ha a kép állóbb a kerethez képest
+						//console.log("vertikális", img.attr("width"), imgGroup.height(), img.attr("height"), img.attr("width") * imgGroup.height() / img.attr("height"));
+						img.css({
+							"height": "inherit",
+							"width": img.attr("width") * imgGroup.height() / img.attr("height"),
+							"max-width": "none"
+							//"max-width": img.attr("width") * imgGroup.height() / img.attr("height")
+						});
+					}
+
+					imgHeight = img.height();		// átskálázott képméret (ha ez a sor feljebb van, akkor nem érvényesül az arányosítás)
+				} else {
+
+					// képaránynak megfelelő súlyozás
+					if (imgRatio > stackRatio) {	// ha a kép fekvőbb a kerethez képest
+						img.css(o.style.landscape);
+					} else {						// ha a kép állóbb a kerethez képest
+						img.css(o.style.portrait);
+					}
+
+					imgHeight = img.height();		// átskálázott képméret (ha ez a sor feljebb van, akkor nem érvényesül az arányosítás)
 				}
-
-				imgHeight = img.height();		// átskálázott képméret (ha ez a sor feljebb van, akkor nem érvényesül az arányosítás)
 
 				//console.log(img, stackHeight, imgHeight, (stackHeight - imgHeight) / 2);
 
@@ -5637,24 +5779,119 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 				else if (c >= galleryItems.length) { current = 0; }		// ha túl maga, az elejére „csordul”
 				else { current = c; }
 
-
-				imgGroup.children().removeClass(o.css.current).fadeOut(o.fade);					// minden elem elrejtése
+				setNavigation(current);															// beállítja a betöltöttségnek megfelelő navigációs elemeket
 
 				// aktuális kép megjelenítése
-				if (o.cover && current == 0) {													// ha van borító és az elsőn állunk
-					imgGroup.children().eq(current).addClass(o.css.current).fadeIn(o.fade);
-					setPosition(imgGroup.children().eq(current));
-				} else {																		// minden más esetben
-					for (var i = 0; i < o.stack; i++) {											// adott stackhez való képeket kirakja a szélességi arányt igazítva a stack méretéhez
-						if (current + i < galleryItems.length) {
-							imgGroup.children().eq(current + i)
-								.addClass(o.css.current)
-								.css({
-									width: (100 / o.stack) + "%",
-									"margin-left":  (100 / o.stack) * i + "%"
-								})
-								.fadeIn(o.fade);
-							setPosition(imgGroup.children().eq(current + i));
+				if (o.transition.effect == "push") {
+
+				//	effect:fold – csak akkor működik ha a stack mérete: 2
+				} else if (o.transition.effect == "fold" && o.stack == 2) {
+					var prevLeft, prevRight, currentLeft, currentRight;
+
+					// ha jobbra lapozok
+					if (direction) {
+						prevLeft = imgGroup.children().eq(previous);
+						prevRight = imgGroup.children().eq(previous + 1);
+						currentLeft = imgGroup.children().eq(current);
+						currentRight = imgGroup.children().eq(current + 1);
+
+						// ha a nyitóelemre lépünk (első slide)
+						if (previous == current) {
+
+							// ha a nyitó cover
+							if (current == 0 && o.cover) {
+								currentLeft.addClass(o.css.current).css({
+									//"width": "0%",
+									//"margin-left": "auto",
+									//"margin-right": "auto",
+									"z-index": 900
+								}).show();
+								setPosition(currentLeft);
+
+								// ha a nyitó nem cover
+							} else {
+								currentLeft.addClass(o.css.current).css({
+									"width": "50%",
+									"margin-left": "0%",
+									"z-index": 1000
+								}).show();
+								setPosition(currentLeft);
+
+								currentRight.addClass(o.css.current).css({
+									"width": "50%",
+									"margin-left": "50%",
+									"z-index": 997
+								}).show();
+								setPosition(currentRight);
+							}
+
+						// ha nem nyitóelemre lépünk
+						} else {
+
+							// ha a következő egy cover
+							if (current == 0 && o.cover) {
+
+
+							// ha a következő nem cover
+							} else {
+								prevLeft.removeClass(o.css.current).css({ "z-index": 998});
+								prevRight.removeClass(o.css.current).css({
+									"z-index": 999
+								}).animate({
+									width: "0%"
+								}, o.transition.duration, function () {
+									prevRight.hide();												// miután lement az anim elrejti
+								});
+
+								currentLeft.addClass(o.css.current).css({
+									"width": "0%",
+									"margin-left": "90%",
+									"z-index": 1000
+								}).show();
+								setPosition(currentLeft);
+
+								currentLeft.animate({
+									width: "50%",
+									marginLeft: "0%"
+								}, o.transition.duration, function () {
+									prevLeft.hide();
+								});
+
+								// ha van jobboldali oldalpár is
+								if (currentRight.length > 0) {
+									currentRight.addClass(o.css.current).css({
+										"width": "50%",
+										"margin-left": "50%",
+										"z-index": 997
+									}).show();
+									setPosition(currentRight);
+								}
+							}
+						}
+
+					// ha balra lapozok
+					} else {
+
+					}
+
+				//	effect:dissolve
+				} else {
+					imgGroup.children().removeClass(o.css.current).fadeOut(o.fade);					// minden elem elrejtése
+					if (o.cover && current == 0) {													// ha van borító és az elsőn állunk
+						imgGroup.children().eq(current).addClass(o.css.current).fadeIn(o.fade);
+						setPosition(imgGroup.children().eq(current));
+					} else {																		// minden más esetben
+						for (var i = 0; i < o.stack; i++) {											// adott stackhez való képeket kirakja a szélességi arányt igazítva a stack méretéhez
+							if (current + i < galleryItems.length) {
+								imgGroup.children().eq(current + i)
+									.addClass(o.css.current)
+									.css({
+										width: (100 / getStackSize(current)) + "%",					// a stack szélességét az egyszerre megjeleníthető stackek számával elosztja állítja be
+										"margin-left":  (100 / getStackSize(current)) * i + "%"		// a fenti értékhez lövi be a bal margót
+									})
+									.fadeIn(o.fade);
+								setPosition(imgGroup.children().eq(current + i));
+							}
 						}
 					}
 				}
@@ -5710,36 +5947,38 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 	// default options
 	$.fn.gallery2.defaultOptions = {
 		selector: {
-			default:		".gbgallery",
-			download:		"[data-download]"
+			default:		".gbgallery",		// alapértelmezett wrapper ha más nincs megadva
+			download:		"[data-download]"	// alapértelmezett letöltés attribútum
 		},
-		stack:				1,			// [1..] – a megadott számú fotót egyszerre mutatja
-		cover:				false,		// true|false – ha a fenti érték nem false, akkor az első képet borítónak veszi
-		start:				0,			// auto|[0..] - a megadott sorszámú elemmel indít. Ha auto, akkor mindig az aktuális elemnél nyílik fel
-		autoplay:			false,		// true|false
-		loop:				true,		// true|false
-		stretch:			true,		// true|false – ha a kép kisebb, akkor stretch-elje vagy hagyja változatlanul
-		fullsize:			false,		// true|false
-		fullscreen:			false,		// true|false
-		stackMatch:			false,		// true|false - ha true, akkor az egy stack-en belül lévő képek magasságát kompenzálja a szélesség terhére
-		keyboard:			true,		// true|false - kezelje a lapozó billentyűket és az esc-et
-		toc:				false,		// true|false
-		showFirst:			true,		// true|false - ha true, akkor többszöri nézegetés indításánál mindig az elejétől kezdi, míg false esetén megjegyzi a pozíciót
-		fade:				200,		// fade duration
+		orientation:		"horizontal",		// [horizontal|vertical]
+		stack:				1,					// [1..] – a megadott számú fotót egyszerre mutatja
+		cover:				false,				// true|false – ha a fenti érték nem false, akkor az első képet borítónak veszi
+		start:				0,					// auto|[0..] - a megadott sorszámú elemmel indít. Ha auto, akkor mindig az aktuális elemnél nyílik fel
+		autoplay:			false,				// true|false
+		loop:				true,				// true|false
+		stretch:			true,				// true|false – ha a kép kisebb, akkor stretch-elje vagy hagyja változatlanul
+		fullsize:			false,				// true|false
+		fullscreen:			false,				// true|false
+		stackMatch:			false,				// true|false - ha true, akkor az egy stack-en belül lévő képek magasságát kompenzálja a szélesség terhére
+		keyboard:			true,				// true|false - kezelje a lapozó billentyűket és az esc-et
+		toc:				false,				// true|false
+		showFirst:			true,				// true|false - ha true, akkor többszöri nézegetés indításánál mindig az elejétől kezdi, míg false esetén megjegyzi a pozíciót
+		fade:				200,				// fade duration
 		transition: {
-			effect:			"push",		// dissolve|push - képváltás effekt
-			duration:		500			// amináció hossza
+			effect:			"dissolve",			// dissolve|push|fold - képváltás effekt
+			duration:		500					// amináció hossza
 		},
-		download:			false,		// true|false
-		zoom:				false,		// true|false
+		download:			false,				// true|false - vegye-e figyelembe a data-download attribútumot
+		zoom:				false,				// true|false - legyen-e kapcsolható zoom (vertikális) nézet
+		zoomThumbnail:		false,				// true|false - zoom nézetben jelenítse meg a thumbnaileket vagy sem
 		thumbnail: {
-			show:			true,		// true|false
-			position:		"bottom",	// top|bottom
-			height:			100,
-			paddingTop:		70
+			show:			true,				// true|false
+			position:		"bottom",			// top|bottom
+			height:			100,				// thumbnailek magassága
+			paddingTop:		70					//
 		},
 		html: {
-			modal:			"<div class='modal-gallery2' tabindex='-1' role='dialog' aria-hidden='true' aria-labelledby=''><div class='modal-dialog'><div class='modal-content'><div class='modal-header'></div><div class='modal-body'></div><div class='modal-footer'></div></div></div></div>",
+			modal:			"<div class='modal-gallery2 modal-gallery-horizontal' tabindex='-1' role='dialog' aria-hidden='true' aria-labelledby=''><div class='modal-dialog'><div class='modal-content'><div class='modal-header'></div><div class='modal-body'></div><div class='modal-body-vertical'></div><div class='modal-footer'></div></div></div></div>",
 			imgGroup:		"<ul class='modal-img-group'></ul>",
 			imgStack:		"<li class='modal-img-stack'></li>",
 			imgFrame:		"<div class='modal-img-frame'></div>",
@@ -5751,23 +5990,48 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 			next:			"<a class='modal-next' href='#'><span class='icon icon-right'></span></a>",
 			close:			"<a class='modal-close' href='#'><span class='icon icon-x'></span></a>",
 			download:		"<a class='modal-download' href='#' target='_blank'><span class='icon icon-download'></span></a>",
+			zoom:			"<a class='modal-zoom' href='#'><span class='icon icon-search'></span></a>",
 			preloader:		"<div class='modal-preloader'>Betöltés folyamatban…</div>"
 		},
 		css: {
 			img:			"modal-img",
+			imgGroup:		"modal-img-group",
+			imgStack:		"modal-img-stack",
 			cover:			"modal-img-cover",
 			thumb:			"modal-thumb",
 			modalHeader:	"modal-footer",
 			modalBody:		"modal-body",
+			modalBodyV:		"modal-body-vertical",
 			modalFooter:	"modal-footer",
 			current:		"current",
-			reverseRatio:	"modal-img-swapratio"
+			reverseRatio:	"modal-img-swapratio",
+			effectFold:		"modal-effect-fold"
 		},
-		fn: {
-			beforeopen: function() {},
-			open: function() {},
-			beforedismiss: function() {},
-			dismiss: function() {}
+		style: {
+			landscape: {
+				width: "100%",
+				height: "auto"
+			},
+			portrait: {
+				width: "auto",
+				height: "100%"
+			},
+			landscapeStretch: {
+				"width": "inherit",
+				"max-width": "none",
+				"height": "inherit"
+			},
+			portraitStretch: {
+				"width": "inherit",
+				"max-width": "none",
+				"height": "inherit"
+			}
+		},
+		event: {
+			beforeopen:		function() {},		// megjelenítés előtt végrehajtandó utasítások
+			open:			function() {},		// megjelenítés után végrehajtandó utasítások
+			beforedismiss:	function() {},		// bezárás előtt végrehajtandó utasítások
+			dismiss:		function() {}		// bezárás után végrehajtandó utasítások
 		}
 	};
 
@@ -6412,6 +6676,150 @@ var esNameday = {
 				panels.not( panels.eq(except) ).removeClass(o.selectors.expandedClass);
 			}
 		});
+	};
+
+} (jQuery));
+;
+//
+//	Page preloader
+//
+
+/*
+	todo	ellenőrizni an encode-olt képeket is!
+	todo	ellenőrizni a webfontokat is
+	done	lekezelni ha a kép hibás
+	todo	többszörös greenbox.preload indításhoz automatikusan külön namespace létrehozás
+	todo	kapcsolhatóvá tenni, hogy publikálja a letöltés státuszát
+
+	A byte csak akkor működik ha lokál, xhr-rel leszedhető fileokkal hívjuk a fileokat
+*/
+
+
+(function ( $ ) {
+
+	$.fn.preloader = function ( options ) {
+
+		var oType = Object.prototype.toString.call( options ) === '[object Array]' ? "Array" : "Object",		// paraméter típusa
+			o, wrap;
+
+		// ha nincs paraméter vagy Object, akkor feltölti a wrap-et
+		if (oType == "Object") {
+			o = $.extend(true, {}, $.fn.preloader.defaultOptions, options);
+			wrap = this[0] ? $(this) : $(o.selector.default);
+		}
+
+		// global namespace ellenőrzése
+		if (window.greenbox == undefined) {
+			window.greenbox = {};				// creates global namespace if not exists
+		}
+
+		window.greenbox.preloader = {};			// preloader object is created
+
+		greenbox.preloader = {					// init values
+			loaded:		false,					// ha minden elem betöltődött, átvált true-ra
+			percent:	0,						// betöltött elemek száma %-osan
+			item:		0,						// összes betöltendő elem száma
+			itemloaded:	0,						// betöltött elemek száma
+			byte:		0,						// byte töltöttség
+			imgloading:	"",						// az épp töltődő kép URL-je
+			imgloaded:	""						// a legutolsó betöltött kép URL-je
+		};
+
+		// ellenőrizni, hogy létezik-e egyáltalán
+		function xhrRequest (url) {
+			var xhr = new XMLHttpRequest();
+			xhr.open('HEAD', url, true);
+			xhr.onreadystatechange = function(){
+				if ( xhr.readyState == 4 ) {
+					if ( xhr.status == 200 ) {
+						//console.log('Size in bytes: ' + xhr.getResponseHeader('Content-Length'), xhr.imageUrl);
+						return xhr.getResponseHeader('Content-Length')
+					} else {
+						//console.log('ERROR');
+						return false;
+					}
+				}
+			};
+			xhr.send(null);
+		}
+
+		// betölti a képet asszinkron
+		function loadImage(url) {
+			var img = new Image();
+			img.onload = function() {
+				greenbox.preloader.itemloaded++;																		// növeli a betöltött elemek számát
+				greenbox.preloader.percent = greenbox.preloader.itemloaded / greenbox.preloader.item * 100;				// százalék beállítása
+				if (greenbox.preloader.itemloaded == greenbox.preloader.item) {											// ha minden elem betöltődött
+					greenbox.preloader.loaded = true;																	// ha minden elem betöltődött, az értéke true-ra változik
+					$(document).trigger("preloaded");
+				}
+				greenbox.preloader.imgloaded = url;
+				//console.log(this.src, this.width, this.height);
+			};
+			img.onerror = function() {
+				greenbox.preloader.item--;																				// csökkenti az összes betöltendő elemek számát
+				greenbox.preloader.percent = greenbox.preloader.itemloaded / greenbox.preloader.item * 100;				// százalék beállítása
+				if (greenbox.preloader.itemloaded == greenbox.preloader.item) {											// ha minden elem betöltődött
+					greenbox.preloader.loaded = true;																	// ha minden elem betöltődött, az értéke true-ra változik
+					$(document).trigger("preloaded");
+				}
+			};
+			img.src = url;
+		}
+
+		// paraméterként átvett tömbben lévő URL-ekre meghívja a képbetöltést; processArray(["url1", "url2", "url3"...])
+		function processArray(arr) {
+			greenbox.preloader.item += arr.length;
+			for (var i = 0; i < arr.length; i++) {
+				greenbox.preloader.imgloading = arr[i];
+				loadImage(arr[i]);
+			}
+		}
+
+		// ha nincs paraméter vagy Object, akkor végignézi az összes wrap-ben lévő elemet
+		if (oType == "Object") {
+			wrap.each(function () {
+				var item = $(this);
+				// img tagek betöltése
+				if (o.img && item.is("img") && item.attr("src") !== "") {
+					greenbox.preloader.item++;							// növeli az összes betöltendő elem számát
+					greenbox.preloader.imgloading = item.attr("src");
+					loadImage(item.attr("src"));
+				}
+				// css backgroundok betöltése
+				if (o.css && item.css("background-image") !== "none") {
+					greenbox.preloader.item++;							// növeli az összes betöltendő elem számát
+					greenbox.preloader.imgloading = item.css("background-image").replace("url(", "").replace(")", "");
+					loadImage(item.css("background-image").replace("url(", "").replace(")", ""));
+				}
+			});
+
+			// ha külön tömbben is csaptunk hozzá képeket, akkor azokat is előtölti
+			if (o.images.length > 0) {
+				processArray(o.images);
+			}
+		}
+
+		// ha a paraméter csak Array, akkor azokat az elemeket tölti be
+		if (oType == "Array") {
+			processArray(options);
+		}
+
+		return;
+	};
+
+
+	// default options
+	$.fn.preloader.defaultOptions = {
+		selector: {
+			default: "*"
+		},
+		images:			[],				// betöltendő képeket tömbben is át lehet adni akár pluszban akár kizárólagosan
+		publishStatus:	true,			// true|false – todo	létrehozza a greenbox névteret és folyamatosan frissíti benne a preload infókat
+		img:			true,			// true|false - ellenőrzi az img tageket
+		css:			true,			// true|false - ellenőrzi a css-sel hozzárendelt háttereket
+		progressbar:	false,			// true|false -
+		percent:		false			// true|false -
 	};
 
 } (jQuery));

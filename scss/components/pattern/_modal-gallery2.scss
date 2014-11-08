@@ -34,6 +34,20 @@ $enable-modal-gallery:		true !default;
 @if $enable-modal-gallery {
 
 	.modal-gallery2 {
+
+		.modal-body {
+			@extend %fit-absolute;
+			@include transition(all .2s ease);
+		}
+		.modal-body-vertical {
+			@extend %fit-absolute;
+			@include transition(all .5s ease);
+			top: 100%;
+		}
+	}
+
+	.modal-gallery2:not(.modal-gallery-vertical) {
+//	.modal-gallery2.modal-gallery-horizontal {
 		@extend %fit-browser;
 		display: none;
 		background-color: transparentize(black, .10);
@@ -53,7 +67,15 @@ $enable-modal-gallery:		true !default;
 		.modal-content {}
 		.modal-header {}
 		.modal-title {}
-		.modal-body { @extend %fit-absolute; }
+		.modal-body {
+//			@extend %fit-absolute;
+			@include transition(all .5s ease);
+		}
+		.modal-body-vertical {
+//			@extend %fit-absolute;
+			@include transition(all .5s ease);
+//			top: 100%;
+		}
 		.modal-footer {}
 
 		// gallery items
@@ -72,20 +94,32 @@ $enable-modal-gallery:		true !default;
 			display: none;
 			width: 100%;
 			height: 100%;
-//			padding: 50px;
 			text-align: center;
+
+			&[data-stack="first"] .modal-img {
+				margin-right: 0;
+			}
+
+			&[data-stack="inline"] .modal-img {
+				margin-lef: 0;
+				margin-right: 0;
+			}
+
+			&[data-stack="last"] .modal-img {
+				margin-left: 0;
+			}
 
 			&.current {}
 			&.modal-img-cover {}
 
-			&.current[data-stack="2"] img {
-				margin-right: 0;
-			}
+//			&.current[data-stack="2"] img {
+//				margin-right: 0;
+//			}
 
-			&.current[data-stack="2"] + .current[data-stack="2"] img {
-				margin-left: 0;
-				margin-right: auto;
-			}
+//			&.current[data-stack="2"] + .current[data-stack="2"] img {
+//				margin-left: 0;
+//				margin-right: auto;
+//			}
 		}
 
 		.modal-img-frame {
@@ -93,19 +127,13 @@ $enable-modal-gallery:		true !default;
 			width: 100%;
 			height: 100%;
 			vertical-align: middle;
-//			background-color: transparentize(white, .8);
 		}
 
 		.modal-img {
 			display: block;
-//			width: auto;
-//			height: 100%;
-			width: 100%;
-			height: auto;
 			margin-left: auto;
 			margin-right: auto;
 			vertical-align: middle;
-//			border: 5px solid white;
 
 			&.modal-img-swapratio {
 				width: auto;
@@ -119,9 +147,7 @@ $enable-modal-gallery:		true !default;
 			bottom: 15px;
 			width: 100%;
 			margin: 0;
-//			background-color: transparentize(white, .8);
 			white-space: nowrap;
-//			overflow: auto;
 			overflow: hidden;
 
 			img {}
@@ -129,12 +155,32 @@ $enable-modal-gallery:		true !default;
 
 		.modal-thumb-stack {
 			display: inline-block;
-			margin-right: 15px;
-			border: 1px solid transparentize(white, .75);
 			cursor: pointer;
 			vertical-align: middle;
 			background-color: black;
 			@include transition(all .5s ease);
+
+			&[data-stack="single"] {
+				margin-right: 15px;
+				border: 1px solid transparentize(white, .75);
+			}
+
+			&[data-stack="first"] {
+				border: 1px solid transparentize(white, .75);
+				border-right: 0 none transparent;
+			}
+
+			&[data-stack="inline"] {
+				border: 1px solid transparentize(white, .75);
+				border-left: 0 none transparent;
+				border-right: 0 none transparent;
+			}
+
+			&[data-stack="last"] {
+				margin-right: 15px;
+				border: 1px solid transparentize(white, .75);
+				border-left: 0 none transparent;
+			}
 
 			&:first-child {
 				margin-left: 15px;
@@ -172,7 +218,7 @@ $enable-modal-gallery:		true !default;
 		}
 
 		// navigation
-		.modal-prev, .modal-next, .modal-close, .modal-download {
+		.modal-prev, .modal-next, .modal-close, .modal-download, .modal-zoom {
 			position: fixed;
 			background-color: transparentize(black, .5);
 			border: 1px solid transparentize(white, .3);
@@ -193,6 +239,7 @@ $enable-modal-gallery:		true !default;
 		}
 
 		.modal-prev {
+			display: none;		// ezt majd a script kapcsolja be a betöltöttségnek megfelelően
 			top: 50%;
 			left: 15px;
 			margin-top: -20pt;
@@ -207,9 +254,254 @@ $enable-modal-gallery:		true !default;
 			right: 15px;
 		}
 		.modal-download {
-			display: none;
+			display: none;		// enek láthatósgát script vezérli annak megfelelően, hogy tartozik-e data-download paraméter hozzá vagy sem
 			top: 25px;
 			right: 105px
+		}
+
+		.modal-zoom {
+			top: 25px;
+			right: 165px
+		}
+	}
+
+
+//	------------------------- ZOOM VIEW ––––––––––––––––––––––––––––––--------------------------------------------------
+
+	.modal-gallery2.modal-gallery-vertical {
+		@extend %fit-browser;
+		display: none;
+		background-color: transparentize(black, .10);
+		z-index: 999999;
+
+		.modal-preloader {
+			position: fixed;
+			top: 0;
+			left: 0;
+			padding: $baseline $gutter;
+			color: white;
+			//		text-align: center;
+		}
+
+		// modal items
+		.modal-dialog { @extend %fit-absolute; }
+		.modal-content {}
+		.modal-header {}
+		.modal-title {}
+		.modal-body {
+			@include transition(all .5s ease);
+			@include opacity(0);
+		}
+		.modal-body-vertical {
+			@include transition(all .5s ease);
+			top: 0%;
+			overflow: auto;
+		}
+
+		// gallery items
+		.modal-img-group {
+			padding: 50px 80px;
+			overflow: auto;
+		}
+
+		.modal-img-stack {
+			width: 100%;
+			margin-bottom: 30px;
+			text-align: center;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+
+			&.current {}
+			&.modal-img-cover {}
+
+//			&.current[data-stack="2"] img {
+//				margin-right: 0;
+//			}
+
+//			&.current[data-stack="2"] + .current[data-stack="2"] img {
+//				margin-left: 0;
+//				margin-right: auto;
+//			}
+		}
+
+		.modal-img-frame {
+//			display: inline-block;
+			width: 100%;
+//			height: 100%;
+//			vertical-align: middle;
+			//			background-color: transparentize(white, .8);
+		}
+
+		.modal-img {
+			display: block;
+			//			width: auto;
+			//			height: 100%;
+			width: 100%;
+			height: auto;
+//			margin-left: auto;
+//			margin-right: auto;
+//			vertical-align: middle;
+			//			border: 5px solid white;
+
+			&.modal-img-swapratio {
+				width: auto;
+				height: 100%;
+			}
+		}
+
+		// thumbnail
+		.modal-thumb-group {
+			display: none;
+			position: fixed;
+			bottom: 15px;
+			width: 100%;
+			margin: 0;
+			//			background-color: transparentize(white, .8);
+			white-space: nowrap;
+			//			overflow: auto;
+			overflow: hidden;
+
+			img {}
+		}
+
+		.modal-thumb-stack {
+			display: inline-block;
+			cursor: pointer;
+			vertical-align: middle;
+			background-color: black;
+			@include transition(all .5s ease);
+
+			&[data-stack="single"] {
+				margin-right: 15px;
+				border: 1px solid transparentize(white, .75);
+			}
+
+			&[data-stack="first"] {
+				border: 1px solid transparentize(white, .75);
+				border-right: 0 none transparent;
+			}
+
+			&[data-stack="inline"] {
+				border: 1px solid transparentize(white, .75);
+				border-left: 0 none transparent;
+				border-right: 0 none transparent;
+			}
+
+			&[data-stack="last"] {
+				margin-right: 15px;
+				border: 1px solid transparentize(white, .75);
+				border-left: 0 none transparent;
+			}
+
+			&:first-child {
+				margin-left: 15px;
+			}
+
+			&:last-child {
+				margin-right: 15px;
+			}
+
+			&:hover {
+				.modal-thumb {
+					@include opacity(.8);
+				}
+			}
+
+			&.current {
+				border-color: $color-1;
+
+				.modal-thumb {
+					@include opacity(1);
+				}
+			}
+		}
+
+		.modal-thumb-frame {
+			display: inline-block;
+			vertical-align: middle;
+		}
+
+		.modal-thumb {
+			display: block;
+			width: auto;
+			@include opacity(.35);
+			@include transition(all .2s ease);
+		}
+
+		// navigation
+		.modal-prev, .modal-next, .modal-close, .modal-download, .modal-zoom {
+			position: fixed;
+			background-color: transparentize(black, .5);
+			border: 1px solid transparentize(white, .3);
+			width: 36pt;
+			height: 36pt;
+			font-size: 25pt;
+			line-height: 36pt;
+			color: transparentize(white, .3);
+			text-align: center;
+			@include border-radius(50%);
+			@include transition(all .2s ease);
+
+			&:hover {
+				color: white;
+				background-color: $color-1;
+				border-color: $color-1;
+			}
+		}
+
+		.modal-prev {
+			display: none !important;
+			top: 50%;
+			left: 15px;
+			margin-top: -20pt;
+		}
+		.modal-next {
+			display: none !important;
+			top: 50%;
+			right: 15px;
+			margin-top: -20pt;
+		}
+		.modal-close {
+			top: 25px;
+			right: 15px;
+		}
+		.modal-download {
+			display: none;		// enek láthatósgát script vezérli annak megfelelően, hogy tartozik-e data-download paraméter hozzá vagy sem
+			top: 25px;
+			right: 105px
+		}
+
+		.modal-zoom {
+			top: 25px;
+			right: 165px
+		}
+	}
+
+	/*
+	Lapozás effect specifikus classok
+	*/
+
+//	Fold
+
+	.modal-gallery2.modal-effect-fold {
+
+		.modal-img-stack {
+
+			// úgy viselkedik mintha első lenne
+			&[data-stack="single"]:not(.modal-img-cover) .modal-img {
+				margin-right: 0;
+			}
+
+//			&[data-stack="inline"] .modal-img {
+//				margin-lef: 0;
+//				margin-right: 0;
+//			}
+
+//			&[data-stack="last"] .modal-img,  {
+//				margin-left: 0;
+//			}
 		}
 	}
 }
