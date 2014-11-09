@@ -6689,7 +6689,7 @@ var esNameday = {
 	todo	ellenőrizni a webfontokat is
 	done	lekezelni ha a kép hibás
 	todo	többszörös greenbox.preload indításhoz automatikusan külön namespace létrehozás
-	todo	kapcsolhatóvá tenni, hogy publikálja a letöltés státuszát
+	done	kapcsolhatóvá tenni, hogy publikálja a letöltés státuszát
 
 	A byte csak akkor működik ha lokál, xhr-rel leszedhető fileokkal hívjuk a fileokat
 */
@@ -6700,30 +6700,45 @@ var esNameday = {
 	$.fn.preloader = function ( options ) {
 
 		var oType = Object.prototype.toString.call( options ) === '[object Array]' ? "Array" : "Object",		// paraméter típusa
-			o, wrap;
+			o, wrap, preloaderProgressbar,
+			_loaded = 		false,
+			_percent =		0,
+			_item = 		0,
+			_itemloaded = 	0,
+			_byte = 		0,
+			_imgloading = 	"",
+			_imgloaded = 	"";
 
 		// ha nincs paraméter vagy Object, akkor feltölti a wrap-et
 		if (oType == "Object") {
 			o = $.extend(true, {}, $.fn.preloader.defaultOptions, options);
 			wrap = this[0] ? $(this) : $(o.selector.default);
+			preloaderProgressbar = $(o.progressbar.html);
 		}
 
-		// global namespace ellenőrzése
-		if (window.greenbox == undefined) {
-			window.greenbox = {};				// creates global namespace if not exists
+		// ha publikáljuk a státuszt, akkor ellenőrzi és létrehozza a greenbox namespace-t
+		if (o.publishStatus) {
+			if (window.greenbox == undefined) {		// global namespace ellenőrzése
+				window.greenbox = {};				// creates global namespace if not exists
+			}
+			window.greenbox.preloader = {};			// preloader object is created
+			updateStatus();							// alapértékek beállítása
 		}
 
-		window.greenbox.preloader = {};			// preloader object is created
-
-		greenbox.preloader = {					// init values
-			loaded:		false,					// ha minden elem betöltődött, átvált true-ra
-			percent:	0,						// betöltött elemek száma %-osan
-			item:		0,						// összes betöltendő elem száma
-			itemloaded:	0,						// betöltött elemek száma
-			byte:		0,						// byte töltöttség
-			imgloading:	"",						// az épp töltődő kép URL-je
-			imgloaded:	""						// a legutolsó betöltött kép URL-je
-		};
+		// töltöttség aktuális állapotának publikálása ha
+		function updateStatus() {
+			if (o.publishStatus) {
+				greenbox.preloader = {				// init values
+					loaded:		_loaded,			// ha minden elem betöltődött, átvált true-ra
+					percent:	_percent,			// betöltött elemek száma %-osan
+					item:		_item,				// összes betöltendő elem száma
+					itemloaded:	_itemloaded,		// betöltött elemek száma
+					byte:		_byte,				// byte töltöttség
+					imgloading:	_imgloading,		// az épp töltődő kép URL-je
+					imgloaded:	_imgloaded			// a legutolsó betöltött kép URL-je
+				};
+			}
+		}
 
 		// ellenőrizni, hogy létezik-e egyáltalán
 		function xhrRequest (url) {
@@ -6747,21 +6762,25 @@ var esNameday = {
 		function loadImage(url) {
 			var img = new Image();
 			img.onload = function() {
-				greenbox.preloader.itemloaded++;																		// növeli a betöltött elemek számát
-				greenbox.preloader.percent = greenbox.preloader.itemloaded / greenbox.preloader.item * 100;				// százalék beállítása
-				if (greenbox.preloader.itemloaded == greenbox.preloader.item) {											// ha minden elem betöltődött
-					greenbox.preloader.loaded = true;																	// ha minden elem betöltődött, az értéke true-ra változik
+				_itemloaded++;											// növeli a betöltött elemek számát
+				_percent = _itemloaded / _item * 100;					// százalék beállítása
+				updateStatus();
+				if (_itemloaded == _item) {								// ha minden elem betöltődött
+					_loaded = true;										// ha minden elem betöltődött, az értéke true-ra változik
+					updateStatus();
 					$(document).trigger("preloaded");
 				}
-				greenbox.preloader.imgloaded = url;
-				//console.log(this.src, this.width, this.height);
+				_imgloaded = url;
+				updateStatus();
 			};
 			img.onerror = function() {
-				greenbox.preloader.item--;																				// csökkenti az összes betöltendő elemek számát
-				greenbox.preloader.percent = greenbox.preloader.itemloaded / greenbox.preloader.item * 100;				// százalék beállítása
-				if (greenbox.preloader.itemloaded == greenbox.preloader.item) {											// ha minden elem betöltődött
-					greenbox.preloader.loaded = true;																	// ha minden elem betöltődött, az értéke true-ra változik
-					$(document).trigger("preloaded");
+				_item--;												// csökkenti az összes betöltendő elemek számát
+				_percent = _itemloaded / _item * 100;					// százalék beállítása
+				updateStatus();
+				if (_itemloaded == _item) {								// ha minden elem betöltődött
+					_loaded = true;										// ha minden elem betöltődött, az értéke true-ra változik
+					updateStatus();
+					$(document).trigger("preloaded");					// betöltöttséget jelző státusz elsütve
 				}
 			};
 			img.src = url;
@@ -6769,12 +6788,45 @@ var esNameday = {
 
 		// paraméterként átvett tömbben lévő URL-ekre meghívja a képbetöltést; processArray(["url1", "url2", "url3"...])
 		function processArray(arr) {
-			greenbox.preloader.item += arr.length;
+			_item += arr.length;
+			updateStatus();
 			for (var i = 0; i < arr.length; i++) {
-				greenbox.preloader.imgloading = arr[i];
+				_imgloading = arr[i];
+				updateStatus();
 				loadImage(arr[i]);
 			}
 		}
+
+		function setProgressbar() {
+			$("body").append(preloaderProgressbar.show());				// progressbar elhelyezése a DOM-ban
+
+			// szín beállítása
+			if (o.progressbar.color !== false) { preloaderProgressbar.css("background-color", o.progressbar.color); }
+
+			// magasság beállítása
+			if (o.progressbar.height !== false) { preloaderProgressbar.css("height", o.progressbar.height); }
+
+			// pozíció beállítása
+			if (o.progressbar.position == "center") { preloaderProgressbar.css({ top: "50%", "margin-top": Math.ceil(preloaderProgressbar.height() / 2) * -1});
+			} else if (o.progressbar.position == "bottom") { preloaderProgressbar.css({ top: "auto", bottom: "0"}); }
+
+			var sI = setInterval(function () {							// betöltés végéig adott időközönként frissíti a progressbar állapotát
+				preloaderProgressbar.css("width", _percent + "%");		// szélesség követése
+				if (_loaded) {
+					clearInterval(sI);
+					var sT = setTimeout(function () {
+						clearTimeout(sT);
+						preloaderProgressbar.hide();
+						$(document).trigger("preloadedafter");			// elsüti a betöltés vége utáni eseményt
+					}, o.progressbar.delay);
+				}
+			}, o.progressbar.interval);
+		}
+
+		$(document).trigger("preloadstart");							// elsüti a betöltés kezdete eseményt
+
+		// ha nincs kikapcsolva a preloader, elkezdi megjeleníti a preloadert
+		if (o.progressbar !== false) { setProgressbar(); }
 
 		// ha nincs paraméter vagy Object, akkor végignézi az összes wrap-ben lévő elemet
 		if (oType == "Object") {
@@ -6782,14 +6834,16 @@ var esNameday = {
 				var item = $(this);
 				// img tagek betöltése
 				if (o.img && item.is("img") && item.attr("src") !== "") {
-					greenbox.preloader.item++;							// növeli az összes betöltendő elem számát
-					greenbox.preloader.imgloading = item.attr("src");
+					_item++;											// növeli az összes betöltendő elem számát
+					_imgloading = item.attr("src");
+					updateStatus();
 					loadImage(item.attr("src"));
 				}
 				// css backgroundok betöltése
 				if (o.css && item.css("background-image") !== "none") {
-					greenbox.preloader.item++;							// növeli az összes betöltendő elem számát
-					greenbox.preloader.imgloading = item.css("background-image").replace("url(", "").replace(")", "");
+					_item++;											// növeli az összes betöltendő elem számát
+					_imgloading = item.css("background-image").replace("url(", "").replace(")", "");
+					updateStatus();
 					loadImage(item.css("background-image").replace("url(", "").replace(")", ""));
 				}
 			});
@@ -6818,8 +6872,15 @@ var esNameday = {
 		publishStatus:	true,			// true|false – todo	létrehozza a greenbox névteret és folyamatosan frissíti benne a preload infókat
 		img:			true,			// true|false - ellenőrzi az img tageket
 		css:			true,			// true|false - ellenőrzi a css-sel hozzárendelt háttereket
-		progressbar:	false,			// true|false -
-		percent:		false			// true|false -
+		progressbar: {					// {}|false - ha nem false, akkor figyelembe veszi a paramétereket
+			html:		"<div class='preloader-progressbar'></div>",
+			type:		"line",			// line|percent|linepercent
+			position:	"top",			// top|center|bottom
+			color:		false,			// #XXXXXX - hexa code for color
+			height:		false,			// magasság megadása; ha false, akkor 3px magas alapból
+			interval:	50,				// ilyen időközönként ellenőrízze a töltöttségi állapotot
+			delay:		500				// betöltés után ennyi idővel tüntesse el magát
+		}
 	};
 
 } (jQuery));
