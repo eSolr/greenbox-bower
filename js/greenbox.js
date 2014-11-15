@@ -4394,6 +4394,7 @@ var es = {
 			selectedClass:		"selected",
 			container:			".tab-panels",
 			disabledClass:		".disabled",
+			remotePanelAttr:	"data-tab-panels",
 			animating:			false,
 			looping:			false,
 			setUniqueID:		false,
@@ -4418,8 +4419,8 @@ var es = {
 		return wrap.each( function () {
 
 			var tabs = $(this),
-				tabPanels = $(tabs.attr("data-tab-panels")),
-				containerHasId = String(tabs.attr("data-tab-panels"))[0] == "#" ? true : false;
+				tabPanels = $(tabs.attr(o.remotePanelAttr)),
+				containerHasId = String(tabs.attr(o.remotePanelAttr))[0] == "#" ? true : false;
 
 			//	Ha nincs default érték, az első fület állítja be
 			if (tabs.children("." + o.selectedClass).length == 0) {
@@ -4837,7 +4838,7 @@ var es = {
 	};
 
 	$.fn.esStickyFooter.defaultOptions = {
-		selector: ".footer-sticky",									//	default selector
+		selector: ".js-footer-sticky",								//	default selector
 		class: undefined,											//	attached at sticky state
 		style: "position: fixed; width: 100%; bottom: 0; left: 0;"	//	if class added this css is ignored
 	};
@@ -6818,6 +6819,7 @@ var esNameday = {
 						clearTimeout(sT);
 						preloaderProgressbar.hide();
 						$(document).trigger("preloadedafter");			// elsüti a betöltés vége utáni eseményt
+						preloaderProgressbar.remove();					// törli a progressbart a DOM-ból
 					}, o.progressbar.delay);
 				}
 			}, o.progressbar.interval);

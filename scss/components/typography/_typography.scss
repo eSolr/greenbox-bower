@@ -77,6 +77,7 @@ $font-sizes-retina:			() !default;
 @if $enable-typography-module {
 
 	html {
+		font-size: 100%;						//	IE
 		font-size: $base-font-size;
 		line-height: $baseline;
 
@@ -88,7 +89,6 @@ $font-sizes-retina:			() !default;
 	body {
 		@include font-smoothing(true);
 		font-family: $base-font-family;
-		font-size: 100%;						//	IE
 //		font-weight: 400;
 		color: $text-color;
 		background-color: $bg-color;
