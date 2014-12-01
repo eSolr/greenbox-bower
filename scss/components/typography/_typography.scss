@@ -99,6 +99,11 @@ $font-sizes-retina:			() !default;
 		}
 	}
 
+	// font és opentype feature-ök bekapcsolása
+	html, body {
+		font-feature-settings: "kern" 1, "liga" 1, "pnum" 1, "tnum" 0, "onum" 1, "lnum" 0, "dlig" 0; /* 1. */
+	}
+
 	//	loading media query specific –—responsive–— font sizes
 	@include set-font-sizes($font-sizes-xsmall);
 	@media #{$small}	{ @include set-font-sizes($font-sizes-small); }

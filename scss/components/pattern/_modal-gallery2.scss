@@ -295,7 +295,7 @@ $enable-modal-gallery:		true !default;
 		.modal-body-vertical {
 			@include transition(all .5s ease);
 			top: 0%;
-			overflow: auto;
+			overflow-y: scroll;
 		}
 
 		// gallery items
@@ -488,6 +488,11 @@ $enable-modal-gallery:		true !default;
 	.modal-gallery2.modal-effect-fold {
 
 		.modal-img-stack {
+
+			// cover első kép mindig jobboldalt van
+			&.modal-img-cover .modal-img {
+				margin-left: 0;
+			}
 
 			// úgy viselkedik mintha első lenne
 			&[data-stack="single"]:not(.modal-img-cover) .modal-img {

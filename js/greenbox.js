@@ -5388,6 +5388,7 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 				xhr.send(null);
 			}*/
 
+
 			function eventEndScroll(item) {
 
 				if (item == undefined) { item = $(window); }
@@ -5533,6 +5534,8 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 								var thumb = $(this);
 								//console.log("maradék: " + thumb.index() % o.stack, thumb.index());
 
+								previous = current;			// fold effecthez kell, ha adott pozícióra ugrunk
+
 								if (thumb.index() == 0 && o.cover) {
 									showCurrent(0)
 								} else {
@@ -5571,23 +5574,38 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 
 			// galéria alapelemeinek legenerálása
 			function generateGallery() {
-				eventEndScroll(modalBodyV);
+				eventEndScroll(modalBodyV);									// scrollend esemény hozzárendelése a vertikális nézethez
 				modal.prepend(preloader);									// preloader elhelyezése
 				body.append(modal.attr("id", galleryItems.attr("rel")));	// modal elhelyezése, rel id-ként
 				modalFooter.append(prev, next, close);						// navigációs elemek elhelyezése
 				if (o.download) { modalFooter.append(download); }			// download gomb elhelyezése
 				if (o.zoom) {
 					modalFooter.append(zoom);								// zoom gomb elhelyezése
-					modalBodyV.on("scrollend.gallery", function () {
+					modalBodyV.on("scrollend.gallery", function () {		// scrollend-re leellenőrzi, mely kép van a képernyőn
 						var bodyVImages = modalBodyV.find("." + o.css.imgStack);
+						var c = current;	// ebbe kerül a scroll szerinti pozíció, current az alapérték
 						for (var i = 0; i < galleryItems.length; i++) {
 							// ha adott kép a képernyőn van, akkor beállítja currentnek
-							if (0 < bodyVImages.eq(i).offset().top && bodyVImages.eq(i).offset().top < $w.height() / 2) {
-								//console.log(i, bodyVImages.eq(i).offset().top, bodyVImages.eq(i));
-								//current = getStackNumber(i);
-								//	todo korrigálni a stack értéket vagy levizsgálni a showCurrentben
+							if (0 <= bodyVImages.eq(i).offset().top && bodyVImages.eq(i).offset().top < $w.height() / 2) {
+								//console.log("felső rész a felső félben", i, bodyVImages.eq(i).offset().top, bodyVImages.eq(i));
+								c = i;
+							} else if (bodyVImages.eq(i).offset().top < 0 && $w.height() < bodyVImages.eq(i).offset().top + bodyVImages.eq(i).height() ) {
+								//console.log("fent és lent is túlnyúlik", i, bodyVImages.eq(i).offset().top, bodyVImages.eq(i));
+								c = i;
+							} else if (bodyVImages.eq(i).offset().top < 0 && $w.height() / 2 < bodyVImages.eq(i).offset().top + bodyVImages.eq(i).height()) {
+								//console.log("az alja túllóg a képernyő felén", i, bodyVImages.eq(i).offset().top, bodyVImages.eq(i));
+								c = i;
 							}
 						}
+
+						for (var j = 0; j <= c; j++) {
+							if (bodyVImages.eq(j).is("[data-stack='first']") || bodyVImages.eq(j).is("." + o.css.cover)) {
+								current = j;
+							}
+						}
+
+						//console.log("ellenőrzés végén", current);
+						//showCurrent(current);
 					});
 				}
 
@@ -5609,10 +5627,20 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 					e.preventDefault();
 					removeModal();
 				});
-				zoom.off().on("click", function (e) {
+				zoom.off().on("click", function (e) {				// zoomra kattintva megjeleníti vertikális galériát
 					e.preventDefault();
 					modal.toggleClass("modal-gallery-vertical");
-					showCurrent(current);
+
+					if (modal.is(".modal-gallery-vertical")) {		// ha normálról váltunk vertikálisra
+						modalBodyV.scrollTop(0);					// visszaállítani alaphelyzetbem, mert külünben nem fogja tudni a position().top, hogy adott kép milyen messze van a body tetejétől
+						//console.log(current, modalBodyV.find("." + o.css.imgStack).eq(current).position().top);
+						modalBodyV.scrollTop(modalBodyV.find("." + o.css.imgStack).eq(current).position().top);		// a current elemre ugrik a vertikális listában
+					} else {										// ha visszaváltunk normál nézetre
+						imgGroup.children().hide();					// mielőtt bekapcsolná az aktuális állapotot, elrejt minden korábbit
+						showCurrent(current);
+					}
+
+					//console.log(current);
 				});
 
 				modal.trigger("gallerybeforeopen");
@@ -5634,10 +5662,10 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 				if (o.keyboard) {
 					$w.off("keydown.gallery").on("keydown.gallery", function (e) {
 						if (e.keyCode == 27) { removeModal(); }						// esc
-						if ([37, 38, 33].indexOf(e.keyCode) >= 0) { showPrev(); }	// bal, fel, pgup
-						if ([39, 40, 34].indexOf(e.keyCode) >= 0) { showNext(); }	// jobb, le, pgdown
-						if ([36].indexOf(e.keyCode) >= 0) { showFirst(); }			// home
-						if ([35].indexOf(e.keyCode) >= 0) { showLast(); }			// end
+						if ([37].indexOf(e.keyCode) >= 0) { showPrev(); }	// bal, fel, pgup – 37, 38, 33
+						if ([39].indexOf(e.keyCode) >= 0) { showNext(); }	// jobb, le, pgdown – 39, 40, 34
+						//if ([36].indexOf(e.keyCode) >= 0) { showFirst(); }			// home
+						//if ([35].indexOf(e.keyCode) >= 0) { showLast(); }			// end
 					});
 				}
 
@@ -5688,14 +5716,11 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 			}
 
 			function getProportionalWidth(img) {
-
 				//rw * ph pw
 				//rh
-
 			}
 
-
-
+			// képméretezés korrigálása
 			function setPosition(imgStack) {
 				var img = imgStack.find("img"),
 					imgHeight,
@@ -5703,10 +5728,10 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 					stackHeight =  imgStack.height(),
 					stackRatio = imgStack.width() / stackHeight;
 
+				// fold effect esetén
 				if (o.transition.effect == "fold" && o.stack == 2) {
 
 					// képaránynak megfelelő súlyozás
-					//if (imgRatio > stackRatio) {	// ha a kép fekvőbb a kerethez képest
 					if (imgRatio > (imgGroup.width() / 2) / imgGroup.height()) {	// ha a kép fekvőbb a kerethez képest
 						//img.css(o.style.landscapeStretch);
 						img.css({
@@ -5784,6 +5809,7 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 
 				// aktuális kép megjelenítése
 				if (o.transition.effect == "push") {
+					//	todo > Ez még várat magára
 
 				//	effect:fold – csak akkor működik ha a stack mérete: 2
 				} else if (o.transition.effect == "fold" && o.stack == 2) {
@@ -5791,33 +5817,113 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 
 					// ha jobbra lapozok
 					if (direction) {
-						prevLeft = imgGroup.children().eq(previous);
-						prevRight = imgGroup.children().eq(previous + 1);
-						currentLeft = imgGroup.children().eq(current);
-						currentRight = imgGroup.children().eq(current + 1);
+						//prevLeft = imgGroup.children().eq(previous);
+						//prevRight = imgGroup.children().eq(previous + 1);
+						//currentLeft = imgGroup.children().eq(current);
+						//currentRight = imgGroup.children().eq(current + 1);
 
-						// ha a nyitóelemre lépünk (első slide)
+						//console.log(previous, current);
+
+						/*
+						 1. ha nyitóra lépünk és a nyitó cover		––– OK
+						 2. ha nyitóra lépünk és a nyitó nem cover	––– OK
+						 3. ha nem nyitóra lépünk coverről			––– OK
+						 4. ha nem nyitóra lépünk nem coverről		––– OK
+						 5. ha single-re lépünk nem coverről		––– OK
+						 6. ha coverre lépünk nem coverről			––– OK
+						 7. ha coverre lépünk single-ről			––– OK
+						*/
+
+
+						// ha nyitóra lépünk
 						if (previous == current) {
+							//console.log("nyitóra léptünk");
 
-							// ha a nyitó cover
-							if (current == 0 && o.cover) {
-								currentLeft.addClass(o.css.current).css({
-									//"width": "0%",
-									//"margin-left": "auto",
-									//"margin-right": "auto",
-									"z-index": 900
-								}).show();
-								setPosition(currentLeft);
+							currentLeft = imgGroup.children().eq(current);
+							currentRight = imgGroup.children().eq(current + 1);
 
-								// ha a nyitó nem cover
-							} else {
-								currentLeft.addClass(o.css.current).css({
-									"width": "50%",
-									"margin-left": "0%",
-									"z-index": 1000
-								}).show();
-								setPosition(currentLeft);
+							// ha a nyitó borító is egyben (akkor nincs currentLeft csak currentRight)
+							if (o.cover) {
+								//console.log("+ ami borító is egyben");
+								currentRight = currentLeft;					// a jobb lesz a bal
+								currentLeft = $("nonexistingobject");		// üres objektumot adunk neki, hogy ne szálljon el hibával
+							}
 
+							currentLeft.addClass(o.css.current).css({
+								"width": "50%",
+								"margin-left": "0%",
+								"z-index": 1000
+							}).show();
+							setPosition(currentLeft);
+
+							currentRight.addClass(o.css.current).css({
+								"width": "50%",
+								"margin-left": "50%",
+								"z-index": 997
+							}).show();
+							setPosition(currentRight);
+						}
+
+						// oldalpárról vagy hátlapról borítóra lépünk
+						if (previous !== current && current == 0 && o.cover) {
+							//console.log("oldalpárról vagy hátlapról borítóra lépünk");
+
+							prevLeft = imgGroup.children().eq(previous);
+							prevRight = imgGroup.children().eq(previous + 1);
+							currentRight = imgGroup.children().eq(current);
+
+							prevLeft.removeClass(o.css.current).fadeOut(o.transition.duration);
+							prevRight.removeClass(o.css.current).fadeOut(o.transition.duration);
+
+							currentRight.addClass(o.css.current).css({
+								"width": "50%",
+								"margin-left": "50%",
+								"z-index": 997
+							}).fadeIn(o.transition.duration);
+							setPosition(currentRight);
+						}
+
+						// akárhonnan oldalpárra lépünk (borítóról vagy oldalpárról)
+						if (previous !== current && current !== 0) {
+							//console.log("oldalpárra lépünk");
+
+							prevLeft = imgGroup.children().eq(previous);
+							prevRight = imgGroup.children().eq(previous + 1);
+							currentLeft = imgGroup.children().eq(current);
+							currentRight = imgGroup.children().eq(current + 1);
+
+							// ha borítóról oldalpárra (akkor nincs prevLeft csak prevRight)
+							if (current == 1 && o.cover) {
+								//console.log("+ borítóról");
+								prevRight = prevLeft;						// a jobb lesz a bal
+								prevLeft = $("nonexistingobject");			// üres objektumot adunk neki, hogy ne szálljon el hibával
+							}
+
+							prevLeft.removeClass(o.css.current).css({ "z-index": 998});
+							prevRight.removeClass(o.css.current).css({
+								"z-index": 999
+							}).animate({
+								width: "0%"
+							}, o.transition.duration, function () {
+								prevRight.hide();							// miután lement az anim elrejti
+							});
+
+							currentLeft.addClass(o.css.current).css({
+								"width": "0%",
+								"margin-left": "90%",
+								"z-index": 1000
+							}).show();
+							setPosition(currentLeft);
+
+							currentLeft.animate({
+								width: "50%",
+								marginLeft: "0%"
+							}, o.transition.duration, function () {
+								prevLeft.hide();
+							});
+
+							// ha van jobboldali oldalpár is, azaz az utolsó „oldalpár„ nem egy „oldalból” áll
+							if (currentRight.length > 0) {
 								currentRight.addClass(o.css.current).css({
 									"width": "50%",
 									"margin-left": "50%",
@@ -5825,54 +5931,111 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 								}).show();
 								setPosition(currentRight);
 							}
-
-						// ha nem nyitóelemre lépünk
-						} else {
-
-							// ha a következő egy cover
-							if (current == 0 && o.cover) {
-
-
-							// ha a következő nem cover
-							} else {
-								prevLeft.removeClass(o.css.current).css({ "z-index": 998});
-								prevRight.removeClass(o.css.current).css({
-									"z-index": 999
-								}).animate({
-									width: "0%"
-								}, o.transition.duration, function () {
-									prevRight.hide();												// miután lement az anim elrejti
-								});
-
-								currentLeft.addClass(o.css.current).css({
-									"width": "0%",
-									"margin-left": "90%",
-									"z-index": 1000
-								}).show();
-								setPosition(currentLeft);
-
-								currentLeft.animate({
-									width: "50%",
-									marginLeft: "0%"
-								}, o.transition.duration, function () {
-									prevLeft.hide();
-								});
-
-								// ha van jobboldali oldalpár is
-								if (currentRight.length > 0) {
-									currentRight.addClass(o.css.current).css({
-										"width": "50%",
-										"margin-left": "50%",
-										"z-index": 997
-									}).show();
-									setPosition(currentRight);
-								}
-							}
 						}
+
 
 					// ha balra lapozok
 					} else {
 
+						//console.log(previous, current);
+
+						/*
+						 1. ha nyitóra lépünk és a nyitó cover		–––
+						 2. ha nyitóra lépünk és a nyitó nem cover	–––
+						 3. ha nem nyitóra lépünk coverről			–––
+						 4. ha nem nyitóra lépünk nem coverről		–––
+						 5. ha single-re lépünk nem coverről		–––
+						 6. ha coverre lépünk nem coverről			–––
+						 7. ha coverre lépünk single-ről			–––
+						 */
+
+
+						// oldalpárról vagy hátlapról borítóra lépünk
+						if (previous !== current && current == 0 && o.cover) {
+							//console.log("balra oldalpárról a borítóra lépünk");
+
+							prevLeft = imgGroup.children().eq(previous);
+							prevRight = imgGroup.children().eq(previous + 1);
+							currentRight = imgGroup.children().eq(current);
+
+							prevLeft.removeClass(o.css.current)
+								.animate({
+									width: "0%",
+									marginLeft: "50%"
+								}, o.transition.duration, function () {
+									prevLeft.hide();
+								});
+							prevRight.removeClass(o.css.current).css({ "z-index": 999 });
+
+							currentRight.addClass(o.css.current)
+								.css({
+									"width": "0%",
+									"margin-left": "0%",
+									"z-index": 1000
+								})
+								.show()
+								.animate({
+									width: "50%",
+									marginLeft: "50%"
+								}, o.transition.duration, function () {
+									prevRight.hide();
+								});
+							setPosition(currentRight);
+						}
+
+						// akárhonnan oldalpárra lépünk (borítóról vagy oldalpárról)
+						if (previous !== current && current !== 0) {
+							//console.log("balra oldalpárra lépünk");
+
+							prevLeft = imgGroup.children().eq(previous);
+							prevRight = imgGroup.children().eq(previous + 1);
+							currentLeft = imgGroup.children().eq(current);
+							currentRight = imgGroup.children().eq(current + 1);
+
+							// ha utolsó single oldalról (borítóról) oldalpárra (akkor nincs prevLeft csak prevRight)
+							if (previous == 0 && o.cover) {
+								//console.log("+ borítóról a hátlapra");
+								prevRight = prevLeft;						// a jobb lesz a bal
+								prevRight.fadeOut(o.transition.duration);
+								prevLeft = $("nonexistingobject");			// üres objektumot adunk neki, hogy ne szálljon el hibával
+							}
+
+							prevLeft.removeClass(o.css.current).css({ "z-index": 998})
+								.animate({
+									"width": "0%",
+									"margin-left": "50%"
+								}, o.transition.duration, function () {
+									prevLeft.hide();							// miután lement az anim elrejti
+								});
+							prevRight.removeClass(o.css.current).css({
+								"z-index": 999
+							});
+
+							currentRight.addClass(o.css.current).css({
+								"width": "0%",
+								"margin-left": "0%",
+								"z-index": 1000
+							}).show();
+							setPosition(currentRight);
+
+							currentRight.animate({
+								width: "50%",
+								marginLeft: "50%"
+							}, o.transition.duration, function () {
+								prevRight.hide();
+							});
+
+							// ha van baloldali oldalpár is, azaz az utolsó „oldalpár„ nem egy „oldalból” áll
+							//console.log(currentLeft.length);
+							if (currentLeft.length > 0) {
+								currentLeft.addClass(o.css.current).css({
+									"width": "50%",
+									"margin-left": "0%",
+									"z-index": 997
+								}).show();
+								setPosition(currentLeft);
+							}
+						}
 					}
 
 				//	effect:dissolve
