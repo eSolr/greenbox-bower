@@ -5327,6 +5327,9 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 //
 //	todo legyen responsive képméretek betöltésében is
 //	todo vertkálissal indítson
+//	todo folding esetén megoldeni a cover nélküli lapozást a két szélén
+//	todo rendesen kidebugolni, hogy vertikális scrollnál mi számít aktuálisnak
+//	todo rendesen kidebuggolni a vertikális ki-bekapcsolgatásánál az aktuális sctack kiválasztást (most egyel balra ugrik)
 /*
 
 1. azonosítani a képlinkeket
@@ -5635,7 +5638,30 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 						modalBodyV.scrollTop(0);					// visszaállítani alaphelyzetbem, mert külünben nem fogja tudni a position().top, hogy adott kép milyen messze van a body tetejétől
 						//console.log(current, modalBodyV.find("." + o.css.imgStack).eq(current).position().top);
 						modalBodyV.scrollTop(modalBodyV.find("." + o.css.imgStack).eq(current).position().top);		// a current elemre ugrik a vertikális listában
+						$w.on("keydown.galleryvertical", function (e) {	// vertikális billentyűs görgetés beállítása (fel, le, pgup, pgdn
+							if ([38].indexOf(e.keyCode) >= 0) {		// bal, fel, pgup – 37, 38, 33
+								modalBodyV.animate({
+									scrollTop: modalBodyV.scrollTop() - 100
+								}, 100);
+							}
+							if ([40].indexOf(e.keyCode) >= 0) {		// jobb, le, pgdown – 39, 40, 34
+								modalBodyV.animate({
+									scrollTop: modalBodyV.scrollTop() + 100
+								}, 100);
+							}
+							if ([33].indexOf(e.keyCode) >= 0) {		// bal, fel, pgup – 37, 38, 33
+								modalBodyV.animate({
+									scrollTop: modalBodyV.scrollTop() - $w.height()
+								}, 100);
+							}
+							if ([34].indexOf(e.keyCode) >= 0) {		// jobb, le, pgdown – 39, 40, 34
+								modalBodyV.animate({
+									scrollTop: modalBodyV.scrollTop() + $w.height()
+								}, 100);
+							}
+						});
 					} else {										// ha visszaváltunk normál nézetre
+						$w.off("keydown.galleryvertical");			// vertikális billentyűs görgetés eldobása
 						imgGroup.children().hide();					// mielőtt bekapcsolná az aktuális állapotot, elrejt minden korábbit
 						showCurrent(current);
 					}
@@ -5648,7 +5674,9 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 
 				modal.fadeIn(o.fade, function () {
 					modalBody.append(imgGroup);				// kép konténer hozzáadása a DOM-hoz
-					if (o.zoom) { modalBodyV.append(imgGroup.clone()); }				// kép konténer hozzáadása a DOM-hoz
+					if (o.zoom) {							// kép konténer hozzáadása a DOM-hoz
+						modalBodyV.append(imgGroup.clone());
+					}
 					if (o.thumbnail.show) {					// ha van thumbnail, akkor a thumb konténer hozzáadása a DOM-hoz és betöltés indítása
 						modalBody.append(thumbGroup);		// thumb konténer hozzáadása a DOM-hoz
 						loadThumbnails();					// thumbnailek asszinkron betöltése elindítva
