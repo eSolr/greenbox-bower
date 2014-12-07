@@ -8,6 +8,7 @@
 
 
 $enable-grid-module: 		true !default;
+$enable-adaptive-grid:		false !default;
 $enable-grid-old-module: 	false !default;
 $ie7:						false !default;
 $ie8:						false !default;
@@ -331,7 +332,16 @@ $mq-last-prefix:			"last" !default;
 
 	// Set max-width for normal row (row-fluid remains flexible)
 	.row {
+		width: 100%;
 		max-width: $grid-max-width;		// set maximum width
+
+		@if ($enable-adaptive-grid) {
+//			@media #{$small} { width: $mq-small; }
+			@media #{$medium} { width: $mq-medium; }
+			@media #{$large} { width: $mq-large; }
+			@media #{$xlarge} { width: $mq-xlarge; }
+			@media #{$retina} { width: $mq-retina; }
+		}
 	}
 
 	// By default all "column like" item gets a full width and a gutter
