@@ -18,6 +18,7 @@ $ie7:						false;			// ie7 compatibility mode for rem unit and inline-block
 //	Enable/disable modules, features
 
 $enable-grid-module: 		true;			// true|false
+$enable-print-module:		true;			// true|false
 $enable-typography-module: 	true;			// true|false
 $enable-icon-module: 		true;			// true|false
 $enable-form-module: 		true;			// true|false
@@ -28,7 +29,6 @@ $enable-responsive-img:		true;			// true|false
 $enable-autocomplete-module:true;			// true|false
 $enable-datepicker-module:	true;			// true|false
 $enable-encoded-img:		true;			// true|false
-$enable-grid-for-print:		false;			// true|false
 $enable-modal-module:		true;			// true|false
 $enable-modal-gallery:		true;			// true|false
 
@@ -76,7 +76,7 @@ $selected-bg-color:			$color-1;
 //	----------------------------------------
 //	Grid module
 
-$enable-adaptive-grid:		false;			// turns on adaptive mode
+$enable-locking-grid:		false;			// turns on "locking grid" mode
 $enable-grid-deprecated:	false;			// compatibility mode with the old grid system
 
 //	Grid settings
@@ -159,6 +159,7 @@ $font-sizes-xsmall: 		(("h1, .h1" 2.8rem ($baseline * 3))
 							,(small .8rem)
 							);
 
+$font-sizes-print:			();
 $font-sizes-small:			();
 $font-sizes-medium:			();
 $font-sizes-large:			();

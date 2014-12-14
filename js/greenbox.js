@@ -1,4 +1,53 @@
-/*
+//
+//	IDfy
+//	It assignes makes h1…h6 items as an URL encoded version of title
+//
+//	todo csekkolni az ID duplikátumokat. Ha van, akkor _# sorszámozott formátumban egészítse ki
+//	todo ha nincs encode-olható szöveg a címben, akkor #id_... formátumban
+//	done skippelje a strong, em stb. tageket, és csak a „nettó” szöveget vegye alapul
+//	todo legyen overwrite opció, ha felül szeretnénk írni a meglévőket (nem javasolt)
+//	todo kell neki egy hash lekövető pár is, ami a dinamikusan létrehozott id-ra ugrik ha hozzárendelés után talál az URL-ben
+//
+//	research:	http://stackoverflow.com/questions/286921/efficiently-replace-all-accented-characters-in-a-string
+//				http://stackoverflow.com/questions/18123501/replacing-accented-characters-with-plain-ascii-ones
+
+
+(function ( $ ) {
+
+	$.fn.IDfy = function ( options ) {
+
+		var defaultOptions = {
+			selector: {
+				default: "h1, h2, h3, h4, h5, h6"
+			},
+			overwrite: false		// true|false
+		};
+
+		var o = $.extend({}, defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector.default);
+
+		if (window.greenbox == undefined) {		// global namespace ellenőrzése
+			window.greenbox = {};				// creates global namespace if not exists
+		}
+		window.greenbox.idfy = [];				// idfy array is created
+
+		return wrap.each(function(){
+			var item = $(this),
+				itemText = item.text(),
+				encodedItemText = encodeURI(itemText),
+				idCounter = 1;
+
+			//if (overwrite)
+
+			// ha az itemnek nincs már ID-ja és ugyanilyen ID-val még nem szerepel több
+			if (item.attr("id") == undefined && $("#" + encodedItemText)) {
+				item.attr("id", "encodedItemText");
+			}
+			//console.log(item, itemText);
+		});
+	};
+
+} (jQuery));;/*
  Makes a select autocomplete
 
  Inputok:

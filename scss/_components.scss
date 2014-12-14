@@ -59,7 +59,7 @@
 @import "components/pattern/list-divider";
 @import "components/pattern/list-style";
 @import "components/pattern/media";
-@import "components/pattern/media-query";			// grid
+@import "components/pattern/media-query";			// grid – meg kell előzze a _visibility-t
 @import "components/pattern/navigation";
 @import "components/pattern/panel";
 @import "components/pattern/ratio";
@@ -83,7 +83,11 @@
 
 // grid
 @import "components/grid/grid";
-@import "components/grid/grid-deprecated";
+//@import "components/grid/grid-deprecated";		// obsolete
+
+
+// print
+@import "components/print/print";					// a grid után kell szerepelnie
 
 
 // typography

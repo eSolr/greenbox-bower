@@ -8,7 +8,7 @@
 
 
 $enable-grid-module: 		true !default;
-$enable-adaptive-grid:		false !default;
+$enable-locking-grid:		true !default;		// turns on "locking grid" mode
 $enable-grid-old-module: 	false !default;
 $ie7:						false !default;
 $ie8:						false !default;
@@ -147,7 +147,7 @@ $mq-last-prefix:			"last" !default;
 	$pull-prefix:	$mq-pull-prefix + "-";
 
 	// .col-last
-	.#{$column-prefix}#{$mq-large-prefix} {
+	.#{$column-prefix}#{$size-prefix}#{$mq-last-prefix} {
 		@include last(true);
 	}
 
@@ -335,7 +335,7 @@ $mq-last-prefix:			"last" !default;
 		width: 100%;
 		max-width: $grid-max-width;		// set maximum width
 
-		@if ($enable-adaptive-grid) {
+		@if ($enable-locking-grid) {
 //			@media #{$small} { width: $mq-small; }
 			@media #{$medium} { width: $mq-medium; }
 			@media #{$large} { width: $mq-large; }

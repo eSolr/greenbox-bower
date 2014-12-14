@@ -29,6 +29,7 @@ $base-font-size:			12pt !default;
 $baseline:					18pt !default;
 $gutter:					$grid-gutter !default;
 
+$font-sizes-print:			() !default;
 $font-sizes-xsmall:			() !default;
 $font-sizes-small:			() !default;
 $font-sizes-medium:			() !default;
@@ -106,6 +107,7 @@ $font-sizes-retina:			() !default;
 
 	//	loading media query specific –—responsive–— font sizes
 	@include set-font-sizes($font-sizes-xsmall);
+	@media #{$print}	{ @include set-font-sizes($font-sizes-print); }		// print specific
 	@media #{$small}	{ @include set-font-sizes($font-sizes-small); }
 	@media #{$medium}	{ @include set-font-sizes($font-sizes-medium); }
 	@media #{$large}	{ @include set-font-sizes($font-sizes-large); }

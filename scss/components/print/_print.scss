@@ -1,0 +1,20 @@
+//
+//	Print specific general settings
+//
+
+//	Research
+//	http://www.smashingmagazine.com/2013/03/08/tips-and-tricks-for-print-style-sheets/
+
+
+$enable-print-module:		true !default;
+$print-grid-column-prefix:	"col";
+$print-grid-prefix:			"pr";
+
+
+//	turns on print grid
+@if $enable-print-module {
+
+	@media #{$print} {
+		@include set-grid($print-grid-column-prefix, $print-grid-prefix)
+	}
+}
