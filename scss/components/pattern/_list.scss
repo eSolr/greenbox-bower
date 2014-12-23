@@ -32,6 +32,7 @@ ul {
 	}
 }
 
+
 //	no format
 .list-noformat {
 	list-style-type: none !important;
@@ -47,6 +48,12 @@ ul {
 		@include inline-block;
 		margin-right: -4px;
 	}
+}
+
+
+//	horizontal list ——as inline-box—— -4px margin fix if
+.list-inline-fix > * {
+	margin-right: -4px;
 }
 
 //	the old way

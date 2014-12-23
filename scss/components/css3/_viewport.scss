@@ -1,0 +1,23 @@
+//
+//	CSS viewport settings
+//
+
+//	Reserach
+//	--------
+//	http://blog.teamtreehouse.com/thinking-ahead-css-device-adaptation-with-viewport
+//	https://dev.opera.com/blog/andreas-rwd-presentations/
+
+//	Viewport settings:
+//	------------------
+//	width: auto|device-width;
+//	zoom: 1|N;						equivalent to initial-scale
+//	min-zoom: 1|N;					equivalent to minimum-scale
+//	max-zoom: 1|N;					equivalent to maximum-scale
+//	user-zoom: fixed;				equivalent to user-scalable
+
+
+@mixin viewport() {
+	@-ms-viewport	{ @content; }
+	@-o-viewport	{ @content; }
+	@viewport		{ @content; }
+}

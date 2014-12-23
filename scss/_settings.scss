@@ -18,6 +18,7 @@ $ie7:						false;			// ie7 compatibility mode for rem unit and inline-block
 //	Enable/disable modules, features
 
 $enable-grid-module: 		true;			// true|false
+$enable-locking-grid:		false;			// true|false
 $enable-print-module:		true;			// true|false
 $enable-typography-module: 	true;			// true|false
 $enable-icon-module: 		true;			// true|false
@@ -75,9 +76,6 @@ $selected-bg-color:			$color-1;
 
 //	----------------------------------------
 //	Grid module
-
-$enable-locking-grid:		false;			// turns on "locking grid" mode
-$enable-grid-deprecated:	false;			// compatibility mode with the old grid system
 
 //	Grid settings
 $grid-columns:				12;				// number of columns			default: 12
