@@ -1,0 +1,19 @@
+//@mixin input-placeholder {
+//	font-family: $placeholder-text-font;
+//	color: $placeholder-text-color;
+//}
+//
+//::-webkit-input-placeholder	{ @include input-placeholder; }
+//:-moz-placeholder 			{ @include input-placeholder; }
+//::-moz-placeholder 			{ @include input-placeholder; }		// FF 19+
+//:-ms-input-placeholder 		{ @include input-placeholder; }
+//.placeholder 				{ @include input-placeholder; }		//Class added via JS shim for IE7-9
+
+
+@mixin placeholder($selector: "") {
+	#{$selector}::-webkit-input-placeholder	{ @content; }
+	#{$selector}:-moz-placeholder 			{ @content; }
+	#{$selector}::-moz-placeholder 			{ @content; }		// FF 19+
+	#{$selector}:-ms-input-placeholder 		{ @content; }
+	#{$selector}.placeholder 				{ @content; }		//Class added via JS shim for IE7-9
+}

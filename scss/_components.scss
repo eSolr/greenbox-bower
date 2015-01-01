@@ -13,6 +13,9 @@
 @import "components/function/rem";
 @import "components/function/remove-unit";
 
+// mixins
+@import "components/mixins/placeholder";
+
 // utility
 @import "components/utility/float";
 @import "components/utility/font-moothing";
