@@ -26,19 +26,19 @@ $display-type:				"only screen";
 //	Closed for smaller, opened for larger screens
 $screen:					quote($display-type) !global;
 $xsmall:					quote($display-type) !global;
-$small:						quote($display-type) + " and (min-width:"#{$mq-small}")" !global;
-$medium:					quote($display-type) + " and (min-width:"#{$mq-medium}")" !global;
-$large:						quote($display-type) + " and (min-width:"#{$mq-large}")" !global;
-$xlarge:					quote($display-type) + " and (min-width:"#{$mq-xlarge}")" !global;
-$retina:					quote($display-type) + " and (min-width:"#{$mq-retina}")" !global;
+$small:						quote($display-type) + " and (min-width: #{$mq-small})" !global;
+$medium:					quote($display-type) + " and (min-width: #{$mq-medium})" !global;
+$large:						quote($display-type) + " and (min-width: #{$mq-large})" !global;
+$xlarge:					quote($display-type) + " and (min-width: #{$mq-xlarge})" !global;
+$retina:					quote($display-type) + " and (min-width: #{$mq-retina})" !global;
 
 //	Reversed sizing from desktop to mobile
 //	This is only for handling exceptions
-$xsmall-max:				"(max-width:"#{$mq-small - 1}")" !global;
-$small-max:					"(max-width:"#{$mq-medium - 1}")" !global;
-$medium-max:				"(max-width:"#{$mq-large - 1}")" !global;
-$large-max:					"(max-width:"#{$mq-xlarge - 1}")" !global;
-$xlarge-max:				"(max-width:"#{$mq-retina - 1}")" !global;
+$xsmall-max:				"(max-width: #{$mq-small - 1})" !global;
+$small-max:					"(max-width: #{$mq-medium - 1})" !global;
+$medium-max:				"(max-width: #{$mq-large - 1})" !global;
+$large-max:					"(max-width: #{$mq-xlarge - 1})" !global;
+$xlarge-max:				"(max-width: #{$mq-retina - 1})" !global;
 
 
 //  Orientation specific media queries
