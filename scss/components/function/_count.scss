@@ -20,9 +20,34 @@
 // $arg-count-is_type    [def: false][true][type] ha típusra keresünk, akkor ez true|"type"
 
 
+//@function count($arg-count-list, $arg-count-value, $arg-count-is_type: false) {
+//  $arg-count-counter: ();
+//  @if -and(-or($arg-count-is_type, $arg-count-is_type == "type"), -not(length($arg-count-list) == 0)) {
+//    @for $i from 1 through length($arg-count-list) {
+//      @if type-of(nth($arg-count-list, $i)) == $arg-count-value {
+//        $arg-count-counter: append($arg-count-counter, $i);
+//      }
+//    }
+//  }
+//  @else {
+//    @for $i from 1 through length($arg-count-list) {
+//      @if nth($arg-count-list, $i) == $arg-count-value {
+//        $arg-count-counter: append($arg-count-counter, $i);
+//      }
+//    }
+//  }
+//  //  Visszatérő érték
+//  @if length($arg-count-counter) != 0 {
+//    @return $arg-count-counter;
+//  }
+//  @else {
+//    @return false;
+//  }
+//}
+
 @function count($arg-count-list, $arg-count-value, $arg-count-is_type: false) {
   $arg-count-counter: ();
-  @if -and(-or($arg-count-is_type, $arg-count-is_type == "type"), -not(length($arg-count-list) == 0)) {
+  @if ($arg-count-is_type or $arg-count-is_type == "type") and not length($arg-count-list) == 0 {
     @for $i from 1 through length($arg-count-list) {
       @if type-of(nth($arg-count-list, $i)) == $arg-count-value {
         $arg-count-counter: append($arg-count-counter, $i);

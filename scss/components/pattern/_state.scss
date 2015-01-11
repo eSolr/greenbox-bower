@@ -168,6 +168,7 @@ $black:	black !default !global;
 //	generated shades of bgcolors in 5% steps
 @include generate-bg-shades(".bg", $bg-color);
 @include generate-bg-shades(".bgw", $white);
+@include generate-bg-shades(".bgb", $black);
 @include generate-bg-shades(".bg-text", $text-color);
 
 //	font color
@@ -180,6 +181,7 @@ $black:	black !default !global;
 //	generated shades of bgcolors in 5% steps
 @include generate-color-shades(".color-bg", $bg-color);
 @include generate-color-shades(".color-bgw", $white);
+@include generate-color-shades(".color-bgb", $black);
 @include generate-color-shades(".color-text", $text-color);
 
 //	border width
@@ -210,6 +212,7 @@ $black:	black !default !global;
 //	generated shades of bgcolors in 5% steps
 @include generate-border-shades(".border-bg", $bg-color);
 @include generate-border-shades(".border-bgw", $white);
+@include generate-border-shades(".border-bgb", $black);
 @include generate-border-shades(".border-text", $text-color);
 
 

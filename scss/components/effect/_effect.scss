@@ -30,7 +30,7 @@ $enable-effect-module:		true !default;
 	.duration-600 { @include transition-duration(600ms); }
 	.duration-700 { @include transition-duration(700ms); }
 	.duration-800 { @include transition-duration(800ms); }
-	.duration-900 { @include transition-duration(90ms); }
+	.duration-900 { @include transition-duration(900ms); }
 	.duration-1000 { @include transition-duration(1000ms); }
 	.duration-1500 { @include transition-duration(1500ms); }
 	.duration-2000 { @include transition-duration(2000ms); }
@@ -45,7 +45,7 @@ $enable-effect-module:		true !default;
 	.delay-600 { @include transition-delay(600ms); }
 	.delay-700 { @include transition-delay(700ms); }
 	.delay-800 { @include transition-delay(800ms); }
-	.delay-900 { @include transition-delay(90ms); }
+	.delay-900 { @include transition-delay(900ms); }
 	.delay-1000 { @include transition-delay(1000ms); }
 	.delay-1500 { @include transition-delay(1500ms); }
 	.delay-2000 { @include transition-delay(2000ms); }
