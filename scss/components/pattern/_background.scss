@@ -60,3 +60,17 @@
 	@extend .bg-align;
 	background-position: left top;
 }
+
+
+//	Background size
+.bg-size-contain {
+	background-size: contain;
+}
+
+.bg-size-cover {
+	background-size: cover;
+}
+
+.bg-size-auto {
+	background-size: auto;
+}
