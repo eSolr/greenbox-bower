@@ -246,6 +246,38 @@ html.touch {
 .show-blind-inline-block { display: none; }
 
 
+//	Print visibility
+@media screen {
+
+	.hide-screen {
+		display: none;
+	}
+
+	.show-print-block,
+	.show-print-inline,
+	.show-print-inline-block {
+		display: none;
+	}
+}
+
+@media print {
+
+	.hide-print {
+		display: none !important;
+	}
+
+	.show-print-block {
+		display: block;
+	}
+
+	.show-print-inline {
+		display: inline;
+	}
+
+	.show-print-inline-block {
+		display: inline-block;
+	}
+}
 
 
 //

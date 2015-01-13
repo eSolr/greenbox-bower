@@ -7273,6 +7273,88 @@ var esNameday = {
 			}
 		}
 	};
+} (jQuery));;
+//
+//	Selectet formázható wrappel veszi körbe
+//
+
+//	OnChange-re frissíti a wrap szövegmezőjét
+
+(function ( $ ) {
+
+	$.fn.select = function ( options ) {
+
+		defaultOptions = {
+			selector: {
+				default: ".select"
+			},
+			css: {
+				container: "select-container",
+				selectText: "select-text",
+				selectSymbol: "select-symbol",
+				selectIcon: "select-icon"
+			},
+			style: {
+				select: {
+					"width": "100%",
+					"opacity": 0,
+					"-moz-opacity": 0,
+					"filter": "unquote('alpha(opacity=0)')"
+				}
+			},
+			copyCSS: true,		// true|false – másolja a select classait a containerre kivéve a .select-et
+			removeCSS: false,	// true|false – törli a classokat a forrásselectről
+			copyID: true,		// true|false - ha true, akkor a prefixszel kiegészítve átemeli a select ID-jét
+			removeID: false,	// true|false - ha true, akkor törlis a forrásselect ID-ját
+			IDPrefix: "sc-",	// [string] – ID másoláskor ez lesz a container ID prefix, hogy ne akadjon a selecttel
+			autoFormat: true	// true|false - ha be van kapcsolva, akkor a plugn rejti el az eredeti selectet
+		};
+
+		var o = $.extend(true, {}, defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector.default);
+
+		return wrap.each(function () {
+			var sel = $(this),
+				selContainer = $("<div/>").addClass(o.css.container),
+				selText = $("<span/>").addClass(o.css.selectText),
+				selIcon = $("<span/>").addClass(o.css.selectIcon),
+				selSymbol = $("<span/>").addClass(o.css.selectSymbol);
+
+			sel.wrap(selContainer).before(selText).before(selSymbol);
+			selText.text(sel.children(":selected").text());
+
+			// forrás select elrejtése
+			if (o.autoFormat) {
+				sel.css(o.style.select)
+			}
+
+			// ha a class másolás bekapcsolva
+			if (o.copyCSS) {
+				sel.parent().addClass(sel.attr("class").replace("select", ""));
+			}
+
+			// ha class törlés be van állítva, a forrás selectről töröl minden classt
+			if (o.removeCSS) {
+				sel.removeClass();
+			}
+
+			// ha az ID másolás bekapcsolva
+			if (o.copyID && sel.attr("id")) {
+				sel.parent().attr("id", o.IDPrefix + sel.attr("id"));
+			}
+
+			// ha id törlés be van állítva, a forrás selectről törli az id-t
+			if (o.removeID) {
+				sel.removeAttr("id");
+			}
+
+			// onChange-re frissíti a text tartalmát
+			sel.on("change", function (e) {
+				selText.text(sel.children(":selected").text());
+			});
+		});
+	}
+
 } (jQuery));;//
 //	Select Go To based on its value if value attribute exists
 //	todo target
