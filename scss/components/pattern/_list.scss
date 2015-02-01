@@ -50,9 +50,15 @@ ul {
 	}
 }
 
+//	new list inline without whitespace compensation
+.inline-list {
+	@extend .list;
+
+	> * { @include inline-block; }
+}
 
 //	horizontal list ——as inline-box—— -4px margin fix if
-.list-inline-fix > * {
+.inline-list-fix > * {
 	margin-right: -4px;
 }
 
