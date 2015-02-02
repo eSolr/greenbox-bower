@@ -2978,7 +2978,9 @@ var es = {
 			URLRegExp: [
 				[/'/g,"%27"],
 				[/,/g,"%2C"],
-				[/ /g,"%20"]
+				[/ /g,"%20"],
+				[/\(/g,"%28"],
+				[/\)/g,"%29"]
 			]
 		};
 
@@ -3053,14 +3055,14 @@ var es = {
 //			Ha nem img tagről van szó, átemeli háttérképnek
 			} else {
 				_img.css({
-					"background-image": "url(" + secureURL(imgURLs[ currentStatus ]) + ")"
+					"background-image": "url('" + secureURL(imgURLs[ currentStatus ]) + "')"
 				});
 			}
 
 //			Ha a hívó attribútum értéke "bg" vagy "BG", akkor átemeli a szülő elembe háttérképként
 			if (parentBG && isImg) {
 				_img.css(o.hiddenClass).parent().css({
-					"background-image": "url(" + secureURL(imgURLs[ currentStatus ]) + ")"
+					"background-image": "url('" + secureURL(imgURLs[ currentStatus ]) + "')"
 				});
 			}
 
