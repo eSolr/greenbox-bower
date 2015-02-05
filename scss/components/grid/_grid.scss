@@ -320,14 +320,14 @@ $mq-last-prefix:			"last" !default;
 
 	// Handles nested rows for both normal and fluid rows
 	.row, .row-fluid {
-		@include row(false, $grid-gutter, $grid-direction);
+		@include row("false", $grid-gutter, $grid-direction);
 		float: none;
 
 		* html & { overflow-x: hidden; }
 
-		.row, .row-fluid { @include row(nested, $grid-gutter, $grid-direction); }
+		.row, .row-fluid { @include row("nested", $grid-gutter, $grid-direction); }
 
-		> .row, .row-fluid { @include row(false, $grid-gutter, $grid-direction); }
+		> .row, .row-fluid { @include row("false", $grid-gutter, $grid-direction); }
 	}
 
 	// Set max-width for normal row (row-fluid remains flexible)
