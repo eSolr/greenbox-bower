@@ -54,12 +54,19 @@ ul {
 .inline-list {
 	@extend .list;
 
-	> * { @include inline-block; }
+	& > * { @include inline-block; }
 }
 
 //	horizontal list ——as inline-box—— -4px margin fix if
-.inline-list-fix > * {
-	margin-right: -4px;
+.inline-list-fix {
+
+	& > * {
+		margin-right: -4px;
+	}
+
+	& > *:last-child {
+		margin-right: 0;
+	}
 }
 
 //	the old way
