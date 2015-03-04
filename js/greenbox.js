@@ -7130,6 +7130,101 @@ var esNameday = {
 } (jQuery));
 ;
 //
+//	Beágyazott (iframe, object stb.) elemek responsive méretfeloldása
+//
+
+/*
+	A probléma
+	Responsive iframe beágyazás csak úgy működik, ha az iframe szélességét és magasságát 100%-ra állítjuk
+	és az iframe-et egy alakítható méretű keretbe helyezzük, mely relative pozíciójú, 100% széles és
+	a magasságát padding-bottommal %-an vagy abszolút értékben meg tudjuk határozni.
+	Ennek hátránya, hogy az iframe magassága összeesik.
+
+	A megoldás
+	A plugin megnézi, hogy az iframe megadott méretei milyen arányúak és a magasságát annak megfelelően
+	állítja be %-os vagy abszolút értékkel.
+
+	A működés
+	1) Azonosítja az iframe-et (vagy objektumot, amit megadunk wrapperként),
+	2) iframe-nek beállítja a css objektumot (szélesség, magasság 100%-ra stb.)
+	3) becsomagolja az iframe-et egy containerbe, ami meghatározza majd a magasság arányát
+*/
+
+
+(function ( $ ) {
+
+	$.fn.responsiveEmbed = function ( options ) {
+
+		defaultOptions = {
+			selector: {
+				default: "iframe"
+			},
+			defaultHeight: "500px",				// ha nincs megadva magasság, ez lesz beállítva
+			html: {
+				iframeContainer: "<div/>"
+			},
+			css: {
+				iframeContainer: {				// konténer alapstílus
+					position: "relative",
+					width: "100%",
+					height: "0",
+					overflow: "hidden"
+				},
+				iframe: {						// iframe alapstílus
+					position: "absolute",
+					top: 0,
+					left: 0,
+					width: "100%",
+					height: "100%"
+				}
+			},
+			event: {
+				beforeInit: function () {},
+				afterInit: function () {}
+			}
+		};
+
+		var o = $.extend(true, {}, defaultOptions, options),
+			wrap = this[0] ? $(this) : $(o.selector.default);
+
+		return wrap.each(function () {
+
+			o.i = {																					// belső változók
+				iframe: $(this),
+				iframeContainer: $(o.html.iframeContainer).css(o.css.iframeContainer),
+				rawWidth: undefined,																// eredetileg megadott szélesség változója
+				rawHeight: undefined,																// eredetileg megadott magasság változója
+				width: "100%",
+				height: o.defaultHeight
+			};
+
+			o.i.rawWidth = o.i.iframe.attr("width");
+			o.i.rawHeight = o.i.iframe.attr("height");
+
+			o.event.beforeInit(o);																	// eseményfüggvényt triggel előtte
+
+			// _ * px || _ * %
+			if (o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("px") > 0 || o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("%") > 0) {
+				o.i.height = o.i.rawHeight;															// magasságnak beállítja az értéket
+			}
+			// px * px
+			if (o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("px") > 0 && o.i.rawWidth !== undefined && o.i.rawWidth.indexOf("px") > 0) {									// px * px
+				o.i.height = (Number(o.i.rawHeight.replace("px","")) / Number(o.i.rawWidth.replace("px","")) * 100) + "%";	// magasságnak a magasság szélességhez viszonyított %-os értékét állítja be
+			}
+			// % * %
+			if (o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("%") > 0 && o.i.rawWidth !== undefined && o.i.rawWidth.indexOf("%") > 0) {									// % * %
+				o.i.height = (Number(o.i.rawHeight.replace("%","")) / Number(o.i.rawWidth.replace("%","")) * 100) + "%";	// magasságnak a magasság szélességhez viszonyított %-os értékét állítja be
+			}
+
+			o.i.iframe.css(o.css.iframe).wrap(o.i.iframeContainer.css("padding-bottom", o.i.height));						// iframe responsive megjelenés és becsomagolás
+
+			o.event.afterInit(o);																	// eseményfüggvényt triggel utána
+		});
+	};
+
+} (jQuery));
+;
+//
 //	Scroller
 //
 
