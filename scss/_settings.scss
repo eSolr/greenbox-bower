@@ -18,20 +18,20 @@ $ie7:						false;			// ie7 compatibility mode for rem unit and inline-block
 //	Enable/disable modules, features
 
 $enable-grid-module: 		true;			// true|false
-$enable-locking-grid:		false;			// true|false
+$enable-locking-grid:		true;			// true|false
 $enable-print-module:		true;			// true|false
 $enable-typography-module: 	true;			// true|false
 $enable-icon-module: 		true;			// true|false
 $enable-form-module: 		true;			// true|false
 $enable-blueprint-module: 	true;			// true|false
 $enable-effect-module:		true;			// true|false
-$enable-admin-module:		true;			// true|false
 $enable-responsive-img:		true;			// true|false
-$enable-autocomplete-module:true;			// true|false
-$enable-datepicker-module:	true;			// true|false
+$enable-autocomplete-module:false;			// true|false
+$enable-datepicker-module:	false;			// true|false
 $enable-encoded-img:		true;			// true|false
-$enable-modal-module:		true;			// true|false
-$enable-modal-gallery:		true;			// true|false
+$enable-modal-module:		false;			// true|false
+$enable-modal-gallery:		false;			// true|false
+$enable-admin-module:		false;			// true|false
 
 
 //	----------------------------------------
