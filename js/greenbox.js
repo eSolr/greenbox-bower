@@ -7206,7 +7206,7 @@ var esNameday = {
 		};
 
 		var o = $.extend(true, {}, defaultOptions, options),
-			wrap = this[0] ? $(this) : $(o.selector.default);
+			wrap = this.selector == "" ? $(o.selector.default) : $(this);
 
 		return wrap.each(function () {
 
