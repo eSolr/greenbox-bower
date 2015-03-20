@@ -695,14 +695,15 @@
 	};
 
 } (jQuery));
-;if (typeof console == 'undefined') {
-	var console = {};
-	console.log = function() {return;};
-	console.debug = function() {return;};
-	console.info = function() {return;};
-	console.warn = function() {return;};
-	console.exception = function() {return;};
-};;/*
+;//if (typeof console == 'undefined') {
+//	var console = {};
+//	console.log = function() {return;};
+//	console.debug = function() {return;};
+//	console.info = function() {return;};
+//	console.warn = function() {return;};
+//	console.exception = function() {return;};
+//};
+;/*
  Makes an input datePicker
 
  Általános leírás
@@ -1246,7 +1247,7 @@
 	<div data-ajax-source="http://source-of-the-content"></div>
 */
 
-(function(){
+(function( $ ){
 
 	$.fn.esAjaxSource = function( options ) {
 
@@ -1298,8 +1299,7 @@
 //		$.fn.esAjaxSource();
 //	});
 
-})(jQuery);
-
+} (jQuery));
 ;/*
 	@desc		Ajax linking into html selector
 	@tested
@@ -1317,7 +1317,7 @@
 	<a href="http://target-link" data-ajax-target=".any-selector">Load content with ajax</a>
 */
 
-(function(){
+(function( $ ){
 
 	$.fn.esAjaxTarget = function( options ) {
 
@@ -1355,7 +1355,7 @@
 //		$.fn.esAjaxTarget();
 //	});
 
-})(jQuery);;/*
+} (jQuery));;/*
 	Character counter
 
 	A source —input or textarea— and a target where the value appears needs to be added,
@@ -1399,35 +1399,37 @@
 */
 
 
-//	aktuális dátum kiírása
-var esDate = {
+(function () {
+	//	aktuális dátum kiírása
+	var esDate = {
 
-	dateFormat:	"hu",
+		dateFormat:	"hu",
 
-	getDate: function() {
+		getDate: function() {
 
-		var month_hu = new Array(
-			["január", "jan"],
-			["február", "feb"],
-			["március", "már"],
-			["április", "ápr"],
-			["május", "máj"],
-			["június", "jún"],
-			["július", "júl"],
-			["augusztus", "aug"],
-			["szeptember", "szep"],
-			["október", "okt"],
-			["november", "nov"],
-			["december", "dec"]
-		);
+			var month_hu = new Array(
+				["január", "jan"],
+				["február", "feb"],
+				["március", "már"],
+				["április", "ápr"],
+				["május", "máj"],
+				["június", "jún"],
+				["július", "júl"],
+				["augusztus", "aug"],
+				["szeptember", "szep"],
+				["október", "okt"],
+				["november", "nov"],
+				["december", "dec"]
+			);
 
-		var year = new Date().getFullYear();
-		var month = new Date().getMonth();
-		var day = new Date().getDate();
+			var year = new Date().getFullYear();
+			var month = new Date().getMonth();
+			var day = new Date().getDate();
 
-		return year + ". " + month_hu[month][0] + " " + day + ".";
-	}
-};;/*	Example
+			return year + ". " + month_hu[month][0] + " " + day + ".";
+		}
+	};
+} ());;/*	Example
 */
 
 //	todo lekezelni, ha túlfutottunk a dátumon: 0-t írni
@@ -1461,7 +1463,7 @@ var esDate = {
 //
 
 
-(function(){
+(function( $ ){
 
 	$.fn.esDesignMode = function( options ) {
 
@@ -1512,11 +1514,13 @@ var esDate = {
 			}
 		});
 	};
-})(jQuery);;//@version:		2.0
-//@release notes:
+} (jQuery));
+;
+// version:		2.0
+// release notes:
 //				• javítva a json export bug, ami nem exportálta ki az area vagy fn tartalmát ha egy data-es-portlet elemük volt
 //				• json exporternél megadható nem exportálandó attribútom (pl.: style)
-//@requirements:
+// requirements:
 //
 // Az alábbi elemekből áll:
 //
@@ -1799,7 +1803,7 @@ var esDate = {
 		// This function is called at all drop events and
 		// it contains the logic 								todo	kiszervezni egy tömbbe, hogy paraméterezhető maradjon
 		function dndAdd(source, target) {
-			console.log("dndAdd");
+			//console.log("dndAdd");
 
 			//	If source or target NOT exists > stop
 			if (!source || !target ) { return false; }
@@ -2270,7 +2274,7 @@ var esDate = {
 			});
 		});
 	};
-}) (jQuery);;/*	Example
+} (jQuery));;/*	Example
 
  */
 
@@ -2408,7 +2412,7 @@ var esDate = {
 
 //	$.fn.esSelectBtn();
 
-}) (jQuery);;/*
+} (jQuery));;/*
 	desc		Select Direction
 	ajax
 	tested
@@ -2531,29 +2535,17 @@ var esDate = {
 //		$.fn.esSelectDir();
 //	});
 
-}) (jQuery);;
+} (jQuery));;
 //
 //	Research
 //	http://www.w3schools.com/tags/ref_urlencode.asp
-//	http://www.w3schools.com/jsref/jsref_encodeuricomponent.asp
+//	http://www.w3schools.com/jsref/jsref_encodeuricomponent.asp;//desc		Image crop
+//ajaxload	tested
+//autoload	yes
 
-var es = {
-
-	function: {}
-};;/*
-	desc		Image crop
-	ajaxload	tested
-	autoload	yes
-*/
-
-
-/*
-	A plugin csak img tageken fut végig, azokon is csak a dom_wrap-ben szereplő attribútumúakon.
-
-	Example
-
-
-*/
+//A plugin csak img tageken fut végig, azokon is csak a dom_wrap-ben szereplő attribútumúakon.
+//
+//Example
 
 
 (function ( $ ) {
@@ -3223,7 +3215,7 @@ var es = {
 //	$(document).ready(function(){
 //		$.fn.esSetWindowsHeight();
 //	});
-}) (jQuery);;/*
+} (jQuery));;/*
 	Show Items on scroll
 
 	Ha elér a scroll addig a pontig, hogy egy elem megjelenik, akkor adott elemhez hozzárendel egy class-t,
@@ -4358,7 +4350,7 @@ var es = {
 			});
 		});
 	};
-}) (jQuery);;/*	Example
+} (jQuery));;/*	Example
 
 	<a href="#" class="js-switch" data-switch-target=".mobile">Toggle mobile menu</a>
 	...
@@ -4657,7 +4649,7 @@ var es = {
 //		$.fn.esValignMiddle();
 //	});
 
-}) (jQuery);;/*
+} (jQuery));;/*
 	Video loader
 
 	A videó tartalmaknál ki lehet választani, hogy mi történjen:
@@ -4722,7 +4714,7 @@ var es = {
 			}, delay || defaultDelay);
 		});
 	}
-}(jQuery));;//
+} (jQuery));;//
 //	Set a "manual" scrollend event which is triggered after window scroll event ends with 250ms default delay.
 //	As a parameter the delay value can me modified.
 //
@@ -4792,7 +4784,7 @@ var es = {
 			setScroll();
 		});
 	}
-}(jQuery));;
+} (jQuery));;
 //
 //	todo megadni, hogy mihez képes állítsa be magát
 //
@@ -5137,7 +5129,7 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 
 //		Zoom kezelése
 		function zooming(n) {
-			console.log(n);
+			//console.log(n);
 			/*if (o.zoom) {
 				var s = $(this),
 					zoomStatus = false;
@@ -6316,7 +6308,7 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 	done	kapcsolhatóvá tenni, hogy a visible állapottal járó classokat scrollOut-ra levegye-e, azaz ne csak egy, hanem kétirányú legyen a folyamat
 */
 
-(function($){
+(function ( $ ) {
 
 	$.fn.isVisible = function ( options ) {
 
@@ -6400,7 +6392,7 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 		return !!clientSize && ((compareBottom <= viewBottom) && (compareTop >= viewTop));
 	};*/
 
-})(jQuery);;
+} (jQuery));;
 //
 //	Makes an item linkable with the value of the attribute
 //
@@ -6616,7 +6608,6 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 			setModalWidth();
 
 			if (fnToggle == "hide") {
-				console.log("hájd");
 				hideModal();
 			}
 
