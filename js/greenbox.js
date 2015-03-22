@@ -2387,8 +2387,7 @@
 				}
 			}
 
-			//select.hide().after(_container);					// select elrejtve, új container létrehozva
-			select.after(container);
+			select.hide().after(container);					// select elrejtve, új container létrehozva
 			options.each(function() {							// az option elemein végiglépve létrehozza a container elemeit
 
 				var optionIdx = $(this).index();
