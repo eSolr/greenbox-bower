@@ -2307,16 +2307,14 @@
 	@tested		Safari, Chrome, Fireforx, Opera, IE
 
 	todo		meg kellene jelölni a legenerált scelectet is, hogy multiple-e vagy sem
-	todo		select change() változást azonnal kezelje le!
 	todo		az üres text értékű option-t hagyja ki > van helyette reset
 	todo		az üres value értékű option-t hagyja ki > van helyette reset
 	done		elsütni a change eseményt ha megváltozik a select
 	todo		megoldani, hogy a class-nál megadott formázásokat vegye át a generált, vagy egy data-class… be lehessen betenni a classokat
-	todo		ajax postolást beletenni – Roodieval beszélni
+	todo		ajax postolást beletenni
 	todo		lekezelni ha menet közben hízik a select
 	todo		kezelni: <option disabled>
 	todo		kezelni: <optgroup>, <optgroup disabled>
-	todo		a reset az alapállapotot állítsa vissza, ne pedig töröljön mindent
 */
 
 /*
@@ -2368,16 +2366,34 @@
 
 		return wrap.each( function () {
 
-			var select = $(this);
+			var select = $(this),
+				options = select.children(),
+				multiselect = select.prop("multiple"),
+				container = $(o.groupHTML).addClass(o.groupClass);
 
 			o.reset = select.is("[data-multiple-reset]");		// ha szeretnénk reset (törlés) gombot is
 
-			// eredeti select elrejtve, és container létrehozva, majd a select elemein egyesével végigmegy
-			select.hide().after(o.groupHTML).next().addClass(o.groupClass).end().children().each(function() {
+			// átvezeti a select beállításait a containerbe
+			function syncContainer () {
+				var buttons = container.children(),
+					diff = o.hideFirst ? 1 : 0;								// különbség options és buttons elemszámában attól függően, hogy az első rejtett-e
+
+				buttons.removeClass(o.selector.selectedClass);			// leszedi a selected class-t az összes gombról
+
+				for (var i = 0; i <= buttons.length; i++) {					// és visszaállítja a selected-nek megfelelően
+					if (options.eq(i + diff).prop("selected")) {
+						buttons.eq(i).addClass(o.selector.selectedClass);
+					}
+				}
+			}
+
+			//select.hide().after(_container);					// select elrejtve, új container létrehozva
+			select.after(container);
+			options.each(function() {							// az option elemein végiglépve létrehozza a container elemeit
 
 				var optionIdx = $(this).index();
 
-				select.next()
+				container
 					.append(o.buttonHTML).children().eq(optionIdx).text(this.text)
 					.addClass(function(){
 						if (select.children().eq(optionIdx).attr("selected")) {
@@ -2388,31 +2404,34 @@
 					})
 					.on("click.esolr.selectbtn", function(e){
 						e.preventDefault();
+						var btn = $(this),
+							btnIndex = o.hideFirst ? btn.index() + 1: btn.index();		// ha az első elem rejtett, a container elemeinek index-ét eggyel növelni kell, hogy szinkronban maradjon a selecttel
+
 						if (select.prop("multiple")) {
-							$(this).toggleClass(o.selectedClass);
-							if ($(this).parent().prev().children().eq($(this).index()).prop("selected")) {
-								$(this).parent().prev().children().eq($(this).index()).removeAttr("selected").change();
+							if (options.eq(btnIndex).prop("selected")) {
+								options.eq(btnIndex).prop("selected", false).change();
 							} else {
-								$(this).parent().prev().children().eq($(this).index()).prop("selected", true).change();
+								options.eq(btnIndex).prop("selected", true).change();
 							}
 						} else {
-							$(this).siblings().removeClass(o.selectedClass).end().addClass(o.selectedClass)
-								.parent().prev().children().removeAttr("selected").eq($(this).index()).prop("selected", true).change();
+							options.eq(btnIndex).prop("selected", true).change();
 						}
 					});
 			});
 
 			// ha az első rejtve kell maradjon
-			if (o.hideFirst) { select.next().children().first().hide(); }
+			if (o.hideFirst) { select.next().children().first().remove(); }
 
-			if (select.prop("multiple") && o.reset) {
-				select.next().append(o.buttonHTML).children().last().text(o.resetHTML).addClass(o.buttonClass).addClass(o.resetClass)
+			if (multiselect && o.reset) {
+				container.append(o.buttonHTML).children().last().text(o.resetHTML).addClass(o.buttonClass).addClass(o.resetClass)
 					.on("click.esolr.selectbtn", function(e){
 						e.preventDefault();
-						$(this).siblings().removeClass(o.selectedClass).parent().prev().children().removeAttr("selected");
-						select.change();
+						options.prop("selected", false).change();
 					});
 			}
+
+			// ha a select maga változott, akkor átvezeti a select beállításait a containerbe
+			select.change(function() { syncContainer(); });
 		});
 	};
 } (jQuery));;/*
