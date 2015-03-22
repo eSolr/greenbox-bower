@@ -2403,9 +2403,7 @@
 			});
 
 			// ha az első rejtve kell maradjon
-			if (o.hideFirst) {
-					console.log(o.hideFirst, select.next().children().first().hide());
-				}
+			if (o.hideFirst) { select.next().children().first().hide(); }
 
 			if (select.prop("multiple") && o.reset) {
 				select.next().append(o.buttonHTML).children().last().text(o.resetHTML).addClass(o.buttonClass).addClass(o.resetClass)
