@@ -2348,6 +2348,7 @@
 			selectedClass:	"selected",			//
 			reset:			undefined,
 			copyClass:		true,
+			hideFirst:		false,				// true|false – true esetén a létrehozott btn elemek közül elrejti az elsőt
 			selector: {
 				default:		".select-btn",
 				groupClass:		"select-btn-group",
@@ -2368,8 +2369,10 @@
 		return wrap.each( function () {
 
 			var select = $(this);
+
 			o.reset = select.is("[data-multiple-reset]");		// ha szeretnénk reset (törlés) gombot is
 
+			// eredeti select elrejtve, és container létrehozva, majd a select elemein egyesével végigmegy
 			select.hide().after(o.groupHTML).next().addClass(o.groupClass).end().children().each(function() {
 
 				var optionIdx = $(this).index();
@@ -2399,6 +2402,11 @@
 					});
 			});
 
+			// ha az első rejtve kell maradjon
+			if (o.hideFirst) {
+					console.log(o.hideFirst, select.next().children().first().hide());
+				}
+
 			if (select.prop("multiple") && o.reset) {
 				select.next().append(o.buttonHTML).children().last().text(o.resetHTML).addClass(o.buttonClass).addClass(o.resetClass)
 					.on("click.esolr.selectbtn", function(e){
@@ -2409,9 +2417,6 @@
 			}
 		});
 	};
-
-//	$.fn.esSelectBtn();
-
 } (jQuery));;/*
 	desc		Select Direction
 	ajax
