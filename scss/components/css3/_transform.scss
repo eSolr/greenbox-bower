@@ -1,8 +1,6 @@
-//	@desc		CSS3 Transforms
-//	@name
-//	@author		Armin
-//	@tested
-//	@requires	_prefix.scss
+//	Requires	_prefix.scss
+
+//	Research	http://desandro.github.io/3dtransforms/docs/perspective.html
 
 
 //	Transformations:
@@ -36,4 +34,8 @@
 
 @mixin transform-origin($args...) {
 	@include prefix("transform-origin", $args, webkit moz ms);
+}
+
+@mixin perspective($args...) {
+	@include prefix("perspective", $args, webkit moz o ms);
 }
