@@ -30,7 +30,7 @@ $google-font-url: "http://fonts.googleapis.com/css?family=" !default;
 	$import-url: $import-url + ":" + unquote($google-font-styles);
 	$import-url: $import-url + "&subset=" + unquote($google-font-subsets);
 
-	@import url(unquote($import-url));
+//	@import url(unquote($import-url));
 
 	.#{concat-list($google-font-name, "-")} {
 		font-family: #{$google-font-name};

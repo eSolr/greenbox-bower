@@ -26,6 +26,7 @@
 //	skew(x-angle,y-angle)	Defines a 2D skew transformation along the X- and the Y-axis
 //	skewX(angle)			Defines a 2D skew transformation along the X-axis
 //	skewY(angle)			Defines a 2D skew transformation along the Y-axis
+//	transform-origin
 //	perspective(n)			Defines a perspective view for a 3D transformed element
 
 @mixin transform($args...) {
@@ -36,6 +37,7 @@
 	@include prefix("transform-origin", $args, webkit moz ms);
 }
 
+//	Perspective-nek minden esetben a befogadó konténernek kell lenni, azaz a transform ezen BELÜL kell történjen
 @mixin perspective($args...) {
 	@include prefix("perspective", $args, webkit moz o ms);
 }
