@@ -395,3 +395,16 @@ $mq-last-prefix:			"last" !default;
 		@include set-grid($mq-column-prefix, $mq-retina-prefix)
 	}
 }
+
+
+//	Independent states
+body.grid--locking .row {
+	width: 100%;
+	max-width: $grid-max-width;		// set maximum width
+
+//	@media #{$small} { width: $mq-small; }
+	@media #{$medium} { width: $mq-medium; }
+	@media #{$large} { width: $mq-large; }
+	@media #{$xlarge} { width: $mq-xlarge; }
+	@media #{$retina} { width: $mq-retina; }
+}
