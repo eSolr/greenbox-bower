@@ -7240,10 +7240,10 @@ var esNameday = {
 			o.i.rawWidth = o.i.iframe.attr("width");
 			o.i.rawHeight = o.i.iframe.attr("height");
 
-			if (o.i.rawWidth.indexOf("px") <= 0 && o.i.rawWidth.indexOf("%") <= 0) {				// ha nincs megadva mértékegység, hozzáadja a "px"-t a szélességhez
+			if (o.i.rawWidth !== undefined && o.i.rawWidth.indexOf("px") <= 0 && o.i.rawWidth.indexOf("%") <= 0) {				// ha nincs megadva mértékegység, hozzáadja a "px"-t a szélességhez
 				o.i.rawWidth += "px";
 			}
-			if (o.i.rawHeight.indexOf("px") <= 0 && o.i.rawHeight.indexOf("%") <= 0) {				// ha nincs megadva mértékegység, hozzáadja a "px"-t a magassághoz
+			if (o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("px") <= 0 && o.i.rawHeight.indexOf("%") <= 0) {				// ha nincs megadva mértékegység, hozzáadja a "px"-t a magassághoz
 				o.i.rawHeight += "px";
 			}
 
