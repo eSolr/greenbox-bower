@@ -6966,6 +6966,7 @@ var esNameday = {
 	done	lekezelni ha a kép hibás
 	todo	többszörös greenbox.preload indításhoz automatikusan külön namespace létrehozás
 	done	kapcsolhatóvá tenni, hogy publikálja a letöltés státuszát
+	todo	multiple backgrunddal hibát dob a többszörös url()[, url()]… miatt
 
 	A byte csak akkor működik ha lokál, xhr-rel leszedhető fileokkal hívjuk a fileokat
 */
@@ -7181,6 +7182,11 @@ var esNameday = {
 	1) Azonosítja az iframe-et (vagy objektumot, amit megadunk wrapperként),
 	2) iframe-nek beállítja a css objektumot (szélesség, magasság 100%-ra stb.)
 	3) becsomagolja az iframe-et egy containerbe, ami meghatározza majd a magasság arányát
+
+	Amire figyelni kell, hogy a mértékegységek az alábbiak lehetnek:
+	* nincs, ami megegyezik azzal, mintha px lenne
+	* px
+	* %
 */
 
 
@@ -7234,7 +7240,19 @@ var esNameday = {
 			o.i.rawWidth = o.i.iframe.attr("width");
 			o.i.rawHeight = o.i.iframe.attr("height");
 
+			if (o.i.rawWidth.indexOf("px") <= 0 && o.i.rawWidth.indexOf("%") <= 0) {				// ha nincs megadva mértékegység, hozzáadja a "px"-t a szélességhez
+				o.i.rawWidth += "px";
+			}
+			if (o.i.rawHeight.indexOf("px") <= 0 && o.i.rawHeight.indexOf("%") <= 0) {				// ha nincs megadva mértékegység, hozzáadja a "px"-t a magassághoz
+				o.i.rawHeight += "px";
+			}
+
 			o.event.beforeInit(o);																	// eseményfüggvényt triggel előtte
+
+			//	Három lehetőség van:
+			//	1) nincs szélesség megadva, de magasság (px vagy %) igen
+			//	2) a szélesség és magasság px-ben van megadva mértékegységgel vagy anélkül
+			//	3) a szélesség és magasság %-ban van megadva
 
 			// _ * px || _ * %
 			if (o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("px") > 0 || o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("%") > 0) {
