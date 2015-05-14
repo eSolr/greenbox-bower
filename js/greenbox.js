@@ -7226,6 +7226,7 @@ var esNameday = {
 				default: "iframe"
 			},
 			defaultHeight: "500px",				// ha nincs megadva magasság, ez lesz beállítva
+			height: undefined,					// ha ez meg van adva, akkor mindent felülír
 			html: {
 				iframeContainer: "<div/>"
 			},
@@ -7293,6 +7294,8 @@ var esNameday = {
 			if (o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("%") > 0 && o.i.rawWidth !== undefined && o.i.rawWidth.indexOf("%") > 0) {									// % * %
 				o.i.height = (Number(o.i.rawHeight.replace("%","")) / Number(o.i.rawWidth.replace("%","")) * 100) + "%";	// magasságnak a magasság szélességhez viszonyított %-os értékét állítja be
 			}
+			// ha van megadva kikényszerített magasság „height”, akkor mindenképp az lesz;
+			if (o.height) o.i.height = o.height;
 
 			o.i.iframe.css(o.css.iframe).wrap(o.i.iframeContainer.css("padding-bottom", o.i.height));						// iframe responsive megjelenés és becsomagolás
 
