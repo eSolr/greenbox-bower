@@ -2,11 +2,6 @@
 //  Visibility based on media-query pattern
 //
 
-
-//  todo	gyengénlátó kapcsolókat betenni
-//
-
-
 //	Show up and range mixin
 @mixin visibility-show-min($display) {
 
@@ -227,7 +222,7 @@ html.touch {
 .blind {
 	// Show
 	.show-blind-inline { display: inline; }
-	.show-blind-inline-block { display: inlind-block; }
+	.show-blind-inline-block { display: inline-block; }
 	.show-blind, .show-blind-block { display: block; }
 	// Hide
 	.hide-blind { display: none; }

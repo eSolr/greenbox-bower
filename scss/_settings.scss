@@ -21,14 +21,14 @@ $enable-grid-module: 		true;			// true|false
 $enable-locking-grid:		true;			// true|false
 $enable-print-module:		true;			// true|false
 $enable-typography-module: 	true;			// true|false
-$enable-icon-module: 		true;			// true|false
-$enable-form-module: 		true;			// true|false
-$enable-blueprint-module: 	true;			// true|false
-$enable-effect-module:		true;			// true|false
+$enable-icon-module: 		false;			// true|false
+$enable-form-module: 		false;			// true|false
+$enable-blueprint-module: 	false;			// true|false
+$enable-effect-module:		false;			// true|false
 $enable-responsive-img:		true;			// true|false
 $enable-autocomplete-module:false;			// true|false
 $enable-datepicker-module:	false;			// true|false
-$enable-encoded-img:		true;			// true|false
+$enable-encoded-img:		false;			// true|false
 $enable-modal-module:		false;			// true|false
 $enable-modal-gallery:		false;			// true|false
 $enable-admin-module:		false;			// true|false
@@ -109,7 +109,7 @@ $arial:						Arial, Helvetica, sans-serif;
 $georgia:					Georgia, Times, "Times New Roman", serif;
 $times:						Times, "Times New Roman", Georgia, serif;
 $monospace:					Courier, "Courier New", Monaco, monospace;
-$sourcecode:				"Source Code Pro", #{$monospace};
+$sourcecode:				("Source Code Pro", #{$monospace});
 
 //	Dedicated font family states
 $base-sans-family:			$helvetica-neue;	// .sans

@@ -10,19 +10,18 @@
 
 
 @function opposite($args) {
-
 	$opposite-directions: ();
 
-	@if type_of($args) == string {
-		@if quote($args) == "left" 			{@return right;}
-		@else if quote($args) == "right"	{@return left;}
-		@else if quote($args) == "top"		{@return bottom;}
-		@else if quote($args) == "bottom"	{@return top;}
-
-	} @else if type_of($args) == list {
+	@if type_of($args) == list {
 		@each $v in $args {
 			$opposite-directions: append($opposite-directions, opposite($v));
 		}
 		@return $opposite-directions;
 	}
+
+	@if type_of($args) == string and quote($args) == "right" { @return "left"; }
+	@if type_of($args) == string and quote($args) == "top" { @return "bottom"; }
+	@if type_of($args) == string and quote($args) == "bottom" { @return "top"; }
+
+	@return "right";		// if there isn't "direct" @return value in the function, than libsass stops with error
 }

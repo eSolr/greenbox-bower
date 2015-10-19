@@ -5434,7 +5434,6 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 
 		// galéria inicializálása
 		function initGallery(galleryItems) {
-			if (o.log) console.log("1. lépés – initGallery(); 			// galéria inicializálása");
 			var modal = $(o.html.modal),
 				modalV = $(o.html.modalVertical),
 				modalHeader = modal.find("." + o.css.modalHeader),
@@ -5461,12 +5460,6 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 				direction = true,							// false|back|forward – lapozás itánya (false cssak indulásnál)
 				$w = $(window),
 				body = $("body");
-
-
-			//	Ha csak egy kép van, akkor a default effektet állítja vissza, akármivel is hívtuk meg
-			//if (galleryItems.length == 1) {
-			//	o.transition.effect = "dissolve";
-			//}
 
 			/*function xhrRequest (url) {
 				var xhr = new XMLHttpRequest();
@@ -5542,11 +5535,9 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 
 			//képek betöltése
 			function loadImages(c) {
-				if (o.log) console.log("3. lépés – loadImages();			// egy kép betöltése elindítva");
 				if (c == undefined) { c = 0 }					// ha nem volt megadva kezdőérték, akkor nullával indít
 				var img = new Image(), imgWidth, imgHeight;
 				img.onload = function() {
-					if (o.log) console.log("3/a. img.onload						// kép betöltve");
 					loadedImages++;
 					setNavigation();
 
@@ -5594,10 +5585,8 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 							});
 					}
 
-					// ha az indítókép + a vele látható stack-ek betöltődtek, akkor megjelenítjük és eltüntetjük a preloadert
-					// VAGY ha a galéria egyelemű és az be is töltődött
-					// VAGY ha betöltőtt minden képet, de a elemek száma kevesebb vagy kisebb, mint a stack mérete
-					if (current + o.stack == c || (galleryItems.length == 1 && current == c) || (galleryItems.length -1 == c && c <= o.stack)) {
+					//ha az indítókép + a vele látható stack-ek betöltődtek, akkor megjelenítjük és eltüntetjük a preloadert
+					if (current + o.stack == c) {
 						showCurrent(current);
 						preloader.fadeOut(o.fade);
 					}
@@ -5673,15 +5662,10 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 
 			// galéria alapelemeinek legenerálása
 			function generateGallery() {
-				if (o.log) console.log("2. lépés – generateGallery();		// galéria alapelemek legenerálása");
 				eventEndScroll(modalBodyV);									// scrollend esemény hozzárendelése a vertikális nézethez
 				modal.prepend(preloader);									// preloader elhelyezése
 				body.append(modal.attr("id", galleryItems.attr("rel")));	// modal elhelyezése, rel id-ként
-				if (galleryItems.length > 1) {
-					modalFooter.append(prev, next, close);					// minden navigációs elem elhelyezése ha több mint egy kép van
-				} else {
-					modalFooter.append(close);								// clode gomb elhelyezése ha csak egy kép van
-				}
+				modalFooter.append(prev, next, close);						// navigációs elemek elhelyezése
 				if (o.download) { modalFooter.append(download); }			// download gomb elhelyezése
 				if (o.zoom) {
 					modalFooter.append(zoom);								// zoom gomb elhelyezése
@@ -5713,8 +5697,8 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 					});
 				}
 
-				// effect class hozzáadása a modalhoz ÉS több mint egy kép van
-				if (o.transition.effect == "fold" && galleryItems.length > 1) {
+				// effect class hozzáadása a modalhoz
+				if (o.transition.effect == "fold") {
 					modal.addClass(o.css.effectFold);
 				}
 
@@ -5791,11 +5775,8 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 				if (o.keyboard) {
 					$w.off("keydown.gallery").on("keydown.gallery", function (e) {
 						if (e.keyCode == 27) { removeModal(); }						// esc
-						// ha van értelme lapozni, azaz egy képnél több van, akkor kapnak eseménykezelőt a billentyűk
-						if (galleryItems.length > 1) {
-							if ([37].indexOf(e.keyCode) >= 0) { showPrev(); }	// bal, fel, pgup – 37, 38, 33
-							if ([39].indexOf(e.keyCode) >= 0) { showNext(); }	// jobb, le, pgdown – 39, 40, 34
-						}
+						if ([37].indexOf(e.keyCode) >= 0) { showPrev(); }	// bal, fel, pgup – 37, 38, 33
+						if ([39].indexOf(e.keyCode) >= 0) { showNext(); }	// jobb, le, pgdown – 39, 40, 34
 						//if ([36].indexOf(e.keyCode) >= 0) { showFirst(); }			// home
 						//if ([35].indexOf(e.keyCode) >= 0) { showLast(); }			// end
 					});
@@ -5860,8 +5841,8 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 					stackHeight =  imgStack.height(),
 					stackRatio = imgStack.width() / stackHeight;
 
-				// fold effect esetén ÉS ha több mint egy kép van
-				if (o.transition.effect == "fold" && o.stack == 2 && galleryItems.length > 1) {
+				// fold effect esetén
+				if (o.transition.effect == "fold" && o.stack == 2) {
 
 					// képaránynak megfelelő súlyozás
 					if (imgRatio > (imgGroup.width() / 2) / imgGroup.height()) {	// ha a kép fekvőbb a kerethez képest
@@ -5912,29 +5893,25 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 
 			// aktív thumbnaileket bescrollozza a képernyőre
 			function scrollThumbs() {
-				// ha a galériának több mint egy képe van
-				if (galleryItems.length > 1) {
-					var thumbs = thumbGroup.find(".current"),
-						stackLeft = thumbs.eq(0).offset().left,
-						stackRight = parseInt(thumbs.last().offset().left + thumbs.last().innerWidth()),
-						winWidth = $w.width();
+				var thumbs = thumbGroup.find(".current"),
+					stackLeft = thumbs.eq(0).offset().left,
+					stackRight = parseInt(thumbs.last().offset().left + thumbs.last().innerWidth()),
+					winWidth = $w.width();
 
-					if (winWidth < stackRight) {								// ha jobbra túlcsordul
-						thumbGroup.children().eq(0).css({
-							"margin-left": "-=" + (stackRight - winWidth + 15)
-						});
-					}
-					if (stackLeft < 0) {										// ha balra túlcsordul
-						thumbGroup.children().eq(0).css({
-							"margin-left": "-=" + (stackLeft - 15)
-						});
-					}
+				if (winWidth < stackRight) {								// ha jobbra túlcsordul
+					thumbGroup.children().eq(0).css({
+						"margin-left": "-=" + (stackRight - winWidth + 15)
+					});
+				}
+				if (stackLeft < 0) {										// ha balra túlcsordul
+					thumbGroup.children().eq(0).css({
+						"margin-left": "-=" + (stackLeft - 15)
+					});
 				}
 			}
 
 			// kirajzolja az aktuáls eleme(ke)t a stack-ek számának megfelelően figyelembevéve a cover állapotát is
 			function showCurrent(c) {
-				if (o.log) console.log("4. lépés – showCurrent();			// kép megjelenítése")
 				if (c == undefined) { current = 0 }						// ha paaméter nélkül hívtam meg
 				//if (c < 0) { current = galleryItems.length - 1; }		// ha túl alacsony, a végére „csordul”
 				if (c < 0) { current = (galleryItems.length - cover) % o.stack == 0 ? galleryItems.length - o.stack : galleryItems.length - 1 - (((galleryItems.length - cover) % o.stack) - 1); }		// ha túl alacsony, a végére „csordul”
@@ -5947,8 +5924,8 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 				if (o.transition.effect == "push") {
 					//	todo > Ez még várat magára
 
-				//	effect:fold – csak akkor működik ha a stack mérete: 2 ÉS a kép száma nagyobb, mint egy
-				} else if (o.transition.effect == "fold" && o.stack == 2 && galleryItems.length > 1) {
+				//	effect:fold – csak akkor működik ha a stack mérete: 2
+				} else if (o.transition.effect == "fold" && o.stack == 2) {
 					var prevLeft, prevRight, currentLeft, currentRight;
 
 					// ha jobbra lapozok
@@ -6235,12 +6212,9 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 			e.preventDefault();
 			// ha van rel paramétere, ami nem üres és az azonosított képlinkek közül nem ez az egyetlen példány
 			if (image.is("[rel]") && image.attr("rel") !== "" && wrap.filter("[rel='" + image.attr("rel") + "']").length > 1) {
-				if (o.log) console.log("0. lépés 							// indítás több képpel");
 				initGallery(wrap.filter("[rel='" + image.attr("rel") + "']"));
 				//console.log(image.is("[rel]") && image.attr("rel") !== "", image.attr("rel"), wrap.filter("[rel='" + image.attr("rel") + "']").length);
 			} else {
-				if (o.log) console.log("0. lépés							// indítás egy képpel");
-				initGallery(wrap.filter("[rel='" + image.attr("rel") + "']"));
 				//console.log("egy képet jelenít meg");
 			}
 		});
@@ -6335,8 +6309,7 @@ http://stackoverflow.com/questions/1310378/determining-image-file-size-dimension
 			open:			function() {},		// megjelenítés után végrehajtandó utasítások
 			beforedismiss:	function() {},		// bezárás előtt végrehajtandó utasítások
 			dismiss:		function() {}		// bezárás után végrehajtandó utasítások
-		},
-		log: false
+		}
 	};
 
 } (jQuery));
@@ -7209,11 +7182,6 @@ var esNameday = {
 	1) Azonosítja az iframe-et (vagy objektumot, amit megadunk wrapperként),
 	2) iframe-nek beállítja a css objektumot (szélesség, magasság 100%-ra stb.)
 	3) becsomagolja az iframe-et egy containerbe, ami meghatározza majd a magasság arányát
-
-	Amire figyelni kell, hogy a mértékegységek az alábbiak lehetnek:
-	* nincs, ami megegyezik azzal, mintha px lenne
-	* px
-	* %
 */
 
 
@@ -7226,7 +7194,6 @@ var esNameday = {
 				default: "iframe"
 			},
 			defaultHeight: "500px",				// ha nincs megadva magasság, ez lesz beállítva
-			height: undefined,					// ha ez meg van adva, akkor mindent felülír
 			html: {
 				iframeContainer: "<div/>"
 			},
@@ -7268,19 +7235,7 @@ var esNameday = {
 			o.i.rawWidth = o.i.iframe.attr("width");
 			o.i.rawHeight = o.i.iframe.attr("height");
 
-			if (o.i.rawWidth !== undefined && o.i.rawWidth.indexOf("px") <= 0 && o.i.rawWidth.indexOf("%") <= 0) {				// ha nincs megadva mértékegység, hozzáadja a "px"-t a szélességhez
-				o.i.rawWidth += "px";
-			}
-			if (o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("px") <= 0 && o.i.rawHeight.indexOf("%") <= 0) {				// ha nincs megadva mértékegység, hozzáadja a "px"-t a magassághoz
-				o.i.rawHeight += "px";
-			}
-
 			o.event.beforeInit(o);																	// eseményfüggvényt triggel előtte
-
-			//	Három lehetőség van:
-			//	1) nincs szélesség megadva, de magasság (px vagy %) igen
-			//	2) a szélesség és magasság px-ben van megadva mértékegységgel vagy anélkül
-			//	3) a szélesség és magasság %-ban van megadva
 
 			// _ * px || _ * %
 			if (o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("px") > 0 || o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("%") > 0) {
@@ -7294,8 +7249,6 @@ var esNameday = {
 			if (o.i.rawHeight !== undefined && o.i.rawHeight.indexOf("%") > 0 && o.i.rawWidth !== undefined && o.i.rawWidth.indexOf("%") > 0) {									// % * %
 				o.i.height = (Number(o.i.rawHeight.replace("%","")) / Number(o.i.rawWidth.replace("%","")) * 100) + "%";	// magasságnak a magasság szélességhez viszonyított %-os értékét állítja be
 			}
-			// ha van megadva kikényszerített magasság „height”, akkor mindenképp az lesz;
-			if (o.height) o.i.height = o.height;
 
 			o.i.iframe.css(o.css.iframe).wrap(o.i.iframeContainer.css("padding-bottom", o.i.height));						// iframe responsive megjelenés és becsomagolás
 
